@@ -1,0 +1,24 @@
+{
+  "name": "nemv8",
+  "version": "1.0.0",
+  "description": "not node",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-generator": "^4.16.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yimin83/nemv8.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yimin83/nemv8/issues"
+  },
+  "homepage": "https://github.com/yimin83/nemv8#readme"
+}
