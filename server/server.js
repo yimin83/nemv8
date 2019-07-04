@@ -13,6 +13,6 @@ var server = net.createServer(function(socket){
 server.on('error', function(err){
   console.log('err', err);
 })
-server.listen(8000, function() {
-  console.log('listening on 8000...');
+server.listen(10004, function() {
+  console.log('listening on 10004...');
 })

@@ -834,13 +834,13 @@ export default {
           if (this.rooms[i].beReserved == false) { break }
           this.roomInfo.beReserved = this.rooms[i].beReserved
           this.roomInfo.peopleCnt = this.rooms[i].peopleCnt
-          if (this.rooms[i].startDate.trim() != "")
+          if (this.rooms[i].startDate != null && this.rooms[i].startDate.trim() != "")
             this.startDate = new Date(this.rooms[i].startDate).toISOString().substr(0, 10)
-          if (this.rooms[i].endDate.trim() != "")
+          if (this.rooms[i].endDate != null && this.rooms[i].endDate.trim() != "")
             this.endDate = new Date(this.rooms[i].endDate).toISOString().substr(0, 10)
-          if (this.rooms[i].inTime.trim() != "")
+          if (this.rooms[i].inTime != null && this.rooms[i].inTime.trim() != "")
             this.inTime = this.rooms[i].inTime
-          if (this.rooms[i].outTime.trim() != "")
+          if (this.rooms[i].outTime != null && this.rooms[i].outTime.trim() != "")
             this.outTime = this.rooms[i].outTime
           this.roomInfo.subsName = this.rooms[i].subsName
           this.roomInfo.subsTel = this.rooms[i].subsTel
@@ -907,7 +907,7 @@ export default {
         roomNo: roomNo, isBestRoom: this.bestChkbox, isSmart: this.smartChkbox, setTemp: this.roomInfo.setTemp
       })
         .then((r) => {
-          this.$data.rsvRoomModal = false
+          this.$data.settingRoomModal = false
           console.log("okok2")
           this.getRooms()
         })
