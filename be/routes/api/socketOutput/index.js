@@ -103,28 +103,25 @@ net.makeSendMenualHeatingMsg = function (roomNo, heatingMode, setTemp, setContro
 
 
 net.makeSetRoomState = function (roomNo, roomStat){
-  var buffer = new Buffer(3);
-  buffer.writeUInt8(0x01, 0);
-  buffer.writeUInt8(0x02, 1);
-  buffer.writeUInt8(0x03, 2);
+  var buffer = new Buffer(RoomState.size());
+  RoomState.encode(buffer,0, {
+    RoomNo: roomNo,
+    RoomState: roomStat
+  },{endian:"LE"})
   return buffer;
 }
 
-
-net.makeSetRoomConfig = function (){
-  var buffer = new Buffer(3);
-  buffer.writeUInt8(0x01, 0);
-  buffer.writeUInt8(0x02, 1);
-  buffer.writeUInt8(0x03, 2);
+net.makeSetRoomConfig = function (roomNo, setTemp, controlRange, checkInOutEnbale, checkInTime, checkOutTime){
+  var buffer = new Buffer(RoomConfig.size());
+  RoomConfig.encode(buffer,0, {
+    RoomNo: roomNo,
+    SetTemp: setTemp,
+    ControlRange: controlRange,
+    CheckInOutEnbale: checkInOutEnbale,
+    CheckInTime: checkInTime,
+    CheckOutTime: checkOutTime
+  },{endian:"LE"})
   return buffer;
 }
 
-
-net.makeSetSysConfig = function (){
-  var buffer = new Buffer(3);
-  buffer.writeUInt8(0x01, 0);
-  buffer.writeUInt8(0x02, 1);
-  buffer.writeUInt8(0x03, 2);
-  return buffer;
-}
 module.exports = net;

@@ -34,7 +34,8 @@ router.put('/:type', (req, res, next) => { // 수정
       [beReserved, startDate, endDate, inTime, outTime, subsName, subsTel, peopleCnt, roomNo], function (err, rows, fields) {
         if (!err) {
           var client = net.getConnection();
-          net.writeData(client, "room!!!!");
+          // var buffer = net.makeSetRoomConfig(roomNo, 1, );
+          net.writeData(client, buffer);
           console.log('Room net.makeData() : '+ net.makeData());
           res.send({ success: true })
         } else {
@@ -49,6 +50,7 @@ router.put('/:type', (req, res, next) => { // 수정
         if (!err) {
           res.send({ success: true })
           var client = net.getConnection();
+          // var buffer = net.makeSetRoomConfig(roomNo, setTemp, 4);
           net.writeData(client, "temp!!!!");
           console.log('Temp net.makeData() : '+ net.makeData());
         } else {

@@ -11,120 +11,61 @@
           text-xs-center
         >
         <v-item>
-          <v-card>
-            <div v-if="room.roomType == 18">
-              <div v-if="room.beReserved == false">
-                <v-img
-                  :src="image1_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
+          <v-card
+              slot-scope="{ active, toggle }"
+              :color="room.beReserved ? 'primary' : ''"
+              class="d-flex align-center"
+              dark
+              height="200"
+              @click="reserveRoom(room.roomNo);">
+              <v-scroll-y-transition>
+                <div
+                  v-if="room.beReserved"
+                  class="display-3 text-xs-center"
                 >
-                </v-img>
-              </div>
-              <div v-else>
-                <v-img
-                  :src="image1_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                  <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);">
-                    <v-layout fill-height>
-                      <v-flex xs12 align-end flexbox>
-                        <span class="headline">예약완료</span>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-img>
-              </div>
-            </div>
-            <div v-else-if="room.roomType == 30">
-              <div v-if="room.beReserved == false">
-                <v-img
-                  :src="image3_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                </v-img>
-              </div>
-              <div v-else>
-                <v-img
-                  :src="image3_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                  <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);">
-                    <v-layout fill-height>
-                      <v-flex xs12 align-end flexbox>
-                        <span class="headline">예약완료</span>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-img>
-              </div>
-            </div>
-            <div v-else>
-              <div v-if="room.beReserved == false">
-                <v-img
-                  :src="image2_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                </v-img>
-              </div>
-              <div v-else>
-                <v-img
-                  :src="image2_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                  <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);">
-                    <v-layout fill-height>
-                      <v-flex xs12 align-end flexbox>
-                        <span class="headline">예약완료</span>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-img>
-              </div>
-            </div>
-            <v-card-title primary-title>
-              <div style="margin:auto">
-                <center><b>{{room.roomNo}}호</b> ({{room.roomType}}평형) </center>
-              </div>
-            </v-card-title>
-            <v-card-actions>
-              <v-btn fab dark small left color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>event_available</v-icon>
-              </v-btn>
-              <v-btn fab dark small left color="primary" @click="settingRoom(room.roomNo);">
-                <v-icon dark>wb_sunny</v-icon>
-              </v-btn>
-              <!-- <v-spacer></v-spacer>
-              <v-btn icon @click="upDownBestIcon(room.roomNo);">
-                <v-icon>{{ room.beBestTogle ? 'keyboard_arrow_up' : 'keyboard_arrow_down'  }}</v-icon>
-              </v-btn> -->
-            </v-card-actions>
-            <!-- <v-slide-y-transition>
-              <v-card-text v-show="room.beBestTogle">
-                <div v-if="room.beReserved == false">
-                  <span>
-                    예약일 : - <br>
-                    설정온도 : {{room.isSmart ? room.smartTemp:room.setTemp}} <sup>o</sup>C
-                </span>
+                  <div class="headline">예약완료</div>
                 </div>
-                <div v-else style="margin:auto">
-                  <span>
-                    예약일 : {{room.startDate}} ~ {{room.endDate}} <br>
-                    예약인원 : {{room.peopleCnt}} 명 <br>
-                    입실시간 : {{room.inTime}} <br>
-                    퇴실시간 : {{room.outTime}} <br>
-                    접수일 : {{room.resDate}} <br>
-                    설정온도 : {{room.isSmart ? room.smartTemp:room.setTemp}} <sup>o</sup>C <br>
+              </v-scroll-y-transition>
+              <v-card-title primary-title>
+                <div style="margin:auto">
+                  <center><b>{{room.roomNo}}호</b> ({{room.roomType}}평형) </center>
+                </div>
+              </v-card-title>
+              <v-card-actions>
+                <v-btn fab dark small left color="primary"  @click="reserveRoom(room.roomNo);">
+                  <v-icon dark>event_available</v-icon>
+                </v-btn>
+                <v-btn fab dark small left color="primary" @click="settingRoom(room.roomNo);">
+                  <v-icon dark>wb_sunny</v-icon>
+                </v-btn>
+                <!-- <v-spacer></v-spacer>
+                <v-btn icon @click="upDownBestIcon(room.roomNo);">
+                  <v-icon>{{ room.beBestTogle ? 'keyboard_arrow_up' : 'keyboard_arrow_down'  }}</v-icon>
+                </v-btn> -->
+              </v-card-actions>
+              <!-- <v-slide-y-transition>
+                <v-card-text v-show="room.beBestTogle">
+                  <div v-if="room.beReserved == false">
+                    <span>
+                      예약일 : - <br>
+                      설정온도 : {{room.isSmart ? room.smartTemp:room.setTemp}} <sup>o</sup>C
                   </span>
-                </div>
-              </v-card-text>
-            </v-slide-y-transition> -->
-          </v-card>
+                  </div>
+                  <div v-else style="margin:auto">
+                    <span>
+                      예약일 : {{room.startDate}} ~ {{room.endDate}} <br>
+                      예약인원 : {{room.peopleCnt}} 명 <br>
+                      입실시간 : {{room.inTime}} <br>
+                      퇴실시간 : {{room.outTime}} <br>
+                      접수일 : {{room.resDate}} <br>
+                      설정온도 : {{room.isSmart ? room.smartTemp:room.setTemp}} <sup>o</sup>C <br>
+                    </span>
+                  </div>
+                </v-card-text>
+              </v-slide-y-transition> -->
+            </v-card>
+
+
         </v-item>
       </v-flex>
     </v-layout>
@@ -141,83 +82,28 @@
         <v-item>
           <v-card>
             <v-scroll-y-transition>
-            <div v-if="room.roomN0 == 1501">
-              <v-divider class="my-3"></v-divider>
-            </div>
-            <div v-if="room.roomType == 18">
-              <div v-if="room.beReserved == false">
-                <v-img
-                  :src="image1_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                </v-img>
-              </div>
-              <div v-else>
-                <v-img
-                  :src="image1_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                  <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);">
-                    <v-layout fill-height>
-                      <v-flex xs12 align-end flexbox>
-                        <span class="headline">예약완료</span>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-img>
-              </div>
-            </div>
-            <div v-else-if="room.roomType == 30">
-              <div v-if="room.beReserved == false">
-                <v-img
-                  :src="image3_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                </v-img>
-              </div>
-              <div v-else>
-                <v-img
-                  :src="image3_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                  <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);">
-                    <v-layout fill-height>
-                      <v-flex xs12 align-end flexbox>
-                        <span class="headline">예약완료</span>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-img>
-              </div>
+            <div v-if="room.beReserved == false">
+              <v-img
+                :color="primary"
+                height="130px"
+                @click="reserveRoom(room.roomNo);"
+              >
+              </v-img>
             </div>
             <div v-else>
-              <div v-if="room.beReserved == false">
-                <v-img
-                  :src="image2_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                </v-img>
-              </div>
-              <div v-else>
-                <v-img
-                  :src="image2_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                  <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);">
-                    <v-layout fill-height>
-                      <v-flex xs12 align-end flexbox>
-                        <span class="headline">예약완료</span>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-img>
-              </div>
+              <v-img
+                :color="primary"
+                height="130px"
+                @click="reserveRoom(room.roomNo);"
+              >
+                <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);">
+                  <v-layout fill-height>
+                    <v-flex xs12 align-end flexbox>
+                      <span class="headline">예약완료</span>
+                    </v-flex>
+                  </v-layout>
+                </v-container>
+              </v-img>
             </div>
             </v-scroll-y-transition>
             <v-card-title primary-title>
@@ -232,29 +118,7 @@
               <v-btn fab dark small left color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>wb_sunny</v-icon>
               </v-btn>
-              <!-- <v-spacer></v-spacer>
-              <v-btn icon @click="upDownIcon(room.roomNo);">
-                <v-icon>{{ room.beRoomTogle ? 'keyboard_arrow_up' : 'keyboard_arrow_down'  }}</v-icon>
-              </v-btn> -->
             </v-card-actions>
-            <!-- <v-slide-y-transition>
-              <v-card-text v-show="room.beRoomTogle">
-                <div v-if="room.beReserved == false" >
-                  예약일 : - <br>
-                  설정온도 : {{room.isSmart ? room.smartTemp:room.setTemp}} <sup>o</sup>C
-                </div>
-                <div v-else style="margin:auto">
-                  <span>
-                    예약일 : {{room.startDate}} ~ {{room.endDate}} <br>
-                    예약인원 : {{room.peopleCnt}} 명 <br>
-                    입실시간 : {{room.inTime}} <br>
-                    퇴실시간 : {{room.outTime}} <br>
-                    접수일 : {{room.resDate}} <br>
-                    설정온도 : {{room.isSmart ? room.smartTemp:room.setTemp}} <sup>o</sup>C <br>
-                  </span>
-                </div>
-              </v-card-text>
-            </v-slide-y-transition> -->
           </v-card>
         </v-item>
       </v-flex>
@@ -272,83 +136,28 @@
         <v-item>
           <v-card>
             <v-scroll-y-transition>
-            <div v-if="room.roomN0 == 1501">
-              <v-divider class="my-3"></v-divider>
-            </div>
-            <div v-if="room.roomType == 18">
-              <div v-if="room.beReserved == false">
-                <v-img
-                  :src="image1_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                </v-img>
-              </div>
-              <div v-else>
-                <v-img
-                  :src="image1_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                  <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);">
-                    <v-layout fill-height>
-                      <v-flex xs12 align-end flexbox>
-                        <span class="headline">예약완료</span>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-img>
-              </div>
-            </div>
-            <div v-else-if="room.roomType == 30">
-              <div v-if="room.beReserved == false">
-                <v-img
-                  :src="image3_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                </v-img>
-              </div>
-              <div v-else>
-                <v-img
-                  :src="image3_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                  <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);">
-                    <v-layout fill-height>
-                      <v-flex xs12 align-end flexbox>
-                        <span class="headline">예약완료</span>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-img>
-              </div>
+            <div v-if="room.beReserved == false">
+              <v-img
+                :color="primary"
+                height="130px"
+                @click="reserveRoom(room.roomNo);"
+              >
+              </v-img>
             </div>
             <div v-else>
-              <div v-if="room.beReserved == false">
-                <v-img
-                  :src="image2_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                </v-img>
-              </div>
-              <div v-else>
-                <v-img
-                  :src="image2_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                  <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);">
-                    <v-layout fill-height>
-                      <v-flex xs12 align-end flexbox>
-                        <span class="headline">예약완료</span>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-img>
-              </div>
+              <v-img
+                :color="primary"
+                height="130px"
+                @click="reserveRoom(room.roomNo);"
+              >
+                <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);">
+                  <v-layout fill-height>
+                    <v-flex xs12 align-end flexbox>
+                      <span class="headline">예약완료</span>
+                    </v-flex>
+                  </v-layout>
+                </v-container>
+              </v-img>
             </div>
             </v-scroll-y-transition>
             <v-card-title primary-title>
@@ -363,29 +172,7 @@
               <v-btn fab dark small left color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>wb_sunny</v-icon>
               </v-btn>
-              <!-- <v-spacer></v-spacer>
-              <v-btn icon @click="upDownIcon(room.roomNo);">
-                <v-icon>{{ room.beRoomTogle ? 'keyboard_arrow_up' : 'keyboard_arrow_down'  }}</v-icon>
-              </v-btn> -->
             </v-card-actions>
-            <!-- <v-slide-y-transition>
-              <v-card-text v-show="room.beRoomTogle">
-                <div v-if="room.beReserved == false" >
-                  예약일 : - <br>
-                  설정온도 : {{room.isSmart ? room.smartTemp:room.setTemp}} <sup>o</sup>C
-                </div>
-                <div v-else style="margin:auto">
-                  <span>
-                    예약일 : {{room.startDate}} ~ {{room.endDate}} <br>
-                    예약인원 : {{room.peopleCnt}} 명 <br>
-                    입실시간 : {{room.inTime}} <br>
-                    퇴실시간 : {{room.outTime}} <br>
-                    접수일 : {{room.resDate}} <br>
-                    설정온도 : {{room.isSmart ? room.smartTemp:room.setTemp}} <sup>o</sup>C <br>
-                  </span>
-                </div>
-              </v-card-text>
-            </v-slide-y-transition> -->
           </v-card>
         </v-item>
       </v-flex>
@@ -402,83 +189,28 @@
         <v-item>
           <v-card>
             <v-scroll-y-transition>
-            <div v-if="room.roomN0 == 1501">
-              <v-divider class="my-3"></v-divider>
-            </div>
-            <div v-if="room.roomType == 18">
-              <div v-if="room.beReserved == false">
-                <v-img
-                  :src="image1_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                </v-img>
-              </div>
-              <div v-else>
-                <v-img
-                  :src="image1_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                  <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);">
-                    <v-layout fill-height>
-                      <v-flex xs12 align-end flexbox>
-                        <span class="headline">예약완료</span>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-img>
-              </div>
-            </div>
-            <div v-else-if="room.roomType == 30">
-              <div v-if="room.beReserved == false">
-                <v-img
-                  :src="image3_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                </v-img>
-              </div>
-              <div v-else>
-                <v-img
-                  :src="image3_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                  <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);">
-                    <v-layout fill-height>
-                      <v-flex xs12 align-end flexbox>
-                        <span class="headline">예약완료</span>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-img>
-              </div>
+            <div v-if="room.beReserved == false">
+              <v-img
+                :color="primary"
+                height="130px"
+                @click="reserveRoom(room.roomNo);"
+              >
+              </v-img>
             </div>
             <div v-else>
-              <div v-if="room.beReserved == false">
-                <v-img
-                  :src="image2_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                </v-img>
-              </div>
-              <div v-else>
-                <v-img
-                  :src="image2_src"
-                  height="130px"
-                  @click="reserveRoom(room.roomNo);"
-                >
-                  <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);">
-                    <v-layout fill-height>
-                      <v-flex xs12 align-end flexbox>
-                        <span class="headline">예약완료</span>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-img>
-              </div>
+              <v-img
+                :color="primary"
+                height="130px"
+                @click="reserveRoom(room.roomNo);"
+              >
+                <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);">
+                  <v-layout fill-height>
+                    <v-flex xs12 align-end flexbox>
+                      <span class="headline">예약완료</span>
+                    </v-flex>
+                  </v-layout>
+                </v-container>
+              </v-img>
             </div>
             </v-scroll-y-transition>
             <v-card-title primary-title>
@@ -493,29 +225,7 @@
               <v-btn fab dark small left color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>wb_sunny</v-icon>
               </v-btn>
-              <!-- <v-spacer></v-spacer>
-              <v-btn icon @click="upDownIcon(room.roomNo);">
-                <v-icon>{{ room.beRoomTogle ? 'keyboard_arrow_up' : 'keyboard_arrow_down'  }}</v-icon>
-              </v-btn> --> -->
             </v-card-actions>
-            <!-- <v-slide-y-transition>
-              <v-card-text v-show="room.beRoomTogle">
-                <div v-if="room.beReserved == false" >
-                  예약일 : - <br>
-                  설정온도 : {{room.isSmart ? room.smartTemp:room.setTemp}} <sup>o</sup>C
-                </div>
-                <div v-else style="margin:auto">
-                  <span>
-                    예약일 : {{room.startDate}} ~ {{room.endDate}} <br>
-                    예약인원 : {{room.peopleCnt}} 명 <br>
-                    입실시간 : {{room.inTime}} <br>
-                    퇴실시간 : {{room.outTime}} <br>
-                    접수일 : {{room.resDate}} <br>
-                    설정온도 : {{room.isSmart ? room.smartTemp:room.setTemp}} <sup>o</sup>C <br>
-                  </span>
-                </div>
-              </v-card-text>
-            </v-slide-y-transition> -->
           </v-card>
         </v-item>
       </v-flex>
@@ -816,11 +526,24 @@ export default {
         }
       }
     },
+    initRoomInfo: function () {
+      this.roomInfo.roomNo = 101
+      this.roomInfo.roomType = 18
+      this.roomInfo.pos = 'sea'
+      this.roomInfo.setTemp = 0
+      this.roomInfo.beReserved = false
+      this.roomInfo.peopleCnt = 0
+      this.roomInfo.startDate = new Date().toISOString().substr(0, 10)
+      this.roomInfo.endDate = new Date().toISOString().substr(0, 10)
+      this.roomInfo.inTime = ' '
+      this.roomInfo.outTime = ' '
+      this.roomInfo.subsName = ' '
+      this.roomInfo.subsTel = ' '
+      this.bestChkbox = false
+      this.smartChkbox = false
+    },
     reserveRoom: function (roomNo) {
-      this.startDate = new Date().toISOString().substr(0, 10)
-      this.endDate = new Date().toISOString().substr(0, 10)
-      this.inTime = ''
-      this.outTime = ''
+      this.initRoomInfo();
       for (var i = 0; i < this.rooms.length; i++) {
         if (this.rooms[i].roomNo == roomNo) {
           console.log('startData : ' + this.rooms[i].startDate + 'endDate : ' + this.rooms[i].endDate +'resDate : ' + this.rooms[i].resDate)
@@ -850,12 +573,7 @@ export default {
       this.$data.rsvRoomModal = true
     },
     settingRoom: function (roomNo) {
-      this.roomInfo.isSmart = false
-      this.roomInfo.isBestRoom = false
-      this.roomInfo.smartTemp = 0
-      this.roomInfo.setTemp = 0
-      this.bestChkbox = false
-      this.smartChkbox = false
+      this.initRoomInfo();
       for (var i = 0; i < this.rooms.length; i++) {
         if (this.rooms[i].roomNo == roomNo) {
           this.roomInfo.roomNo = this.rooms[i].roomNo
@@ -869,17 +587,16 @@ export default {
       this.$data.settingRoomModal = true
     },
     saveReserveRoom: function (roomNo) {
-      alert("this.roomInfo.inTime : "+ this.roomInfo.inTime + "")
+      alert('this.roomInfo.inTime : '+ this.roomInfo.inTime)
       this.type = 'room'
       axios.put(`http://localhost:3000/api/rooms/${this.type}`, {
         roomNo: roomNo, beReserved: true, startDate: this.startDate , endDate: this.endDate , inTime: this.inTime , outTime: this.outTime , subsName: this.roomInfo.subsName, subsTel: this.roomInfo.subsTel, peopleCnt: this.roomInfo.peopleCnt
       })
         .then((r) => {
           this.$data.rsvRoomModal = false
-        //  this.pop('객실 상태 변경')
-          console.log("okok3")
+          // this.pop('객실 상태 변경')
+          console.log('okok3')
           this.getRooms()
-
         })
         .catch((e) => {
         //  this.pop(e.message)
@@ -893,9 +610,8 @@ export default {
       })
         .then((r) => {
           this.$data.rsvRoomModal = false
-          console.log("okok")
+          console.log('okok')
           this.getRooms()
-
         })
         .catch((e) => {
           console.log(e.message)
@@ -908,7 +624,7 @@ export default {
       })
         .then((r) => {
           this.$data.settingRoomModal = false
-          console.log("okok2")
+          console.log('okok2')
           this.getRooms()
         })
         .catch((e) => {
