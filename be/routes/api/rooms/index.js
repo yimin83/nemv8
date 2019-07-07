@@ -12,7 +12,7 @@ router.get('/', function(req, res, next) {
     }
     else{
       res.json(result);
-      // console.log(result)
+      console.log(result)
     }
   });
 });
@@ -29,12 +29,14 @@ router.put('/:type', (req, res, next) => { // 수정
   const type = req.params.type
   if(type == "room"){
     console.log(req.body)
-    const { roomNo, beReserved, startDate, endDate, inTime, outTime, subsName, subsTel, peopleCnt }  = req.body
-    mysqlDB.query('update rooms set beReserved=?, startDate=?, endDate=?, inTime=?, outTime=?, subsName=?, subsTel=?, peopleCnt=? where roomNo=?',
-      [beReserved, startDate, endDate, inTime, outTime, subsName, subsTel, peopleCnt, roomNo], function (err, rows, fields) {
+    const { roomNo, beReserved, startDate, endDate, checkInTime, checkOutTime, subsName, subsTel, peopleCnt }  = req.body
+    mysqlDB.query('update rooms set beReserved=?, startDate=?, endDate=?, checkInTime=?, checkOutTime=?, subsName=?, subsTel=?, peopleCnt=? where roomNo=?',
+      [beReserved, startDate, endDate, checkInTime, checkOutTime, subsName, subsTel, peopleCnt, roomNo], function (err, rows, fields) {
         if (!err) {
           var client = net.getConnection();
-          // var buffer = net.makeSetRoomConfig(roomNo, 1, );
+          var buffer = net.makeSetRoomConfig(roomNo, 1, );
+          net.writeData(client, buffer);
+          buffer = net.makeSetRoomState(roomNo, 1);
           net.writeData(client, buffer);
           console.log('Room net.makeData() : '+ net.makeData());
           res.send({ success: true })
@@ -50,8 +52,8 @@ router.put('/:type', (req, res, next) => { // 수정
         if (!err) {
           res.send({ success: true })
           var client = net.getConnection();
-          // var buffer = net.makeSetRoomConfig(roomNo, setTemp, 4);
-          net.writeData(client, "temp!!!!");
+          var buffer = net.makeSetRoomConfig(roomNo, setTemp, 4);
+          net.writeData(client, buffer);
           console.log('Temp net.makeData() : '+ net.makeData());
         } else {
             res.send('error : ' + err);
