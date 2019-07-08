@@ -5,70 +5,35 @@
     <v-layout row wrap justify-center>
       <v-flex
           v-for="room in rooms"
-          v-if="room.roomState == 0"
+          v-if="room.isBestRoom == true"
           :key="room"
           xs10 sm6 md4 lg2 xl2
           text-xs-center
         >
         <v-item>
           <v-card
-              slot-scope="{ active, toggle }"
-              :color="room.roomState == 1 ? 'primary' : ''"
-              class="d-flex align-center"
-              dark
-              height="200"
+              color="purple" class="white--text"
               @click="reserveRoom(room.roomNo);">
-              <v-scroll-y-transition>
-                <div
-                  v-if="room.roomState == 2 "
-                  class="display-3 text-xs-center"
-                >
-                  <div class="headline">예약완료</div>
-                </div>
-              </v-scroll-y-transition>
               <v-card-title primary-title style="margin:auto">
                   <center><b>{{room.roomNo}}호</b> ({{room.roomType}}평형) </center>
               </v-card-title>
               <v-card-actions>
                 <v-btn fab dark small left color="primary"  @click="reserveRoom(room.roomNo);">
-                  <v-icon dark>event_available</v-icon>
+                  <v-icon dark>assignment</v-icon>
+                </v-btn>
+                <v-btn fab dark small left color="primary"  @click="reserveRoom(room.roomNo);">
+                  <v-icon dark>query_builder</v-icon>
                 </v-btn>
                 <v-btn fab dark small left color="primary" @click="settingRoom(room.roomNo);">
-                  <v-icon dark>wb_sunny</v-icon>
+                  <v-icon dark>build</v-icon>
                 </v-btn>
-                <!-- <v-spacer></v-spacer>
-                <v-btn icon @click="upDownBestIcon(room.roomNo);">
-                  <v-icon>{{ room.beBestTogle ? 'keyboard_arrow_up' : 'keyboard_arrow_down'  }}</v-icon>
-                </v-btn> -->
               </v-card-actions>
-              <!-- <v-slide-y-transition>
-                <v-card-text v-show="room.beBestTogle">
-                  <div v-if="room.beReserved == false">
-                    <span>
-                      예약일 : - <br>
-                      설정온도 : {{room.isSmart ? room.smartTemp:room.setTemp}} <sup>o</sup>C
-                  </span>
-                  </div>
-                  <div v-else style="margin:auto">
-                    <span>
-                      예약일 : {{room.startDate}} ~ {{room.endDate}} <br>
-                      예약인원 : {{room.peopleCnt}} 명 <br>
-                      입실시간 : {{room.checkInTime}} <br>
-                      퇴실시간 : {{room.checkOutTime}} <br>
-                      접수일 : {{room.resDate}} <br>
-                      설정온도 : {{room.isSmart ? room.smartTemp:room.setTemp}} <sup>o</sup>C <br>
-                    </span>
-                  </div>
-                </v-card-text>
-              </v-slide-y-transition> -->
             </v-card>
-
-
         </v-item>
       </v-flex>
     </v-layout>
     <v-divider class="my-3"></v-divider>
-    <v-subheader>3층</v-subheader>
+    <v-subheader>2층</v-subheader>
     <v-divider class="my-1"></v-divider>
     <v-layout row wrap>
       <v-flex
@@ -78,22 +43,81 @@
           xs10 sm6 md4 lg2 xl2
         >
         <v-item>
-          <v-card>
-            <v-scroll-y-transition>
-              <v-img
-                :color="primary"
-                height="130px"
-                @click="reserveRoom(room.roomNo);"
-              >
-                <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);" v-if="room.beReserved != false">
-                  <v-layout fill-height>
-                    <v-flex xs12 align-end flexbox>
-                      <span class="headline">예약완료</span>
-                    </v-flex>
-                  </v-layout>
-                </v-container>
-              </v-img>
-            </v-scroll-y-transition>
+          <v-card
+            v-if="room.roomState == 0"
+            color="blue-grey darken-1" class="white--text">
+            <v-card-title primary-title style="margin:auto">
+                <center><b>{{room.roomNo}}호</b> ({{room.roomType}}평형) </center>
+            </v-card-title>
+            <v-card-actions>
+              <v-btn fab dark small left color="primary"  @click="reserveRoom(room.roomNo);">
+                <v-icon dark>assignment</v-icon>
+              </v-btn>
+              <v-btn fab dark small left color="primary"  @click="reserveRoom(room.roomNo);">
+                <v-icon dark>query_builder</v-icon>
+              </v-btn>
+              <v-btn fab dark small left color="primary" @click="settingRoom(room.roomNo);">
+                <v-icon dark>build</v-icon>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+          <v-card
+            v-else-if="room.roomState == 1"
+            color="blue-grey darken-2" class="white--text">
+            <v-card-title primary-title style="margin:auto">
+                <center><b>{{room.roomNo}}호</b> ({{room.roomType}}평형) </center>
+            </v-card-title>
+            <v-card-actions>
+              <v-btn fab dark small left color="primary"  @click="reserveRoom(room.roomNo);">
+                <v-icon dark>assignment</v-icon>
+              </v-btn>
+              <v-btn fab dark small left color="primary"  @click="reserveRoom(room.roomNo);">
+                <v-icon dark>query_builder</v-icon>
+              </v-btn>
+              <v-btn fab dark small left color="primary" @click="settingRoom(room.roomNo);">
+                <v-icon dark>build</v-icon>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+          <v-card
+            v-else-if="room.roomState == 2"
+            color="blue-grey darken-3" class="white--text">
+            <v-card-title primary-title style="margin:auto">
+                <center><b>{{room.roomNo}}호</b> ({{room.roomType}}평형) </center>
+            </v-card-title>
+            <v-card-actions>
+              <v-btn fab dark small left color="primary"  @click="reserveRoom(room.roomNo);">
+                <v-icon dark>assignment</v-icon>
+              </v-btn>
+              <v-btn fab dark small left color="primary"  @click="reserveRoom(room.roomNo);">
+                <v-icon dark>query_builder</v-icon>
+              </v-btn>
+              <v-btn fab dark small left color="primary" @click="settingRoom(room.roomNo);">
+                <v-icon dark>build</v-icon>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+          <v-card
+            v-else-if="room.roomState == 3"
+            color="blue-grey darken-4" class="white--text">
+            <v-card-title primary-title style="margin:auto">
+                <center><b>{{room.roomNo}}호</b> ({{room.roomType}}평형) </center>
+            </v-card-title>
+            <v-card-actions>
+              <v-btn fab dark small left color="primary"  @click="reserveRoom(room.roomNo);">
+                <v-icon dark>assignment</v-icon>
+              </v-btn>
+              <v-btn fab dark small left color="primary"  @click="reserveRoom(room.roomNo);">
+                <v-icon dark>query_builder</v-icon>
+              </v-btn>
+              <v-btn fab dark small left color="primary" @click="settingRoom(room.roomNo);">
+                <v-icon dark>build</v-icon>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+          <v-card
+            v-else
+            color="blue-grey darken-5" class="white--text">
             <v-card-title primary-title style="margin:auto">
                 <center><b>{{room.roomNo}}호</b> ({{room.roomType}}평형) </center>
             </v-card-title>
@@ -127,13 +151,6 @@
                 height="130px"
                 @click="reserveRoom(room.roomNo);"
               >
-                <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);" v-if="room.beReserved != false">
-                  <v-layout fill-height>
-                    <v-flex xs12 align-end flexbox>
-                      <span class="headline">예약완료</span>
-                    </v-flex>
-                  </v-layout>
-                </v-container>
               </v-img>
             </v-scroll-y-transition>
             <v-card-title primary-title style="margin:auto">
@@ -169,13 +186,6 @@
                 height="130px"
                 @click="reserveRoom(room.roomNo);"
               >
-                <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);" v-if="room.beReserved != false">
-                  <v-layout fill-height>
-                    <v-flex xs12 align-end flexbox>
-                      <span class="headline">예약완료</span>
-                    </v-flex>
-                  </v-layout>
-                </v-container>
               </v-img>
             </v-scroll-y-transition>
             <v-card-title primary-title style="margin:auto">
@@ -210,13 +220,6 @@
                 height="130px"
                 @click="reserveRoom(room.roomNo);"
               >
-                <v-container fill-height fluid style="background-color: rgba(255, 255, 255, 0.7);" v-if="room.beReserved != false">
-                  <v-layout fill-height>
-                    <v-flex xs12 align-end flexbox>
-                      <span class="headline">예약완료</span>
-                    </v-flex>
-                  </v-layout>
-                </v-container>
               </v-img>
             </v-scroll-y-transition>
             <v-card-title primary-title style="margin:auto">
@@ -320,7 +323,7 @@
               <v-flex xs6>
                 <v-switch
                  v-model="checkInOutEnbale"
-                 :label="`${checkInOutEnbale?'기본체크인아웃시간':'수동체크인아웃시간'}`"
+                 :label="`${checkInOutEnbale?'수동체크인아웃시간':'기본체크인아웃시간'}`"
                  @change="toggleCheckInOutEnbale()"
                 ></v-switch>
               </v-flex>
@@ -330,7 +333,7 @@
                   v-model="inMenu"
                   :close-on-content-click="false"
                   :nudge-right="40"
-                  :return-value.sync="checkInTime"
+                  :return-value.sync="strCheckInTime"
                   lazy
                   transition="scale-transition"
                   offset-y
@@ -340,7 +343,7 @@
                 >
                   <template v-slot:activator="{ on }">
                     <v-text-field
-                      v-model="checkInTime"
+                      v-model="strCheckInTime"
                       label="체크인"
                       prepend-icon="access_time"
                       readonly
@@ -349,10 +352,10 @@
                   </template>
                   <v-time-picker
                     v-if="inMenu"
-                    v-model="checkInTime"
+                    v-model="strCheckInTime"
                     format="24hr"
                     full-width
-                    @click:minute="$refs.menu1.save(checkInTime)"
+                    @click:minute="$refs.menu1.save(strCheckInTime)"
                   ></v-time-picker>
                 </v-menu>
               </v-flex>
@@ -362,7 +365,7 @@
                   v-model="outMenu"
                   :close-on-content-click="false"
                   :nudge-right="40"
-                  :return-value.sync="checkOutTime"
+                  :return-value.sync="strCheckOutTime"
                   lazy
                   transition="scale-transition"
                   offset-y
@@ -372,7 +375,7 @@
                 >
                   <template v-slot:activator="{ on }">
                     <v-text-field
-                      v-model="checkOutTime"
+                      v-model="strCheckOutTime"
                       label="체크아웃"
                       prepend-icon="access_time"
                       readonly
@@ -381,10 +384,10 @@
                   </template>
                   <v-time-picker
                     v-if="outMenu"
-                    v-model="checkOutTime"
+                    v-model="strCheckOutTime"
                     format="24hr"
                     full-width
-                    @click:minute="$refs.menu2.save(checkOutTime)"
+                    @click:minute="$refs.menu2.save(strCheckOutTime)"
                   ></v-time-picker>
                 </v-menu>
               </v-flex>
@@ -413,6 +416,12 @@
         <v-card-text>
           <v-container fluid grid-list-xl>
             <v-layout row wrap>
+              <v-flex xs6>
+                <v-checkbox
+                  v-model="bestChkbox"
+                  :label="`베스트룸`"
+                ></v-checkbox>
+              </v-flex>
               <v-flex xs6>
                 <v-text-field
                   label="설정온도"
@@ -451,7 +460,7 @@
                   persistent-hint
                   required
                   readonly
-                  v-model="roomInfo.controlRange"
+                  v-model="roomInfo.heatingTimeSec"
                 ></v-text-field>
               </v-flex>
             </v-layout>
@@ -489,8 +498,9 @@ export default {
       image2_src: require('./images/25pyeong.jpg'),
       image3_src: require('./images/30pyeong.jpg'),
       curTemp: 'username',
-      roomTitle: '예약 정보',
-      settingTitle: '설정',
+      roomTitle: '객실 예약',
+      scheduleTitle: '객실 스케쥴',
+      settingTitle: '객실 설정',
       rooms: [],
       roomInfo: {
         roomNo: 101,
@@ -511,7 +521,7 @@ export default {
         startDate: ' ',
         endDate: ' '
       },
-      heatingModes : [
+      heatingModes: [
         { text: '자동' },
         { text: '수동' }
       ],
@@ -520,13 +530,13 @@ export default {
       endDate: new Date().toISOString().substr(0, 10),
       startMenu1: false,
       endMenu2: false,
-      checkInTime: null,
+      strCheckInTime: null,
       inMenu: false,
-      checkOutTime: null,
+      strCheckOutTime: null,
       outMenu: false,
-      checkInOutEnbale:false,
+      strCheckInOutEnbale: false,
       type: 'room',
-      heatingMode:'자동'
+      heatingMode: '자동'
     }
   },
   methods: {
@@ -563,8 +573,8 @@ export default {
       this.roomInfo.heatingTimeSec = 0
       this.roomInfo.roomState = 0
       this.roomInfo.checkInOutEnbale = false
-      this.roomInfo.checkInTime = ' '
-      this.roomInfo.checkOutTime = ' '
+      this.roomInfo.checkInTime = '14:00'
+      this.roomInfo.checkOutTime = '12:00'
       this.roomInfo.startDate = new Date().toISOString().substr(0, 10)
       this.roomInfo.endDate = new Date().toISOString().substr(0, 10)
       this.roomInfo.roomType = 18
@@ -575,30 +585,46 @@ export default {
       this.roomInfo.peopleCnt = 0
       this.checkInOutEnbale = 0
       this.heatingMode = '자동'
-      this.toggleHeatingMode();
+      this.strCheckInTime = '14:00'
+      this.strCheckOutTime = '12:00'
+      this.bestChkbox = false
+      this.toggleHeatingMode()
     },
     getRoomInfo: function (roomNo) {
       for (var i = 0; i < this.rooms.length; i++) {
         if (this.rooms[i].roomNo == roomNo) {
           this.roomInfo.roomNo = this.rooms[i].roomNo
           this.roomInfo.heatingMode = this.rooms[i].heatingMode
-          this.heatingMode = (this.roomInfo.heatingMode==0?'자동':'수동')
+          this.heatingMode = (this.roomInfo.heatingMode == 0 ? '자동' : '수동')
           this.roomInfo.setTemp = this.rooms[i].setTemp
           this.roomInfo.controlRange = this.rooms[i].controlRange
           this.roomInfo.heatingTimeSec = this.rooms[i].heatingTimeSec
           this.roomInfo.roomState = this.rooms[i].roomState
           this.roomInfo.checkInOutEnbale = this.rooms[i].checkInOutEnbale
           this.checkInOutEnbale = this.rooms[i].checkInOutEnbale
-          this.roomInfo.checkInTime = this.rooms[i].checkInTime
-          this.roomInfo.checkOutTime = this.rooms[i].checkOutTime
-          this.roomInfo.startDate = this.rooms[i].startDate
-          this.roomInfo.endDate = this.rooms[i].endDate
+          if(this.rooms[i].strCheckInTime != null && this.rooms[i].strCheckInTime.trim() != '') {
+            this.roomInfo.strCheckInTime = this.rooms[i].strCheckInTime
+            this.strCheckInTime = this.roomInfo.strCheckInTime
+          }
+          if(this.rooms[i].strCheckOutTime != null && this.rooms[i].strCheckOutTime.trim() != '') {
+            this.roomInfo.strCheckOutTime = this.rooms[i].strCheckOutTime
+            this.strCheckOutTime = this.roomInfo.strCheckOutTime
+          }
+          if(this.rooms[i].startDate != null && this.rooms[i].startDate.trim() != '') {
+            this.roomInfo.startDate = this.rooms[i].startDate
+            this.startDate = this.roomInfo.startDate
+          }
+          if(this.rooms[i].endDate != null && this.rooms[i].endDate.trim() != '') {
+            this.roomInfo.endDate = this.rooms[i].endDate
+            this.endDate = this.roomInfo.endDate
+          }
           this.roomInfo.roomType = this.rooms[i].roomType
           this.roomInfo.pos = this.rooms[i].pos
           this.roomInfo.subsName = this.rooms[i].subsName
           this.roomInfo.subsTel = this.rooms[i].subsTel
           this.roomInfo.resDate = this.rooms[i].resDate
           this.roomInfo.peopleCnt = this.rooms[i].peopleCnt
+          this.bestChkbox = this.rooms[i].isBestRoom
           // if (this.rooms[i].startDate != null && this.rooms[i].startDate.trim() != "")
           //   this.startDate = new Date(this.rooms[i].startDate).toISOString().substr(0, 10)
           // if (this.rooms[i].endDate != null && this.rooms[i].endDate.trim() != "")
@@ -613,20 +639,20 @@ export default {
     },
 
     reserveRoom: function (roomNo) {
-      this.initRoomInfo();
+      this.initRoomInfo()
       this.getRoomInfo(roomNo)
       this.$data.rsvRoomModal = true
     },
     settingRoom: function (roomNo) {
-      this.initRoomInfo();
+      this.initRoomInfo()
       this.getRoomInfo(roomNo)
       this.$data.settingRoomModal = true
     },
     saveReserveRoom: function (roomNo) {
-      alert('this.roomInfo.checkInTime : '+ this.roomInfo.checkInTime)
+      alert('this.roomInfo.checkInTime : ' + this.roomInfo.checkInTime)
       this.type = 'room'
       axios.put(`http://localhost:3000/api/rooms/${this.type}`, {
-        roomNo: roomNo, beReserved: true, startDate: this.startDate , endDate: this.endDate , checkInTime: this.checkInTime , checkOutTime: this.checkOutTime , subsName: this.roomInfo.subsName, subsTel: this.roomInfo.subsTel, peopleCnt: this.roomInfo.peopleCnt
+        roomNo: roomNo, beReserved: true, startDate: this.startDate, endDate: this.endDate, checkInTime: this.checkInTime, checkOutTime: this.checkOutTime, subsName: this.roomInfo.subsName, subsTel: this.roomInfo.subsTel, peopleCnt: this.roomInfo.peopleCnt
       })
         .then((r) => {
           this.$data.rsvRoomModal = false
@@ -671,12 +697,8 @@ export default {
       this.roomInfo.checkInOutEnbale = this.checkInOutEnbale
     },
     toggleHeatingMode: function () {
-      if(this.heatingMode=='자동'){
-        this.roomInfo.HeatingMode = 0
-      }
-      else{
-        this.roomInfo.HeatingMode = 1
-      }
+      if (this.heatingMode == '자동') this.roomInfo.HeatingMode = 0
+      else this.roomInfo.HeatingMode = 1
     }
   }
 }
