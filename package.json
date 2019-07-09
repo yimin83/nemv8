@@ -2,23 +2,29 @@
   "name": "nemv8",
   "version": "1.0.0",
   "description": "not node",
-  "main": "index.js",
-  "dependencies": {
-    "express": "^4.17.1",
-    "express-generator": "^4.16.1"
-  },
-  "devDependencies": {},
+  "author": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yimin83/nemv8.git"
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-generator": "^4.16.1",
+    "vuetify": "^2.0.0-beta.0"
   },
-  "author": "",
-  "license": "ISC",
+  "devDependencies": {
+    "sass": "^1.17.4",
+    "sass-loader": "^7.1.0",
+    "vue-cli-plugin-vuetify": "git+https://github.com/vuetifyjs/vue-cli-plugin-vuetify.git#dev",
+    "vuetify-loader": "^1.2.2"
+  },
   "bugs": {
     "url": "https://github.com/yimin83/nemv8/issues"
   },
-  "homepage": "https://github.com/yimin83/nemv8#readme"
+  "homepage": "https://github.com/yimin83/nemv8#readme",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yimin83/nemv8.git"
+  }
 }

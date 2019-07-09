@@ -1,105 +1,77 @@
 <template>
   <v-app>
-    <v-navigation-drawer
-      persistent
-      :mini-variant="miniVariant"
-      :clipped="clipped"
-      v-model="drawer"
-      enable-resize-watcher
-      fixed
+    <v-toolbar
       app
+      :clipped-left="clipped">
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-toolbar-title v-text="title"></v-toolbar-title>
+      <v-spacer></v-spacer>
+    </v-toolbar>
+    <v-navigation-drawer
+    persistent
+    :mini-variant="miniVariant"
+    :clipped="clipped"
+    v-model="drawer"
+    enable-resize-watcher
+    fixed
+    app
     >
-      <v-list>
-        <v-list-tile
-           value="true"
-           v-for="(item, i) in items"
-           :key="i"
-           :to="item.to"
+      <v-list
+        nav
+        dense
+      >
+        <v-list-item-group
+          v-model="group"
+          active-class="deep-purple--text text--accent-4"
+          value="true"
+          v-for="(item, i) in items"
+          :key="i"
+          :to="item.to"
         >
+        <v-list-item>
+        <v-list-item-title>
           <v-list-tile-action>
             <v-icon v-html="item.icon"></v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
             <v-list-tile-title v-text="item.title"></v-list-tile-title>
           </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
+        </v-list-item-title>
+      </v-list-item>
+      </v-list-item-group>
+    </v-list>
     </v-navigation-drawer>
-    <v-toolbar
-      app
-      :clipped-left="clipped"
-    >
-      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-btn icon @click.stop="miniVariant = !miniVariant">
-        <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
-      </v-btn>
-      <v-btn icon @click.stop="clipped = !clipped">
-        <v-icon>web</v-icon>
-      </v-btn>
-      <v-btn icon @click.stop="fixed = !fixed">
-        <v-icon>web</v-icon>
-      </v-btn>
-      <v-toolbar-title v-text="title"></v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn icon @click.stop="rightDrawer = !rightDrawer">
-        <v-icon>menu</v-icon>
-      </v-btn>
-    </v-toolbar>
     <v-content>
       <router-view/>
     </v-content>
-    <v-navigation-drawer
-      temporary
-      :right="right"
-      v-model="rightDrawer"
-      fixed
-      app
-    >
-      <v-list>
-        <v-list-tile @click="right = !right">
-          <v-list-tile-action>
-            <v-icon>compare-arrows</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-title>Switch drawer (click me)</v-list-tile-title>
-        </v-list-tile>
-      </v-list>
-    </v-navigation-drawer>
     <v-footer :fixed="fixed" app>
-        <span>&copy;2017</span>
+      <span>&copy;2017</span>
     </v-footer>
   </v-app>
 </template>
-
 <script>
-
 export default {
   name: 'App',
   data () {
     return {
       clipped: false,
-      drawer: true,
+      drawer: false,
       fixed: false,
       items: [
         {
           icon: 'bubble_chart',
           title: '메인',
-          to: {
-            path: '/'
-          }
+          to: { path: '@/' }
         },
         {
           icon: 'favorite',
           title: '객실예약',
-          to: {
-            path: '/rooms'
-          }
+          to: { path: '@/rooms' }
         },
         {
           icon: 'help',
           title: '이력',
-          to: {
-            path: '/help'
-          }
+          to: { path: '@/help' }
         }
       ],
       miniVariant: false,
@@ -107,41 +79,11 @@ export default {
       rightDrawer: false,
       title: '객실예약시스템'
     }
-  }
-}
-</script>
-<!--<template>
-  <v-app>
-    <v-toolbar app>
-      <v-toolbar-title class="headline text-uppercase">
-        <span>Vuetify</span>
-        <span class="font-weight-light">MATERIAL DESIGN</span>
-      </v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn
-        flat
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>open_in_new</v-icon>
-      </v-btn>
-    </v-toolbar>
+  },
+  methods() {
+    loadPage() {
 
-    <v-content>
-      <router-view/>
-    </v-content>
-  </v-app>
-</template>
-
-<script>
-
-export default {
-  name: 'App',
-  data () {
-    return {
-      //
     }
   }
 }
-</script>-->
+</script>
