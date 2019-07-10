@@ -24,11 +24,11 @@
           v-model="group"
           active-class="deep-purple--text text--accent-4"
           value="true"
+        >
+        <v-list-item
           v-for="(item, i) in items"
           :key="i"
-          :to="item.to"
-        >
-        <v-list-item>
+          :to="item.to">
         <v-list-item-title>
           <v-list-tile-action>
             <v-icon v-html="item.icon"></v-icon>
@@ -61,28 +61,28 @@ export default {
         {
           icon: 'bubble_chart',
           title: '메인',
-          to: { path: '@/' }
+          to: { path: '/' }
         },
         {
           icon: 'favorite',
           title: '객실예약',
-          to: { path: '@/rooms' }
+          to: { path: '/rooms' }
+        },
+        {
+          icon: 'favorite',
+          title: '테스트',
+          to: { path: '/test' }
         },
         {
           icon: 'help',
           title: '이력',
-          to: { path: '@/help' }
+          to: { path: '/help' }
         }
       ],
       miniVariant: false,
       right: true,
       rightDrawer: false,
       title: '객실예약시스템'
-    }
-  },
-  methods() {
-    loadPage() {
-
     }
   }
 }

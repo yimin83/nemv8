@@ -8175,9 +8175,9 @@ vm-browserify@^1.0.1:
   resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.0.tgz#bd76d6a23323e2ca8ffa12028dc04559c75f9019"
   integrity sha512-iq+S7vZJE60yejDYM0ek6zg308+UZsdtPExWP9VZoCFCz1zkJoXFnAX7aZfd/ZwrkidzdUZL0C/ryW+JwAiIGw==
 
-"vue-cli-plugin-vuetify@https://github.com/vuetifyjs/vue-cli-plugin-vuetify.git#dev":
+"vue-cli-plugin-vuetify@git+https://github.com/vuetifyjs/vue-cli-plugin-vuetify.git#dev":
   version "0.5.0"
-  resolved "https://github.com/vuetifyjs/vue-cli-plugin-vuetify.git#0fec01b3080fd31cf34809d1cdcaf0b6e64229ad"
+  resolved "git+https://github.com/vuetifyjs/vue-cli-plugin-vuetify.git#0fec01b3080fd31cf34809d1cdcaf0b6e64229ad"
 
 vue-eslint-parser@^2.0.3:
   version "2.0.3"
