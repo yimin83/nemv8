@@ -5,16 +5,31 @@ var net = require('./../socketOutput');
 
 mysqlDB.connect();
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  mysqlDB.query("SELECT * FROM rooms;", function(err, result, fields){
-    if(err){
-      console.log("쿼리문에 오류가 있습니다.");
-    }
-    else{
-      res.json(result);
-      console.log(result)
-    }
-  });
+router.get('/:type'', function(req, res, next) {
+  const type = req.params.type
+  if(type == "roomStat"){
+    console.log(req.body)
+    mysqlDB.query("SELECT * FROM RoomStat;", function(err, result, fields){
+      if(err){
+        console.log("쿼리문에 오류가 있습니다.");
+      }
+      else{
+        res.json(result);
+        console.log(result)
+      }
+    });
+  }else {
+    console.log(req.body)
+    mysqlDB.query("SELECT * FROM RoomsSchedule;", function(err, result, fields){
+      if(err){
+        console.log("쿼리문에 오류가 있습니다.");
+      }
+      else{
+        res.json(result);
+        console.log(result)
+      }
+    });
+  }
 });
 
 router.post('/', (req, res, next) => { // 생성
