@@ -4,7 +4,7 @@
     <v-subheader>베스트룸</v-subheader>
     <v-layout row wrap justify-center>
       <v-flex
-          v-for="room in rooms"
+          v-for="room in roomStat"
           v-if="room.isBestRoom == true"
           :key="room"
           text-xs-center
@@ -18,10 +18,10 @@
                 <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
               </v-card-title>
               <v-card-actions>
-                <v-spacer></v-spacer>
+                <!-- <v-spacer></v-spacer>
                 <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
                   <v-icon dark>assignment</v-icon>
-                </v-btn>
+                </v-btn> -->
                 <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                   <v-icon dark>query_builder</v-icon>
                 </v-btn>
@@ -39,7 +39,7 @@
     <v-divider class="my-1"></v-divider>
     <v-layout row wrap>
       <v-flex
-          v-for="room in rooms"
+          v-for="room in roomStat"
           v-if="room.roomNo < 1301"
           :key="room"
         >
@@ -54,9 +54,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -76,9 +73,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -98,9 +92,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -120,9 +111,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -142,9 +130,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -162,7 +147,7 @@
     <v-divider class="my-1"></v-divider>
     <v-layout row wrap>
       <v-flex
-          v-for="room in rooms"
+          v-for="room in roomStat"
           v-if="room.roomNo > 1300 && room.roomNo < 1401"
           :key="room"
         >
@@ -177,9 +162,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -199,9 +181,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -221,9 +200,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -243,9 +219,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -265,9 +238,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -285,7 +255,7 @@
     <v-divider class="my-1"></v-divider>
     <v-layout row wrap>
       <v-flex
-          v-for="room in rooms"
+          v-for="room in roomStat"
           v-if=" room.roomNo > 1500 && room.roomNo < 1601"
           :key="room"
         >
@@ -300,9 +270,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -322,9 +289,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -344,9 +308,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -366,9 +327,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -388,9 +346,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -408,7 +363,7 @@
     <v-divider class="my-1"></v-divider>
     <v-layout row wrap>
       <v-flex
-          v-for="room in rooms" v-if="room.roomNo >= 1601"
+          v-for="room in roomStat" v-if="room.roomNo >= 1601"
           :key="room"
         >
         <v-item >
@@ -422,9 +377,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -444,9 +396,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -466,9 +415,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -488,9 +434,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -510,9 +453,6 @@
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                <v-icon dark>assignment</v-icon>
-              </v-btn>
               <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
                 <v-icon dark>query_builder</v-icon>
               </v-btn>
@@ -688,7 +628,7 @@
           <v-btn v-if="roomInfo.roomState == 1" color="blue darken-1" flat @click="saveReserveRoom(roomInfo.roomNo)">예약</v-btn>
           <v-btn v-if="roomInfo.roomState != 1" color="blue darken-1" flat @click="saveReserveRoom(roomInfo.roomNo)">상태변경</v-btn>
           <v-btn v-if="roomInfo.roomState != 1" color="blue darken-1" flat @click="cancelReserveRoom(roomInfo.roomNo)">예약취소</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="rsvRoomModal = false">닫기</v-btn>
+          <v-btn color="blue darken-1" flat @click="closeReserveRoom(roomInfo.roomNo)">닫기</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -823,179 +763,6 @@
               full-width
               offset-x
             >
-              <v-card
-                color="grey lighten-4"
-                min-width="350px"
-                flat
-              >
-                <v-toolbar
-                  :color="selectedEvent.color"
-                  dark
-                >
-                  <v-toolbar-title >{{roomInfo.roomNo}}호 정보</v-toolbar-title>
-                  <v-spacer></v-spacer>
-                </v-toolbar>
-                <v-card-text>
-                  <v-container grid-list-md>
-                    <v-layout wrap>
-                      <v-flex xs6>
-                        <v-menu
-                          v-model="startMenu1"
-                          :close-on-content-click="false"
-                          :nudge-right="40"
-                          lazy
-                          transition="scale-transition"
-                          offset-y
-                          full-width
-                          min-width="290px"
-                        >
-                          <template v-slot:activator="{ on }">
-                            <v-text-field
-                              v-model="startDate"
-                              label="예약 시작일"
-                              prepend-icon="event"
-                              readonly
-                              v-on="on"
-                            ></v-text-field>
-                          </template>
-                          <v-date-picker v-model="startDate" @input="startMenu1 = false"></v-date-picker>
-                        </v-menu>
-                      </v-flex>
-                      <v-spacer></v-spacer>
-                      <v-flex xs6>
-                        <v-menu
-                          v-model="endMenu2"
-                          :close-on-content-click="false"
-                          :nudge-right="40"
-                          lazy
-                          transition="scale-transition"
-                          offset-y
-                          full-width
-                          min-width="290px"
-                        >
-                          <template v-slot:activator="{ on }">
-                            <v-text-field
-                              v-model="endDate"
-                              label="예약 종료일"
-                              prepend-icon="event"
-                              readonly
-                              v-on="on"
-                            ></v-text-field>
-                          </template>
-                          <v-date-picker v-model="endDate" @input="endMenu2 = false"></v-date-picker>
-                        </v-menu>
-                      </v-flex>
-                      <v-spacer></v-spacer>
-                      <v-flex xs6>
-                        <v-text-field
-                          label="예약자 이름"
-                          hint=''
-                          persistent-hint
-                          required
-                          v-model="roomInfo.subsName"
-                        ></v-text-field>
-                      </v-flex>
-                      <v-flex xs6>
-                        <v-text-field
-                          label="예약자 연락처"
-                          hint=''
-                          persistent-hint
-                          required
-                          v-model="roomInfo.subsTel"
-                        ></v-text-field>
-                      </v-flex>
-                      <v-flex xs6>
-                        <v-text-field
-                          label="투숙객 수"
-                          hint=''
-                          persistent-hint
-                          required
-                          v-model="roomInfo.peopleCnt"
-                        ></v-text-field>
-                      </v-flex>
-                      <v-flex xs6>
-                        <v-switch
-                         v-model="checkInOutEnbale"
-                         :label="`${checkInOutEnbale?'수동체크인아웃시간':'기본체크인아웃시간'}`"
-                         @change="toggleCheckInOutEnbale()"
-                        ></v-switch>
-                      </v-flex>
-                      <v-flex xs6 v-if="roomInfo.checkInOutEnbale">
-                        <v-menu
-                          ref="menu1"
-                          v-model="inMenu"
-                          :close-on-content-click="false"
-                          :nudge-right="40"
-                          :return-value.sync="strCheckInTime"
-                          lazy
-                          transition="scale-transition"
-                          offset-y
-                          full-width
-                          max-width="290px"
-                          min-width="290px"
-                        >
-                          <template v-slot:activator="{ on }">
-                            <v-text-field
-                              v-model="strCheckInTime"
-                              label="체크인"
-                              prepend-icon="access_time"
-                              readonly
-                              v-on="on"
-                            ></v-text-field>
-                          </template>
-                          <v-time-picker
-                            v-if="inMenu"
-                            v-model="strCheckInTime"
-                            format="24hr"
-                            full-width
-                            @click:minute="$refs.menu1.save(strCheckInTime)"
-                          ></v-time-picker>
-                        </v-menu>
-                      </v-flex>
-                      <v-flex xs6 v-if="roomInfo.checkInOutEnbale">
-                        <v-menu
-                          ref="menu2"
-                          v-model="outMenu"
-                          :close-on-content-click="false"
-                          :nudge-right="40"
-                          :return-value.sync="strCheckOutTime"
-                          lazy
-                          transition="scale-transition"
-                          offset-y
-                          full-width
-                          max-width="290px"
-                          min-width="290px"
-                        >
-                          <template v-slot:activator="{ on }">
-                            <v-text-field
-                              v-model="strCheckOutTime"
-                              label="체크아웃"
-                              prepend-icon="access_time"
-                              readonly
-                              v-on="on"
-                            ></v-text-field>
-                          </template>
-                          <v-time-picker
-                            v-if="outMenu"
-                            v-model="strCheckOutTime"
-                            format="24hr"
-                            full-width
-                            @click:minute="$refs.menu2.save(strCheckOutTime)"
-                          ></v-time-picker>
-                        </v-menu>
-                      </v-flex>
-                      <v-spacer></v-spacer>
-                    </v-layout>
-                  </v-container>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn v-if="roomInfo.roomState == 1" color="secondary" text @click="saveReserveRoom(roomInfo.roomNo)">예약</v-btn>
-                  <v-btn v-if="roomInfo.roomState != 1" color="secondary" text @click="saveReserveRoom(roomInfo.roomNo)">예약변경</v-btn>
-                  <v-btn v-if="roomInfo.roomState != 1" color="secondary" text @click="cancelReserveRoom(roomInfo.roomNo)">예약취소</v-btn>
-                  <v-btn text color="secondary" @click="selectedOpen = false"> 닫기 </v-btn>
-                </v-card-actions>
-              </v-card>
             </v-menu>
             </v-sheet>
             <v-card>
@@ -1032,36 +799,37 @@ export default {
       selectedEvent: {},
       selectedElement: null,
       selectedOpen: false,
-      events: [
-        {
-          name: 'Large Event',
-          details: 'This starts in the middle of an event and spans over multiple events',
-          start: '2019-06-30 12:00',
-          end: '2019-07-04 14:00',
-          color: 'deep-purple',
-        },
-        {
-          name: 'Conference',
-          details: 'The best time of my life',
-          start: '2019-07-21 12:00',
-          end: '2019-07-28 14:00',
-          color: 'grey darken-1',
-        },
-        {
-          name: 'Hackathon',
-          details: 'Code like there is no tommorrow',
-          start: '2019-07-30 12:00',
-          end: '2019-08-01 14:00',
-          color: 'black',
-        },
-        {
-          name: 'event 1',
-          details: ' ',
-          start: '2019-07-14 12:00',
-          end: '2019-07-16 14:00',
-          color: '#4285F4',
-        }
-      ],
+      events: [],
+      // events: [
+      //   {
+      //     name: 'Large Event',
+      //     details: 'This starts in the middle of an event and spans over multiple events',
+      //     start: '2019-06-30 12:00',
+      //     end: '2019-07-04 14:00',
+      //     color: 'deep-purple',
+      //   },
+      //   {
+      //     name: 'Conference',
+      //     details: 'The best time of my life',
+      //     start: '2019-07-21 12:00',
+      //     end: '2019-07-28 14:00',
+      //     color: 'grey darken-1',
+      //   },
+      //   {
+      //     name: 'Hackathon',
+      //     details: 'Code like there is no tommorrow',
+      //     start: '2019-07-30 12:00',
+      //     end: '2019-08-01 14:00',
+      //     color: 'black',
+      //   },
+      //   {
+      //     name: 'event 1',
+      //     details: ' ',
+      //     start: '2019-07-14 12:00',
+      //     end: '2019-07-16 14:00',
+      //     color: '#4285F4',
+      //   }
+      //],
       show: false,
       rsvRoomModal: false,
       roomScheduleModal: false,
@@ -1078,6 +846,17 @@ export default {
       roomStat: [],
       roomsSchedule: [],
       rooms: [],
+      roomStatInfo: {
+        roomNo: 0,
+        heatingMode: 0,
+        setTemp: 0,
+        controlRange: 0,
+        heatingTimeSec: 0,
+        roomState: 0,
+        roomType: 18,
+        pos: 'sea',
+        isBestRoom: false
+      },
       roomInfo: {
         roomNo: 101,
         heatingMode: 0,
@@ -1101,7 +880,6 @@ export default {
         { text: '자동' },
         { text: '수동' }
       ],
-      userName: 'asd',
       startDate: new Date().toISOString().substr(0, 10),
       endDate: new Date().toISOString().substr(0, 10),
       startMenu1: false,
@@ -1114,9 +892,11 @@ export default {
       type: 'room',
       heatingMode: '자동',
       mouseDowned: false,
-      mouseSelMove: false,
+      isShowEvent: false,
       reserveStartDate: '',
-      reserveEndDate: ''
+      reserveEndDate: '',
+      roomNo: 0,
+      roomIdx: 0
     }
   },
   computed: {
@@ -1162,22 +942,28 @@ export default {
     },
     mouseDown ({ year, month, day }) {
       this.reserveStartDate =  year + '-' + this.chngNumStr(month)+ '-' + this.chngNumStr(day) + ' 14:00'
-      this.mouseDowned=true
-      this.events.push({
-        name: '',
-        start: this.reserveStartDate,
-        color: 'deep-purple',
-      })
+      for(var i=0; i < this.events.length ; i++){
+        if(this.events[i].roomNo == this.roomNo){
+          if( this.events[i].start != this.reserveStartDate){
+           this.mouseDowned=true
+           this.events.push({
+             name: '',
+             start: this.reserveStartDate,
+             color: 'deep-purple',
+           })
+         }
+        }
+      }
     },
     mouseUp ({ year, month, day }) {
       this.reserveEndDate =  year + '-' +  this.chngNumStr(month)+ '-' + this.chngNumStr(day) + ' 12:00'
-      this.mouseDowned=false
-      if(this.mouseDowned){
-        this.events.pop()
+      if(this.mouseDowned) {
+        this.reserveRoom(this.roomNo, null)
+        this.mouseDowned=false
       }
     },
     mouseEnter ({ year, month, day }) {
-      if(this.mouseDowned){
+      if(this.mouseDowned && !this.isShowEvent){
         const tempDate =  year + '-' +  this.chngNumStr(month)+ '-' + this.chngNumStr(day) + ' 12:00'
         this.events.pop()
         this.events.push({
@@ -1186,7 +972,6 @@ export default {
           end: tempDate,
           color: 'deep-purple',
         })
-        this.mouseDowned = true
       }
     },
 
@@ -1203,20 +988,9 @@ export default {
       this.$refs.calendar.next()
     },
     showEvent ({ nativeEvent, event }) {
-      const open = () => {
-        this.selectedEvent = event
-        this.selectedElement = nativeEvent.target
-        setTimeout(() => this.selectedOpen = true, 10)
-      }
-
-      if (this.selectedOpen) {
-        this.selectedOpen = false
-        setTimeout(open, 10)
-      } else {
-        open()
-      }
-
-      nativeEvent.stopPropagation()
+      this.roomIdx = event.idx
+      this.isShowEvent=true
+      this.reserveRoom(this.roomNo, event)
     },
     updateRange ({ start, end }) {
       //alert('updateRange')
@@ -1224,30 +998,16 @@ export default {
       this.start = start
       this.end = end
     },
-    getRooms () {
-      axios.get(`http://localhost:3000/api/rooms/${'roomStat'}`)
-        .then((r) => {
-          this.rooms = r.data
-        })
-        .catch((e) => {
-          console.error(e.message)
-        })
-    },
-    upDownIcon: function (roomNo) {
-      for (var i = 0; i < this.rooms.length; i++) {
-        if (this.rooms[i].roomNo == roomNo) {
-          this.rooms[i].beRoomTogle = !this.rooms[i].beRoomTogle
-          break
-        }
-      }
-    },
-    upDownBestIcon: function (roomNo) {
-      for (var i = 0; i < this.rooms.length; i++) {
-        if (this.rooms[i].roomNo == roomNo) {
-          this.rooms[i].beBestTogle = !this.rooms[i].beBestTogle
-          break
-        }
-      }
+    initRoomStatInfo: function () {
+      this.roomStatInfo.roomNo = 101
+      this.roomStatInfo.heatingMode = 0
+      this.roomStatInfo.setTemp = 0
+      this.roomStatInfo.controlRange = 0
+      this.roomStatInfo.heatingTimeSec = 0
+      this.roomStatInfo.roomState = 0
+      this.roomStatInfo.roomType = 18
+      this.roomStatInfo.pos = 'sea'
+      this.roomStatInfo.isBestRoom = false
     },
     initRoomInfo: function () {
       this.roomInfo.roomNo = 101
@@ -1313,16 +1073,52 @@ export default {
         }
       }
     },
-    reserveRoom: function (roomNo) {
+    getRooms () {
+      axios.get('http://localhost:3000/api/rooms')
+        .then((r) => {
+          this.roomStat = r.data
+        })
+        .catch((e) => {
+          console.error(e.message)
+        })
+    },
+    reserveRoom: function (roomNo, event) {
+      if(event != null) {
+        alert('event start : ' + event.start + ", end : " + event.end)
+      }
+      else {
+        const roomSche = this.events.pop()
+        alert('roomSche start : ' + roomSche.start + ", end : " + roomSche.end)
+      }
       this.initRoomInfo()
       this.getRoomInfo(roomNo)
+      this.isShowEvent=false
       this.$data.rsvRoomModal = true
     },
     scheduleRoom: function (roomNo) {
       this.today = new Date().toISOString().substr(0, 10)
       this.focus =  new Date().toISOString().substr(0, 10)
       this.calType = 'month'
-      this.getRoomInfo(roomNo)
+      this.roomNo = roomNo
+      axios.get(`http://localhost:3000/api/rooms/${roomNo}`)
+        .then((r) => {
+          this.roomsSchedule = r.data
+          alert(this.roomsSchedule.length)
+          for(var i=0; i < this.roomsSchedule.length ; i++){
+            this.events.push({
+              idx: this.roomsSchedule[i].idx,
+              roomNo: this.roomsSchedule[i].roomNo,
+              name: this.roomsSchedule[i].subsName + ' 외 ' + this.roomsSchedule[i].peopleCnt +'명',
+              details: this.roomsSchedule[i].desc,
+              start: this.roomsSchedule[i].strCheckInTime,
+              end: this.roomsSchedule[i].strCheckOutTime,
+              color: 'grey darken-1'
+            })
+          }
+        })
+        .catch((e) => {
+          console.error(e.message)
+        })
       this.$data.roomScheduleModal = true
     },
     settingRoom: function (roomNo) {
@@ -1331,23 +1127,23 @@ export default {
       this.$data.settingRoomModal = true
     },
     saveReserveRoom: function (roomNo) {
-      alert('this.roomInfo.checkInTime : ' + this.roomInfo.checkInTime)
-      this.type = 'room'
-      axios.put(`http://localhost:3000/api/rooms/${this.type}`, {
-        roomNo: roomNo, beReserved: true, startDate: this.startDate, endDate: this.endDate, checkInTime: this.checkInTime, checkOutTime: this.checkOutTime, subsName: this.roomInfo.subsName, subsTel: this.roomInfo.subsTel, peopleCnt: this.roomInfo.peopleCnt
-      })
-        .then((r) => {
-          this.$data.rsvRoomModal = false
-          // this.pop('객실 상태 변경')
-          console.log('okok3')
-          this.getRooms()
-        })
-        .catch((e) => {
-        //  this.pop(e.message)
-          console.log(e.message)
-        })
+      // this.type = 'room'
+      // axios.put(`http://localhost:3000/api/rooms/${this.type}`, {
+      //   roomNo: roomNo, beReserved: true, startDate: this.startDate, endDate: this.endDate, checkInTime: this.checkInTime, checkOutTime: this.checkOutTime, subsName: this.roomInfo.subsName, subsTel: this.roomInfo.subsTel, peopleCnt: this.roomInfo.peopleCnt
+      // })
+      //   .then((r) => {
+      //     this.$data.rsvRoomModal = false
+      //     // this.pop('객실 상태 변경')
+      //     console.log('okok3')
+      //     this.getRooms()
+      //   })
+      //   .catch((e) => {
+      //   //  this.pop(e.message)
+      //     console.log(e.message)
+      //   })
     },
     cancelReserveRoom: function (roomNo) {
+      this.events.pop()
       axios.put(`http://localhost:3000/api/rooms/${'roomsSchedule'}`, {
         roomNo: roomNo, beReserved: false, startDate: '', endDate: '', checkInTime: '', checkOutTime: '', subsName: '', subsTel: '', peopleCnt: 0
       })
@@ -1359,6 +1155,9 @@ export default {
         .catch((e) => {
           console.log(e.message)
         })
+    },
+    closeReserveRoom: function (roomNo) {
+      this.rsvRoomModal = false
     },
     saveSettingRoom: function (roomNo) {
       this.type = 'roomTemp'
