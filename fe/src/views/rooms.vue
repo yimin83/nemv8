@@ -836,10 +836,6 @@ export default {
       settingRoomModal: false,
       bestChkbox: false,
       smartChkbox: false,
-      image1_src: require('./images/18pyeong.jpg'),
-      image2_src: require('./images/25pyeong.jpg'),
-      image3_src: require('./images/30pyeong.jpg'),
-      curTemp: 'username',
       roomTitle: '객실 예약',
       scheduleTitle: '객실 스케쥴',
       settingTitle: '객실 설정',
@@ -892,7 +888,6 @@ export default {
       type: 'room',
       heatingMode: '자동',
       mouseDowned: false,
-      isShowEvent: false,
       reserveStartDate: '',
       reserveEndDate: '',
       roomNo: 0,
@@ -942,28 +937,47 @@ export default {
     },
     mouseDown ({ year, month, day }) {
       this.reserveStartDate =  year + '-' + this.chngNumStr(month)+ '-' + this.chngNumStr(day) + ' 14:00'
+      const isDuple = false
       for(var i=0; i < this.events.length ; i++){
         if(this.events[i].roomNo == this.roomNo){
-          if( this.events[i].start != this.reserveStartDate){
-           this.mouseDowned=true
-           this.events.push({
-             name: '',
-             start: this.reserveStartDate,
-             color: 'deep-purple',
-           })
+          if( this.events[i].start <= this.reserveStartDate && this.events[i].end >= this.reserveStartDate ){
+           isDuple=true
+           break;
          }
         }
+      }
+      if(!isDuple){
+        this.mouseDowned=true
+        this.events.push({
+          name: '',
+          start: this.reserveStartDate,
+          color: 'deep-purple',
+        })
       }
     },
     mouseUp ({ year, month, day }) {
       this.reserveEndDate =  year + '-' +  this.chngNumStr(month)+ '-' + this.chngNumStr(day) + ' 12:00'
+      const isDuple = false
       if(this.mouseDowned) {
-        this.reserveRoom(this.roomNo, null)
-        this.mouseDowned=false
+        if(this.reserveStartDate.substr(0, 10) == this.reserveEndDate.substr(0, 10)) {
+          this.events.pop()
+          return
+        }
+        for(var i=0; i < this.events.length ; i++){
+          if(this.events[i].roomNo == this.roomNo){
+            if( this.events[i].start <= this.reserveEndDate && this.events[i].end >= this.reserveEndDate ) {
+             isDuple = true
+           }
+          }
+        }
+        if(!isDuple){
+          this.reserveRoom(this.roomNo, null)
+        }
       }
+      this.mouseDowned=false
     },
     mouseEnter ({ year, month, day }) {
-      if(this.mouseDowned && !this.isShowEvent){
+      if(this.mouseDowned){
         const tempDate =  year + '-' +  this.chngNumStr(month)+ '-' + this.chngNumStr(day) + ' 12:00'
         this.events.pop()
         this.events.push({
@@ -989,7 +1003,7 @@ export default {
     },
     showEvent ({ nativeEvent, event }) {
       this.roomIdx = event.idx
-      this.isShowEvent=true
+      this.mouseDowned=false
       this.reserveRoom(this.roomNo, event)
     },
     updateRange ({ start, end }) {
@@ -1092,7 +1106,6 @@ export default {
       }
       this.initRoomInfo()
       this.getRoomInfo(roomNo)
-      this.isShowEvent=false
       this.$data.rsvRoomModal = true
     },
     scheduleRoom: function (roomNo) {
@@ -1108,7 +1121,7 @@ export default {
             this.events.push({
               idx: this.roomsSchedule[i].idx,
               roomNo: this.roomsSchedule[i].roomNo,
-              name: this.roomsSchedule[i].subsName + ' 외 ' + this.roomsSchedule[i].peopleCnt +'명',
+              name: this.roomsSchedule[i].subsName,
               details: this.roomsSchedule[i].desc,
               start: this.roomsSchedule[i].strCheckInTime,
               end: this.roomsSchedule[i].strCheckOutTime,
