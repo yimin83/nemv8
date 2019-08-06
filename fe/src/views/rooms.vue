@@ -1,5 +1,5 @@
 <template>
-  <v-container grid-list-md text-xs-center>
+  <v-container grid-list-md>
     <v-divider class="my-3"></v-divider>
     <v-subheader>베스트룸</v-subheader>
     <v-layout row wrap justify-center>
@@ -13,9 +13,9 @@
           <v-card
               color="blue-grey darken-2" class="white--text mx-auto"
               full-width
-              max-width="200px">
+              max-width="120px">
               <v-card-title>
-                <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+                <b>{{room.roomNo}}호</b>
               </v-card-title>
               <v-card-actions>
                 <!-- <v-spacer></v-spacer>
@@ -42,15 +42,16 @@
           v-for="room in roomStat"
           v-if="room.roomNo < 1301"
           :key="room"
+          text-xs-left
         >
         <v-item >
           <v-card
             v-if="room.roomState == 0"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -67,9 +68,9 @@
             v-else-if="room.roomState == 1"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -86,9 +87,9 @@
             v-else-if="room.roomState == 2"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -105,9 +106,9 @@
             v-else-if="room.roomState == 3"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -124,9 +125,9 @@
             v-else
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -156,9 +157,9 @@
             v-if="room.roomState == 0"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -175,9 +176,9 @@
             v-else-if="room.roomState == 1"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -194,9 +195,9 @@
             v-else-if="room.roomState == 2"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -213,9 +214,9 @@
             v-else-if="room.roomState == 3"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -232,9 +233,9 @@
             v-else
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -264,9 +265,9 @@
             v-if="room.roomState == 0"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -283,9 +284,9 @@
             v-else-if="room.roomState == 1"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -302,9 +303,9 @@
             v-else-if="room.roomState == 2"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -321,9 +322,9 @@
             v-else-if="room.roomState == 3"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -340,9 +341,9 @@
             v-else
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -371,9 +372,9 @@
             v-if="room.roomState == 0"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -390,9 +391,9 @@
             v-else-if="room.roomState == 1"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -409,9 +410,9 @@
             v-else-if="room.roomState == 2"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -428,9 +429,9 @@
             v-else-if="room.roomState == 3"
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -447,9 +448,9 @@
             v-else
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
-            max-width="200px">
+            max-width="120px">
             <v-card-title>
-              <v-spacer></v-spacer><b>{{room.roomNo}}호</b>({{room.roomType}}평)<v-spacer></v-spacer>
+              <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -527,7 +528,7 @@
                   hint=''
                   persistent-hint
                   required
-                  v-model="roomInfo.subsName"
+                  v-model="roomScheInfo.subsName"
                 ></v-text-field>
               </v-flex>
               <v-flex xs6>
@@ -536,7 +537,7 @@
                   hint=''
                   persistent-hint
                   required
-                  v-model="roomInfo.subsTel"
+                  v-model="roomScheInfo.subsTel"
                 ></v-text-field>
               </v-flex>
               <v-flex xs6>
@@ -545,17 +546,17 @@
                   hint=''
                   persistent-hint
                   required
-                  v-model="roomInfo.peopleCnt"
+                  v-model="roomScheInfo.peopleCnt"
                 ></v-text-field>
               </v-flex>
               <v-flex xs6>
                 <v-switch
-                 v-model="checkInOutEnbale"
-                 :label="`${checkInOutEnbale?'수동체크인아웃시간':'기본체크인아웃시간'}`"
-                 @change="toggleCheckInOutEnbale()"
+                 v-model="autoCheckIn"
+                 :label="`${!autoCheckIn?'수동체크인아웃시간':'기본체크인아웃시간'}`"
+                 @change="toggleAutoCheckIn()"
                 ></v-switch>
               </v-flex>
-              <v-flex xs6 v-if="roomInfo.checkInOutEnbale">
+              <v-flex xs6 v-if="!autoCheckIn">
                 <v-menu
                   ref="menu1"
                   v-model="inMenu"
@@ -587,7 +588,7 @@
                   ></v-time-picker>
                 </v-menu>
               </v-flex>
-              <v-flex xs6 v-if="roomInfo.checkInOutEnbale">
+              <v-flex xs6 v-if="!autoCheckIn">
                 <v-menu
                   ref="menu2"
                   v-model="outMenu"
@@ -625,10 +626,10 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn v-if="roomInfo.roomState == 1" color="blue darken-1" flat @click="saveReserveRoom(roomInfo.roomNo)">예약</v-btn>
-          <v-btn v-if="roomInfo.roomState != 1" color="blue darken-1" flat @click="saveReserveRoom(roomInfo.roomNo)">상태변경</v-btn>
-          <v-btn v-if="roomInfo.roomState != 1" color="blue darken-1" flat @click="cancelReserveRoom(roomInfo.roomNo)">예약취소</v-btn>
-          <v-btn color="blue darken-1" flat @click="closeReserveRoom(roomInfo.roomNo)">닫기</v-btn>
+          <v-btn v-if="roomScheInfo.roomState == 1" color="blue darken-1" flat @click="saveReserveRoom(roomScheInfo.idx)">예약</v-btn>
+          <v-btn v-if="roomScheInfo.roomState != 1" color="blue darken-1" flat @click="saveReserveRoom(roomScheInfo.idx)">상태변경</v-btn>
+          <v-btn v-if="roomScheInfo.roomState != 1" color="blue darken-1" flat @click="cancelReserveRoom(roomScheInfo.idx)">예약취소</v-btn>
+          <v-btn color="blue darken-1" flat @click="closeReserveRoom()">닫기</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -652,7 +653,7 @@
                   hint=''
                   persistent-hint
                   required
-                  v-model="roomInfo.setTemp"
+                  v-model="roomStatInfo.setTemp"
                 ></v-text-field>
               </v-flex>
               <v-flex xs6>
@@ -662,7 +663,7 @@
                   persistent-hint
                   required
                   readonly
-                  v-model="roomInfo.controlRange"
+                  v-model="roomStatInfo.controlRange"
                 ></v-text-field>
               </v-flex>
               <v-flex xs6>
@@ -676,7 +677,14 @@
                   @change="toggleHeatingMode()"
                 ></v-select>
               </v-flex>
-              <v-flex xs6 v-if="roomInfo.HeatingMode == 1">
+              <v-flex xs6 v-if="roomStatInfo.HeatingMode == 1">
+                <v-switch
+                 v-model="boilerOn"
+                 :label="`${boilerOn?'동작':'정지'}`"
+                 @change="toggleBoilerOn()"
+                ></v-switch>
+              </v-flex>
+              <v-flex xs6 v-if="roomStatInfo.HeatingMode == 1">
                 <v-text-field
                   label="보일러 동작 시간"
                   hint=''
@@ -684,7 +692,7 @@
                   persistent-hint
                   required
                   readonly
-                  v-model="roomInfo.heatingTimeSec"
+                  v-model="roomStatInfo.heatingTimeSec"
                 ></v-text-field>
               </v-flex>
             </v-layout>
@@ -692,7 +700,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click="saveSettingRoom(roomInfo.roomNo)">저장</v-btn>
+          <v-btn color="blue darken-1" flat @click="saveSettingRoom(roomStatInfo.roomNo)">저장</v-btn>
           <v-btn color="blue darken-1" flat @click.native="settingRoomModal = false">닫기</v-btn>
         </v-card-actions>
       </v-card>
@@ -768,7 +776,6 @@
             <v-card>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" flat @click="saveReserveRoom(roomInfo.roomNo)">예약</v-btn>
                 <v-btn color="blue darken-1" flat @click.native="roomScheduleModal = false">닫기</v-btn>
               </v-card-actions>
             </v-card>
@@ -796,52 +803,17 @@ export default {
       },
       start: null,
       end: null,
-      selectedEvent: {},
       selectedElement: null,
       selectedOpen: false,
       events: [],
-      // events: [
-      //   {
-      //     name: 'Large Event',
-      //     details: 'This starts in the middle of an event and spans over multiple events',
-      //     start: '2019-06-30 12:00',
-      //     end: '2019-07-04 14:00',
-      //     color: 'deep-purple',
-      //   },
-      //   {
-      //     name: 'Conference',
-      //     details: 'The best time of my life',
-      //     start: '2019-07-21 12:00',
-      //     end: '2019-07-28 14:00',
-      //     color: 'grey darken-1',
-      //   },
-      //   {
-      //     name: 'Hackathon',
-      //     details: 'Code like there is no tommorrow',
-      //     start: '2019-07-30 12:00',
-      //     end: '2019-08-01 14:00',
-      //     color: 'black',
-      //   },
-      //   {
-      //     name: 'event 1',
-      //     details: ' ',
-      //     start: '2019-07-14 12:00',
-      //     end: '2019-07-16 14:00',
-      //     color: '#4285F4',
-      //   }
-      //],
-      show: false,
       rsvRoomModal: false,
       roomScheduleModal: false,
       settingRoomModal: false,
       bestChkbox: false,
-      smartChkbox: false,
       roomTitle: '객실 예약',
-      scheduleTitle: '객실 스케쥴',
       settingTitle: '객실 설정',
       roomStat: [],
       roomsSchedule: [],
-      rooms: [],
       roomStatInfo: {
         roomNo: 0,
         heatingMode: 0,
@@ -853,24 +825,19 @@ export default {
         pos: 'sea',
         isBestRoom: false
       },
-      roomInfo: {
-        roomNo: 101,
-        heatingMode: 0,
-        setTemp: 0,
-        controlRange: 0,
-        heatingTimeSec: 0,
-        roomState: 0,
-        checkInOutEnbale: false,
-        checkInTime: ' ',
-        checkOutTime: ' ',
-        roomType: 18,
-        pos: 'sea',
-        subsName: ' ',
-        subsTel: ' ',
-        resDate: 0,
+      roomScheInfo: {
+        idx: 0,
+        roomNo: 0,
+        checkInOutEnbale: 0,
+        strCheckInTime: '',
+        checkInTime: 0,
+        strCheckOutTime: '',
+        checkOutTime: 0,
+        subsName: '',
+        subsTel: '',
+        resDate: '',
         peopleCnt: 0,
-        startDate: ' ',
-        endDate: ' '
+        desc: ''
       },
       heatingModes: [
         { text: '자동' },
@@ -884,7 +851,8 @@ export default {
       inMenu: false,
       strCheckOutTime: null,
       outMenu: false,
-      strCheckInOutEnbale: false,
+      autoCheckIn: false,
+      boilerOn:true,
       type: 'room',
       heatingMode: '자동',
       mouseDowned: false,
@@ -971,7 +939,7 @@ export default {
           }
         }
         if(!isDuple){
-          this.reserveRoom(this.roomNo, null)
+          this.reserveRoom(0, null)
         }
       }
       this.mouseDowned=false
@@ -1004,7 +972,7 @@ export default {
     showEvent ({ nativeEvent, event }) {
       this.roomIdx = event.idx
       this.mouseDowned=false
-      this.reserveRoom(this.roomNo, event)
+      this.reserveRoom(this.roomIdx, event)
     },
     updateRange ({ start, end }) {
       //alert('updateRange')
@@ -1022,68 +990,85 @@ export default {
       this.roomStatInfo.roomType = 18
       this.roomStatInfo.pos = 'sea'
       this.roomStatInfo.isBestRoom = false
+      this.boilerOn=true
     },
-    initRoomInfo: function () {
-      this.roomInfo.roomNo = 101
-      this.roomInfo.heatingMode = 0
-      this.roomInfo.setTemp = 0
-      this.roomInfo.controlRange = 0
-      this.roomInfo.heatingTimeSec = 0
-      this.roomInfo.roomState = 0
-      this.roomInfo.checkInOutEnbale = false
-      this.roomInfo.checkInTime = '14:00'
-      this.roomInfo.checkOutTime = '12:00'
-      this.roomInfo.startDate = new Date().toISOString().substr(0, 10)
-      this.roomInfo.endDate = new Date().toISOString().substr(0, 10)
-      this.roomInfo.roomType = 18
-      this.roomInfo.pos = 'sea'
-      this.roomInfo.subsName = ' '
-      this.roomInfo.subsTel = ' '
-      this.roomInfo.resDate = ' '
-      this.roomInfo.peopleCnt = 0
-      this.checkInOutEnbale = 0
-      this.heatingMode = '자동'
+    initRoomScheInfo: function () {
+      this.roomScheInfo.idx=0,
+      this.roomScheInfo.roomNo= 0,
+      this.roomScheInfo.checkInOutEnbale= 0,
+      this.roomScheInfo.strCheckInTime= '',
+      this.roomScheInfo.checkInTime= 0,
+      this.roomScheInfo.strCheckOutTime= '',
+      this.roomScheInfo.checkOutTime= 0,
+      this.roomScheInfo.subsName= '',
+      this.roomScheInfo.subsTel= '',
+      this.roomScheInfo.resDate= '',
+      this.roomScheInfo.peopleCnt= 0,
+      this.roomScheInfo.desc= ''
       this.strCheckInTime = '14:00'
       this.strCheckOutTime = '12:00'
-      this.bestChkbox = false
-      this.toggleHeatingMode()
+      this.autoCheckIn = true
     },
-    getRoomInfo: function (roomNo) {
-      for (var i = 0; i < this.rooms.length; i++) {
-        if (this.rooms[i].roomNo == roomNo) {
-          this.roomInfo.roomNo = this.rooms[i].roomNo
-          this.roomInfo.heatingMode = this.rooms[i].heatingMode
-          this.heatingMode = (this.roomInfo.heatingMode == 0 ? '자동' : '수동')
-          this.roomInfo.setTemp = this.rooms[i].setTemp
-          this.roomInfo.controlRange = this.rooms[i].controlRange
-          this.roomInfo.heatingTimeSec = this.rooms[i].heatingTimeSec
-          this.roomInfo.roomState = this.rooms[i].roomState
-          this.roomInfo.checkInOutEnbale = this.rooms[i].checkInOutEnbale
-          this.checkInOutEnbale = this.rooms[i].checkInOutEnbale
-          if(this.rooms[i].strCheckInTime != null && this.rooms[i].strCheckInTime.trim() != '') {
-            this.roomInfo.strCheckInTime = this.rooms[i].strCheckInTime
-            this.strCheckInTime = this.roomInfo.strCheckInTime
-          }
-          if(this.rooms[i].strCheckOutTime != null && this.rooms[i].strCheckOutTime.trim() != '') {
-            this.roomInfo.strCheckOutTime = this.rooms[i].strCheckOutTime
-            this.strCheckOutTime = this.roomInfo.strCheckOutTime
-          }
-          if(this.rooms[i].startDate != null && this.rooms[i].startDate.trim() != '') {
-            this.roomInfo.startDate = this.rooms[i].startDate
-            this.startDate = this.roomInfo.startDate
-          }
-          if(this.rooms[i].endDate != null && this.rooms[i].endDate.trim() != '') {
-            this.roomInfo.endDate = this.rooms[i].endDate
-            this.endDate = this.roomInfo.endDate
-          }
-          this.roomInfo.roomType = this.rooms[i].roomType
-          this.roomInfo.pos = this.rooms[i].pos
-          this.roomInfo.subsName = this.rooms[i].subsName
-          this.roomInfo.subsTel = this.rooms[i].subsTel
-          this.roomInfo.resDate = this.rooms[i].resDate
-          this.roomInfo.peopleCnt = this.rooms[i].peopleCnt
-          this.bestChkbox = this.rooms[i].isBestRoom
+    getRoomStatInfo: function (roomNo ) {
+      for (var i = 0; i < this.roomStat.length; i++) {
+        if (this.roomStat[i].roomNo == roomNo) {
+          this.roomStatInfo.roomNo = this.roomStat[i].roomNo
+          this.roomStatInfo.heatingMode = this.roomStat[i].heatingMode
+          this.heatingMode = (this.roomStatInfo.heatingMode == 0) ? '자동':'수동'
+          this.toggleHeatingMode()
+          this.roomStatInfo.controlRange = this.roomStat[i].controlRange
+          this.roomStatInfo.heatingTimeSec = this.roomStat[i].heatingTimeSec
+          this.roomStatInfo.roomState = this.roomStat[i].roomState
+          this.roomStatInfo.roomType = this.roomStat[i].roomType
+          this.roomStatInfo.pos = this.roomStat[i].pos
+          this.bestChkbox = this.roomStat[i].isBestRoom
           break
+        }
+      }
+    },
+    getRoomScheInfo: function (idx) {
+      if(idx == 0) {
+        this.autoCheckIn = true
+        this.roomScheInfo.idx = idx
+        this.roomScheInfo.roomNo = this.roomNo
+        this.roomScheInfo.strCheckInTime = this.reserveStartDate
+        this.startDate = this.reserveStartDate.substr(0, 10)
+        this.strCheckInTime = this.reserveStartDate.substr(10, 6)
+        this.roomScheInfo.strCheckOutTime = this.reserveEndDate
+        this.endDate = this.reserveEndDate.substr(0, 10)
+        this.strCheckOutTime = this.reserveEndDate.substr(10, 6)
+      }
+      else{
+        for (var i = 0; i < this.roomsSchedule.length; i++) {
+          if (this.roomsSchedule[i].idx == idx) {
+            this.roomScheInfo.idx = this.roomsSchedule[i].idx
+            this.roomScheInfo.roomNo = this.roomsSchedule[i].roomNo
+            this.roomScheInfo.checkInOutEnbale = this.roomsSchedule[i].checkInOutEnbale
+            this.autoCheckIn = true
+            this.roomScheInfo.strCheckInTime = this.roomsSchedule[i].strCheckInTime
+            this.roomScheInfo.checkInTime = this.roomsSchedule[i].checkInTime
+            this.roomScheInfo.strCheckOutTime = this.roomsSchedule[i].strCheckOutTime
+            this.roomScheInfo.checkOutTime = this.roomsSchedule[i].checkOutTime
+            if(this.roomsSchedule[i].strCheckInTime != null && this.roomsSchedule[i].strCheckInTime.trim() != '') {
+              this.roomScheInfo.strCheckInTime = this.roomsSchedule[i].strCheckInTime
+              this.startDate = this.roomScheInfo.strCheckInTime.substr(0, 10)
+              this.strCheckInTime = this.roomScheInfo.strCheckInTime.substr(10, 6)
+              if(this.strCheckInTime.trim() != '14:00'.trim())
+                this.autoCheckIn = false
+            }
+            if(this.roomsSchedule[i].strCheckOutTime != null && this.roomsSchedule[i].strCheckOutTime.trim() != '') {
+              this.roomScheInfo.strCheckOutTime = this.roomsSchedule[i].strCheckOutTime
+              this.endDate = this.roomScheInfo.strCheckOutTime.substr(0, 10)
+              this.strCheckOutTime = this.roomScheInfo.strCheckOutTime.substr(10, 6)
+              if((!this.autoCheckIn) || this.strCheckOutTime.trim() != '12:00')
+                this.autoCheckIn = false
+            }
+            this.roomScheInfo.subsName = this.roomsSchedule[i].subsName
+            this.roomScheInfo.subsTel = this.roomsSchedule[i].subsTel
+            this.roomScheInfo.peopleCnt = this.roomsSchedule[i].peopleCnt
+            this.roomScheInfo.desc = this.roomsSchedule[i].desc
+            break
+          }
         }
       }
     },
@@ -1096,16 +1081,12 @@ export default {
           console.error(e.message)
         })
     },
-    reserveRoom: function (roomNo, event) {
-      if(event != null) {
-        alert('event start : ' + event.start + ", end : " + event.end)
+    reserveRoom: function (idx, event) {
+      if(event == null) {
+        this.events.pop()
       }
-      else {
-        const roomSche = this.events.pop()
-        alert('roomSche start : ' + roomSche.start + ", end : " + roomSche.end)
-      }
-      this.initRoomInfo()
-      this.getRoomInfo(roomNo)
+      this.initRoomScheInfo()
+      this.getRoomScheInfo(idx)
       this.$data.rsvRoomModal = true
     },
     scheduleRoom: function (roomNo) {
@@ -1116,7 +1097,6 @@ export default {
       axios.get(`http://localhost:3000/api/rooms/${roomNo}`)
         .then((r) => {
           this.roomsSchedule = r.data
-          alert(this.roomsSchedule.length)
           for(var i=0; i < this.roomsSchedule.length ; i++){
             this.events.push({
               idx: this.roomsSchedule[i].idx,
@@ -1135,8 +1115,8 @@ export default {
       this.$data.roomScheduleModal = true
     },
     settingRoom: function (roomNo) {
-      this.initRoomInfo()
-      this.getRoomInfo(roomNo)
+      this.initRoomStatInfo()
+      this.getRoomStatInfo(roomNo)
       this.$data.settingRoomModal = true
     },
     saveReserveRoom: function (roomNo) {
@@ -1186,12 +1166,13 @@ export default {
           console.log(e.message)
         })
     },
-    toggleCheckInOutEnbale: function () {
-      this.roomInfo.checkInOutEnbale = this.checkInOutEnbale
+    toggleAutoCheckIn: function () {
+    },
+    toggleBoilerOn: function () {
     },
     toggleHeatingMode: function () {
-      if (this.heatingMode == '자동') this.roomInfo.HeatingMode = 0
-      else this.roomInfo.HeatingMode = 1
+      if (this.heatingMode == '자동') this.roomStatInfo.HeatingMode = 0
+      else this.roomStatInfo.HeatingMode = 1
     }
   }
 }
