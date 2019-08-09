@@ -14,17 +14,13 @@
               color="blue-grey darken-2" class="white--text mx-auto"
               full-width
               max-width="120px">
-              <v-card-title>
+              <v-card-title
+              style="cursor: pointer"
+              @click="scheduleRoom(room.roomNo);">
                 <b>{{room.roomNo}}호</b>
               </v-card-title>
               <v-card-actions>
-                <!-- <v-spacer></v-spacer>
-                <v-btn fab color="primary"  @click="reserveRoom(room.roomNo);">
-                  <v-icon dark>assignment</v-icon>
-                </v-btn> -->
-                <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                  <v-icon dark>query_builder</v-icon>
-                </v-btn>
+                <v-spacer></v-spacer>
                 <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                   <v-icon dark>build</v-icon>
                 </v-btn>
@@ -50,14 +46,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -69,14 +64,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -88,14 +82,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -107,14 +100,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -126,14 +118,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -158,14 +149,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -177,14 +167,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -196,14 +185,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -215,14 +203,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -234,14 +221,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -266,14 +252,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -285,14 +270,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -304,14 +288,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -323,14 +306,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -342,14 +324,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -373,14 +354,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -392,14 +372,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -411,14 +390,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -430,14 +408,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -449,14 +426,13 @@
             color="blue-grey darken-2" class="white--text mx-auto"
             full-width
             max-width="120px">
-            <v-card-title>
+            <v-card-title
+            style="cursor: pointer"
+            @click="scheduleRoom(room.roomNo);">
               <b>{{room.roomNo}}호</b>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn fab color="primary"  @click="scheduleRoom(room.roomNo);">
-                <v-icon dark>query_builder</v-icon>
-              </v-btn>
               <v-btn fab color="primary" @click="settingRoom(room.roomNo);">
                 <v-icon dark>build</v-icon>
               </v-btn>
@@ -626,9 +602,9 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn v-if="roomScheInfo.roomState == 1" color="blue darken-1" flat @click="saveReserveRoom(roomScheInfo.idx)">예약</v-btn>
-          <v-btn v-if="roomScheInfo.roomState != 1" color="blue darken-1" flat @click="saveReserveRoom(roomScheInfo.idx)">상태변경</v-btn>
-          <v-btn v-if="roomScheInfo.roomState != 1" color="blue darken-1" flat @click="cancelReserveRoom(roomScheInfo.idx)">예약취소</v-btn>
+          <v-btn v-if="roomScheInfo.idx == 0" color="blue darken-1" flat @click="reserveRoomSche()">예약</v-btn>
+          <v-btn v-if="roomScheInfo.idx != 0" color="blue darken-1" flat @click="saveReserveRoom(roomScheInfo.idx)">저장</v-btn>
+          <v-btn v-if="roomScheInfo.idx != 0" color="blue darken-1" flat @click="cancelReserveRoom(roomScheInfo.idx)">예약취소</v-btn>
           <v-btn color="blue darken-1" flat @click="closeReserveRoom()">닫기</v-btn>
         </v-card-actions>
       </v-card>
@@ -662,7 +638,6 @@
                   hint=''
                   persistent-hint
                   required
-                  readonly
                   v-model="roomStatInfo.controlRange"
                 ></v-text-field>
               </v-flex>
@@ -679,8 +654,8 @@
               </v-flex>
               <v-flex xs6 v-if="roomStatInfo.HeatingMode == 1">
                 <v-switch
-                 v-model="boilerOn"
-                 :label="`${boilerOn?'동작':'정지'}`"
+                 v-model="roomStatInfo.boilerOn"
+                 :label="`${roomStatInfo.boilerOn?'동작':'정지'}`"
                  @change="toggleBoilerOn()"
                 ></v-switch>
               </v-flex>
@@ -691,7 +666,6 @@
                   class="pa-0"
                   persistent-hint
                   required
-                  readonly
                   v-model="roomStatInfo.heatingTimeSec"
                 ></v-text-field>
               </v-flex>
@@ -823,7 +797,8 @@ export default {
         roomState: 0,
         roomType: 18,
         pos: 'sea',
-        isBestRoom: false
+        isBestRoom: false,
+        boilerOn: true
       },
       roomScheInfo: {
         idx: 0,
@@ -837,7 +812,7 @@ export default {
         subsTel: '',
         resDate: '',
         peopleCnt: 0,
-        desc: ''
+        strDesc: ''
       },
       heatingModes: [
         { text: '자동' },
@@ -986,11 +961,11 @@ export default {
       this.roomStatInfo.setTemp = 0
       this.roomStatInfo.controlRange = 0
       this.roomStatInfo.heatingTimeSec = 0
-      this.roomStatInfo.roomState = 0
+      this.roomStatInfo.roomState = 1
       this.roomStatInfo.roomType = 18
       this.roomStatInfo.pos = 'sea'
       this.roomStatInfo.isBestRoom = false
-      this.boilerOn=true
+      this.roomStatInfo.boilerOn = true
     },
     initRoomScheInfo: function () {
       this.roomScheInfo.idx=0,
@@ -1004,7 +979,7 @@ export default {
       this.roomScheInfo.subsTel= '',
       this.roomScheInfo.resDate= '',
       this.roomScheInfo.peopleCnt= 0,
-      this.roomScheInfo.desc= ''
+      this.roomScheInfo.strDesc= ''
       this.strCheckInTime = '14:00'
       this.strCheckOutTime = '12:00'
       this.autoCheckIn = true
@@ -1016,18 +991,21 @@ export default {
           this.roomStatInfo.heatingMode = this.roomStat[i].heatingMode
           this.heatingMode = (this.roomStatInfo.heatingMode == 0) ? '자동':'수동'
           this.toggleHeatingMode()
+          this.roomStatInfo.setTemp = this.roomStat[i].setTemp
           this.roomStatInfo.controlRange = this.roomStat[i].controlRange
           this.roomStatInfo.heatingTimeSec = this.roomStat[i].heatingTimeSec
           this.roomStatInfo.roomState = this.roomStat[i].roomState
           this.roomStatInfo.roomType = this.roomStat[i].roomType
           this.roomStatInfo.pos = this.roomStat[i].pos
           this.bestChkbox = this.roomStat[i].isBestRoom
+          this.roomStatInfo.boilerOn = this.roomStat[i].boilerOn
           break
         }
       }
     },
     getRoomScheInfo: function (idx) {
       if(idx == 0) {
+        this.roomTitle = '객실 예약'
         this.autoCheckIn = true
         this.roomScheInfo.idx = idx
         this.roomScheInfo.roomNo = this.roomNo
@@ -1039,6 +1017,7 @@ export default {
         this.strCheckOutTime = this.reserveEndDate.substr(10, 6)
       }
       else{
+        this.roomTitle = '객실 예약 정보'
         for (var i = 0; i < this.roomsSchedule.length; i++) {
           if (this.roomsSchedule[i].idx == idx) {
             this.roomScheInfo.idx = this.roomsSchedule[i].idx
@@ -1066,7 +1045,7 @@ export default {
             this.roomScheInfo.subsName = this.roomsSchedule[i].subsName
             this.roomScheInfo.subsTel = this.roomsSchedule[i].subsTel
             this.roomScheInfo.peopleCnt = this.roomsSchedule[i].peopleCnt
-            this.roomScheInfo.desc = this.roomsSchedule[i].desc
+            this.roomScheInfo.strDesc = this.roomsSchedule[i].strDesc
             break
           }
         }
@@ -1094,6 +1073,7 @@ export default {
       this.focus =  new Date().toISOString().substr(0, 10)
       this.calType = 'month'
       this.roomNo = roomNo
+      this.events = []
       axios.get(`http://localhost:3000/api/rooms/${roomNo}`)
         .then((r) => {
           this.roomsSchedule = r.data
@@ -1102,7 +1082,7 @@ export default {
               idx: this.roomsSchedule[i].idx,
               roomNo: this.roomsSchedule[i].roomNo,
               name: this.roomsSchedule[i].subsName,
-              details: this.roomsSchedule[i].desc,
+              details: this.roomsSchedule[i].strDesc,
               start: this.roomsSchedule[i].strCheckInTime,
               end: this.roomsSchedule[i].strCheckOutTime,
               color: 'grey darken-1'
@@ -1119,31 +1099,49 @@ export default {
       this.getRoomStatInfo(roomNo)
       this.$data.settingRoomModal = true
     },
-    saveReserveRoom: function (roomNo) {
-      // this.type = 'room'
-      // axios.put(`http://localhost:3000/api/rooms/${this.type}`, {
-      //   roomNo: roomNo, beReserved: true, startDate: this.startDate, endDate: this.endDate, checkInTime: this.checkInTime, checkOutTime: this.checkOutTime, subsName: this.roomInfo.subsName, subsTel: this.roomInfo.subsTel, peopleCnt: this.roomInfo.peopleCnt
-      // })
-      //   .then((r) => {
-      //     this.$data.rsvRoomModal = false
-      //     // this.pop('객실 상태 변경')
-      //     console.log('okok3')
-      //     this.getRooms()
-      //   })
-      //   .catch((e) => {
-      //   //  this.pop(e.message)
-      //     console.log(e.message)
-      //   })
-    },
-    cancelReserveRoom: function (roomNo) {
-      this.events.pop()
-      axios.put(`http://localhost:3000/api/rooms/${'roomsSchedule'}`, {
-        roomNo: roomNo, beReserved: false, startDate: '', endDate: '', checkInTime: '', checkOutTime: '', subsName: '', subsTel: '', peopleCnt: 0
+    reserveRoomSche: function () {
+      this.type = 'roomSche'
+      this.roomScheInfo.strCheckInTime = this.startDate + " " + this.strCheckInTime
+      this.roomScheInfo.strCheckOutTime = this.endDate + " " + this.strCheckOutTime
+      axios.post('http://localhost:3000/api/rooms/', {
+        roomNo: this.roomScheInfo.roomNo, checkInOutEnbale: true, strCheckInTime: this.roomScheInfo.strCheckInTime, checkInTime: this.roomScheInfo.strCheckInTime, strCheckOutTime: this.roomScheInfo.strCheckOutTime,
+        checkOutTime: this.roomScheInfo.strCheckOutTime, subsName: this.roomScheInfo.subsName, subsTel: this.roomScheInfo.subsTel, resDate: null, peopleCnt: this.roomScheInfo.peopleCnt, strDesc: this.roomScheInfo.strDesc
       })
         .then((r) => {
           this.$data.rsvRoomModal = false
-          console.log('okok')
-          this.getRooms()
+          // this.pop('객실 상태 변경')
+          console.log('okok3')
+          this.scheduleRoom(this.roomNo)
+        })
+        .catch((e) => {
+        //  this.pop(e.message)
+          console.log(e.message)
+        })
+    },
+    saveReserveRoom: function (idx) {
+      this.type = 'roomSche'
+      this.roomScheInfo.strCheckInTime = this.startDate + " " + this.strCheckInTime
+      this.roomScheInfo.strCheckOutTime = this.endDate + " " + this.strCheckOutTime
+      axios.put(`http://localhost:3000/api/rooms/${this.type}`, {
+        idx: idx, roomNo: this.roomScheInfo.roomNo, checkInOutEnbale: true, strCheckInTime: this.roomScheInfo.strCheckInTime, checkInTime: this.roomScheInfo.strCheckInTime, strCheckOutTime: this.roomScheInfo.strCheckOutTime,
+        checkOutTime: this.roomScheInfo.strCheckOutTime, subsName: this.roomScheInfo.subsName, subsTel: this.roomScheInfo.subsTel, resDate: null, peopleCnt: this.roomScheInfo.peopleCnt, strDesc: this.roomScheInfo.strDesc
+      })
+        .then((r) => {
+          this.$data.rsvRoomModal = false
+          // this.pop('객실 상태 변경')
+          this.scheduleRoom(this.roomNo)
+        })
+        .catch((e) => {
+        //  this.pop(e.message)
+          console.log(e.message)
+        })
+    },
+    cancelReserveRoom: function (idx) {
+      this.events.pop()
+      axios.delete(`http://localhost:3000/api/rooms/${idx}`)
+        .then((r) => {
+          this.$data.rsvRoomModal = false
+          this.scheduleRoom(this.roomNo)
         })
         .catch((e) => {
           console.log(e.message)
@@ -1153,9 +1151,9 @@ export default {
       this.rsvRoomModal = false
     },
     saveSettingRoom: function (roomNo) {
-      this.type = 'roomTemp'
       axios.put(`http://localhost:3000/api/rooms/${'roomStat'}`, {
-        roomNo: roomNo, isBestRoom: this.bestChkbox, isSmart: this.smartChkbox, setTemp: this.roomInfo.setTemp
+        roomNo: this.roomStatInfo.roomNo, heatingMode: this.heatingMode=='자동'?0:1, setTemp: this.roomStatInfo.setTemp, controlRange: this.roomStatInfo.controlRange,
+        heatingTimeSec: this.roomStatInfo.heatingTimeSec, roomState: this.roomStatInfo.roomState, roomType: this.roomStatInfo.roomType, pos: this.roomStatInfo.pos, isBestRoom: this.bestChkbox, boilerOn: this.roomStatInfo.boilerOn
       })
         .then((r) => {
           this.$data.settingRoomModal = false
