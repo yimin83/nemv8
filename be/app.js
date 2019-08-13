@@ -2,7 +2,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var socket = require('./socket');
+//var socket = require('./socket');
 
 const history = require('connect-history-api-fallback')
 const cors = require('cors')
@@ -21,7 +21,7 @@ app.use('/api', require('./routes/api'));
 app.use(history());
 app.use(express.static(path.join(__dirname, '../', 'fe', 'dist')));
 
-socket.server;
+// socket.server;
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

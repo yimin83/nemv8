@@ -1077,6 +1077,7 @@ export default {
       axios.get(`http://localhost:3000/api/rooms/${roomNo}`)
         .then((r) => {
           this.roomsSchedule = r.data
+          alert(this.roomsSchedule.length)
           for(var i=0; i < this.roomsSchedule.length ; i++){
             this.events.push({
               idx: this.roomsSchedule[i].idx,
@@ -1104,8 +1105,7 @@ export default {
       this.roomScheInfo.strCheckInTime = this.startDate + " " + this.strCheckInTime
       this.roomScheInfo.strCheckOutTime = this.endDate + " " + this.strCheckOutTime
       axios.post('http://localhost:3000/api/rooms/', {
-        roomNo: this.roomScheInfo.roomNo, checkInOutEnbale: true, strCheckInTime: this.roomScheInfo.strCheckInTime, checkInTime: this.roomScheInfo.strCheckInTime, strCheckOutTime: this.roomScheInfo.strCheckOutTime,
-        checkOutTime: this.roomScheInfo.strCheckOutTime, subsName: this.roomScheInfo.subsName, subsTel: this.roomScheInfo.subsTel, resDate: null, peopleCnt: this.roomScheInfo.peopleCnt, strDesc: this.roomScheInfo.strDesc
+        roomNo: this.roomScheInfo.roomNo, checkInOutEnbale: true, strCheckInTime: this.roomScheInfo.strCheckInTime, checkInTime: this.roomScheInfo.strCheckInTime, strCheckOutTime: this.roomScheInfo.strCheckOutTime, checkOutTime: this.roomScheInfo.strCheckOutTime, subsName: this.roomScheInfo.subsName, subsTel: this.roomScheInfo.subsTel, resDate: null, peopleCnt: this.roomScheInfo.peopleCnt, strDesc: this.roomScheInfo.strDesc
       })
         .then((r) => {
           this.$data.rsvRoomModal = false
@@ -1123,8 +1123,7 @@ export default {
       this.roomScheInfo.strCheckInTime = this.startDate + " " + this.strCheckInTime
       this.roomScheInfo.strCheckOutTime = this.endDate + " " + this.strCheckOutTime
       axios.put(`http://localhost:3000/api/rooms/${this.type}`, {
-        idx: idx, roomNo: this.roomScheInfo.roomNo, checkInOutEnbale: true, strCheckInTime: this.roomScheInfo.strCheckInTime, checkInTime: this.roomScheInfo.strCheckInTime, strCheckOutTime: this.roomScheInfo.strCheckOutTime,
-        checkOutTime: this.roomScheInfo.strCheckOutTime, subsName: this.roomScheInfo.subsName, subsTel: this.roomScheInfo.subsTel, resDate: null, peopleCnt: this.roomScheInfo.peopleCnt, strDesc: this.roomScheInfo.strDesc
+        idx: idx, roomNo: this.roomScheInfo.roomNo, checkInOutEnbale: true, strCheckInTime: this.roomScheInfo.strCheckInTime, checkInTime: this.roomScheInfo.strCheckInTime, strCheckOutTime: this.roomScheInfo.strCheckOutTime, checkOutTime: this.roomScheInfo.strCheckOutTime, subsName: this.roomScheInfo.subsName, subsTel: this.roomScheInfo.subsTel, resDate: null, peopleCnt: this.roomScheInfo.peopleCnt, strDesc: this.roomScheInfo.strDesc
       })
         .then((r) => {
           this.$data.rsvRoomModal = false
@@ -1152,8 +1151,7 @@ export default {
     },
     saveSettingRoom: function (roomNo) {
       axios.put(`http://localhost:3000/api/rooms/${'roomStat'}`, {
-        roomNo: this.roomStatInfo.roomNo, heatingMode: this.heatingMode=='자동'?0:1, setTemp: this.roomStatInfo.setTemp, controlRange: this.roomStatInfo.controlRange,
-        heatingTimeSec: this.roomStatInfo.heatingTimeSec, roomState: this.roomStatInfo.roomState, roomType: this.roomStatInfo.roomType, pos: this.roomStatInfo.pos, isBestRoom: this.bestChkbox, boilerOn: this.roomStatInfo.boilerOn
+        roomNo: this.roomStatInfo.roomNo, heatingMode: this.heatingMode=='자동' ? 0:1, setTemp: this.roomStatInfo.setTemp, controlRange: this.roomStatInfo.controlRange, heatingTimeSec: this.roomStatInfo.heatingTimeSec, roomState: this.roomStatInfo.roomState, roomType: this.roomStatInfo.roomType, pos: this.roomStatInfo.pos, isBestRoom: this.bestChkbox, boilerOn: this.roomStatInfo.boilerOn
       })
         .then((r) => {
           this.$data.settingRoomModal = false
