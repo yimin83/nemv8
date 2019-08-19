@@ -2,13 +2,14 @@
 var net_client = require('net');
 var struct = require("cpp-struct-js");
 var net = {};
+
 net.getConnection = function (){
     //서버에 해당 포트로 접속
     var client = "";
     var recvData = [];
     var local_port = "";
 
-    client = net_client.connect({port: 10004, host:'localhost'}, function() {
+    client = net_client.connect({port: 15000, host:'localhost'}, function() {
 
         console.log("socketOutput connect log======================================================================");
         console.log('socketOutput connect success');
@@ -19,7 +20,7 @@ net.getConnection = function (){
         local_port = this.localPort;
 
         this.setEncoding('utf8');
-        this.setTimeout(600000); // timeout : 10분
+        //this.setTimeout(600000); // timeout : 10분
         console.log("socketOutput client setting Encoding:binary, timeout:600000" );
         console.log("socketOutput client connect localport : " + local_port);
     });
@@ -61,10 +62,15 @@ net.getConnection = function (){
 }
 
 net.writeData = function (socket, data){
+  console.log('writeData start : ' + data)
   var success = !socket.write(data);
-  if (!success){
-      console.log("socketOutput Server Send Fail");
-  }
+  if(!success){
+        (function(socket, data){
+            socket.once('drain', function(){
+                writeData(socket, data);
+            });
+        })(socket, data)
+    }
 }
 
 
@@ -204,53 +210,37 @@ var ems_auth_req_t = new struct("ems_auth_req_t", [
     "SiteInfo", struct.uint16()
 ]);
 
-var RoomState = new struct("RoomState", [
-    "RoomNo", struct.uint16(),
-    "RoomState", struct.uint8()
-]);
-
-var RoomConfig = new struct("RoomState", [
-    "RoomNo", struct.uint16(),
-    "SetTemp", struct.uint32(),
-    "ControlRange", struct.uint32(),
-    "CheckInOutEnbale", struct.char(1),
-    "CheckInTime", struct.uint32(),
-    "CheckOutTime", struct.uint32()
-]);
-
-net.makeSendMenualHeatingMsg = function (roomNo, heatingMode, setTemp, setControlRange, heatingTimeSec){
-  var buffer = new Buffer(MenualHeatingMsg.size());
-  MenualHeatingMsg.encode(buffer,0, {
-    RoomNo: roomNo,
-    HeatingMode: heatingMode,
-    SetTemp: setTemp,
-    SetControlRange: setControlRange,
-    HeatingTimeSec: heatingTimeSec
-  },{endian:"LE"})
+net.makeEmsMsgHeader_t = function(preamble, version, length, sessionId, seqNo, msgType, msgStatus, reserved){
+  var buffer = new Buffer(ems_msg_header_t.size());
+  ems_msg_header_t.encode(buffer,0, {
+    Preamble: preamble,
+    Version: version,
+    Length: length,
+    SessionId: sessionId,
+    SeqNo: seqNo,
+    MsgType: msgType,
+    MsgStatus: msgStatus
+  },{endian:"BE"})
   return buffer;
 }
 
+net.getSizeEmsMsgHeader_t = function(){
+  return ems_msg_header_t.size()
+}
 
-net.makeSetRoomState = function (roomNo, roomStat){
-  var buffer = new Buffer(RoomState.size());
-  RoomState.encode(buffer,0, {
-    RoomNo: roomNo,
-    RoomState: roomStat
-  },{endian:"LE"})
+net.makeEmsAuthReq_t = function(szAuthId, szAuthPassword, userLevel, siteInfo){
+  var buffer = new Buffer(ems_auth_req_t.size());
+  ems_auth_req_t.encode(buffer,0, {
+    szAuthId: szAuthId,
+    szAuthPassword: szAuthPassword,
+    UserLevel: userLevel,
+    SiteInfo: siteInfo
+  },{endian:"BE"})
   return buffer;
 }
 
-net.makeSetRoomConfig = function (roomNo, setTemp, controlRange, checkInOutEnbale, checkInTime, checkOutTime){
-  var buffer = new Buffer(RoomConfig.size());
-  RoomConfig.encode(buffer,0, {
-    RoomNo: roomNo,
-    SetTemp: setTemp,
-    ControlRange: controlRange,
-    CheckInOutEnbale: checkInOutEnbale,
-    CheckInTime: checkInTime,
-    CheckOutTime: checkOutTime
-  },{endian:"LE"})
-  return buffer;
+net.getSizeEmsAuthReq_t = function(){
+  return ems_auth_req_t.size()
 }
 
 module.exports = net;

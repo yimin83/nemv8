@@ -2,9 +2,31 @@ var express = require('express');
 var router = express.Router();
 var mysqlDB = require('./../../mysql-db');
 var net = require('./../socketOutput');
+var EMS_ID = 'NB_ADMIN'
+var EMS_PASSWORD = 'FLOWERSTONE_81'
+var UserLevel = 1
+var _ems_web_client = 0x81
+var EMS_VERSION = 0x0101
+var EMS_PREAMBLE = 0x1B04
+var Msg_Type_Auth = 0x10
+var Msg_Status_OK = 0
+var web_interface = 0x80
 
 mysqlDB.connect();
+var client = net.getConnection();
 /* GET home page. */
+var totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeEmsAuthReq_t()
+var msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, 1, Msg_Type_Auth, Msg_Status_OK);
+var authReqBuffer = net.makeEmsAuthReq_t(EMS_ID, EMS_PASSWORD, UserLevel, web_interface);
+var authReqFullBuffer = new Buffer(totalSize);
+msgHeaderBuffer.copy(authReqFullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+authReqBuffer.copy(authReqFullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
+
+// const startCallback = Date.now();
+// while (Date.now() - startCallback < 10000) {
+// }
+net.writeData(client, authReqFullBuffer);
+
 router.get('/', function(req, res, next) {
   mysqlDB.query("SELECT * FROM RoomStat;", function(err, result, fields){
     if(err){
