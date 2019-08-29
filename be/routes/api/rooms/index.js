@@ -6,26 +6,45 @@ var EMS_ID = 'NB_ADMIN'
 var EMS_PASSWORD = 'FLOWERSTONE_81'
 var UserLevel = 1
 var _ems_web_client = 0x81
+var oam_get_sys_config = 2
 var EMS_VERSION = 0x0101
 var EMS_PREAMBLE = 0x1B04
 var Msg_Type_Auth = 0x10
+var Msg_Type_OAM = 0x60
 var Msg_Status_OK = 0
 var web_interface = 0x80
 
 mysqlDB.connect();
 var client = net.getConnection();
 /* GET home page. */
+
+var nSeq = 0
 var totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeEmsAuthReq_t()
 var msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, 1, Msg_Type_Auth, Msg_Status_OK);
-var authReqBuffer = net.makeEmsAuthReq_t(EMS_ID, EMS_PASSWORD, UserLevel, web_interface);
-var authReqFullBuffer = new Buffer(totalSize);
-msgHeaderBuffer.copy(authReqFullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-authReqBuffer.copy(authReqFullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
+var msgBuffer = net.makeEmsAuthReq_t(EMS_ID, EMS_PASSWORD, UserLevel, web_interface);
+var fullBuffer = new Buffer(totalSize);
+msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
+net.writeData(client, fullBuffer);
 
+var dataLen = 0
+console.log('1')
+msgBuffer = net.makeOamMsg_t(oam_get_sys_config, dataLen, null);
+console.log('2 : ' + msgBuffer.toString('hex'))
+totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
+console.log('3 totalSize : ' + totalSize)
+msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, 3, Msg_Type_OAM, Msg_Status_OK);
+console.log('4 : ' + msgHeaderBuffer.toString('hex'))
+fullBuffer = new Buffer(totalSize);
+msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+console.log('5 ' + msgHeaderBuffer.toString('hex'))
+msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
+console.log('6 : ' + fullBuffer.toString('hex'))
+net.writeData(client, fullBuffer);
+console.log('7')
 // const startCallback = Date.now();
 // while (Date.now() - startCallback < 10000) {
 // }
-net.writeData(client, authReqFullBuffer);
 
 router.get('/', function(req, res, next) {
   mysqlDB.query("SELECT * FROM RoomStat;", function(err, result, fields){
