@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mysqlDB = require('./../../mysql-db');
 var net = require('./../socketOutput');
+const counter = require('./../makeSeq.js');
 var EMS_ID = 'NB_ADMIN'
 var EMS_PASSWORD = 'FLOWERSTONE_81'
 var UserLevel = 1
@@ -18,33 +19,20 @@ mysqlDB.connect();
 var client = net.getConnection();
 /* GET home page. */
 
-var nSeq = 0
+var nSeq = counter.get()
 var totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeEmsAuthReq_t()
-var msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, 1, Msg_Type_Auth, Msg_Status_OK);
+var msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_Auth, Msg_Status_OK);
 var msgBuffer = net.makeEmsAuthReq_t(EMS_ID, EMS_PASSWORD, UserLevel, web_interface);
 var fullBuffer = new Buffer(totalSize);
 msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
 msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
-net.writeData(client, fullBuffer);
+net.writeData(client, fullBuffer, null);
 
 var dataLen = 0
-console.log('1')
-msgBuffer = net.makeOamMsg_t(oam_get_sys_config, dataLen, null);
-console.log('2 : ' + msgBuffer.toString('hex'))
-totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-console.log('3 totalSize : ' + totalSize)
-msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, 3, Msg_Type_OAM, Msg_Status_OK);
-console.log('4 : ' + msgHeaderBuffer.toString('hex'))
-fullBuffer = new Buffer(totalSize);
-msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-console.log('5 ' + msgHeaderBuffer.toString('hex'))
-msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
-console.log('6 : ' + fullBuffer.toString('hex'))
-net.writeData(client, fullBuffer);
-console.log('7')
 // const startCallback = Date.now();
 // while (Date.now() - startCallback < 10000) {
 // }
+
 
 router.get('/', function(req, res, next) {
   mysqlDB.query("SELECT * FROM RoomStat;", function(err, result, fields){
@@ -56,6 +44,26 @@ router.get('/', function(req, res, next) {
       //console.log(result)
     }
   });
+});
+
+router.get('/setting', function(req, res, next) {
+  // mysqlDB.query("SELECT * FROM RoomStat;", function(err, result, fields){
+  //   if(err){
+  //     console.log("쿼리문에 오류가 있습니다.");
+  //   }
+  //   else{
+  //     res.json(result);
+  //     //console.log(result)
+  //   }
+  // });
+  msgBuffer = net.makeOamMsg_t(oam_get_sys_config, dataLen, null);
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
+  nSeq = counter.get();
+  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
+  fullBuffer = new Buffer(totalSize);
+  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
+  net.writeData(client, fullBuffer, nSeq, null);
 });
 
 router.get('/:roomNo', (req, res, next) => { // 수정
@@ -145,5 +153,16 @@ router.delete('/:idx', (req, res, next) => { // 삭제
   });
 })
 
-
+exports.getMysqlDB = function () {
+    console.log('getMysqlDB!!!!!!!!!!!!!!!!!!' );
+    //return mysqlDB;
+};
+exports.getNet = function () {
+    console.log('getNet!!!!!!!!!!!!!!!!!!' );
+    //return client;
+};
+exports.testFunc = function (res) {
+    console.log('testFunc!!!!!!!!!!!!!!!!!!' );
+    //res.redirect("/");
+};
 module.exports = router;

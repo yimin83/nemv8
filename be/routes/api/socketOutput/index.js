@@ -1,5 +1,6 @@
 
 var net_client = require('net');
+var router = require('./../rooms')
 var struct = require("cpp-struct-js");
 var net = {};
 const ems_msg_type_e = {
@@ -100,7 +101,8 @@ net.getConnection = function (){
     return client;
 }
 
-net.writeData = function (socket, data){
+const resMap = new Map()
+net.writeData = function (socket, data, seq, res){
   console.log('writeData start : ' + data)
   var success = !socket.write(data);
   if(!success){
@@ -112,6 +114,10 @@ net.writeData = function (socket, data){
     }
 }
 
+
+net.getSeq = function(){
+	return
+}
 var emsSysConfig
 var manualHeating
 var roomConfig
@@ -127,6 +133,7 @@ var processOAMmsg = function (data){
      console.log("oamMsgDat.OAMMsgType = " + oamMsgDat.OAMMsgType)
      var emsSysConfigDat = ems_sys_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"BE"});
      console.log("emsSysConfigDat : " + emsSysConfigDat.toString())
+		 router.testFunc();
   }
   else if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_cmd_floorRad_manual_heating && oamMsgDat.DataLen == manual_heating_msg_t.size()){
       console.log("oamMsgDat.OAMMsgType = " + oamMsgDa.OAMMsgType)
