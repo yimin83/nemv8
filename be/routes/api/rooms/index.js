@@ -32,7 +32,14 @@ var dataLen = 0
 // const startCallback = Date.now();
 // while (Date.now() - startCallback < 10000) {
 // }
-
+msgBuffer = net.makeOamMsg_t(oam_get_sys_config, dataLen, null);
+totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
+nSeq = counter.get();
+msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
+fullBuffer = new Buffer(totalSize);
+msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
+net.writeData(client, fullBuffer, nSeq, null);
 
 router.get('/', function(req, res, next) {
   mysqlDB.query("SELECT * FROM RoomStat;", function(err, result, fields){
