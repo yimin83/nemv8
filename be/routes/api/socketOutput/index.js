@@ -38,7 +38,6 @@ net.getConnection = function (){
 
         console.log("socketOutput connect log======================================================================");
         console.log('socketOutput connect success');
-        this.localPort = 10000;
         console.log('socketOutput local = ' + this.localAddress + ':' + this.localPort);
         console.log('socketOutput remote = ' + this.remoteAddress + ':' +this.remotePort);
 
@@ -65,14 +64,12 @@ net.getConnection = function (){
         if(data.length > 0){
             //bufTestRevc = new Buffer.alloc(6);
           var decodeDat = ems_msg_header_t.decode(data, 0, {endian:"BE"});
-          console.log("decodeDat : " + decodeDat.Preamble +", " + decodeDat.Version +", "
-          + decodeDat.Length +", " + decodeDat.SessionId +", " + decodeDat.SeqNo +", "
-          + decodeDat.MsgType +", " + decodeDat.MsgStatus +", " + decodeDat.Reserved);
+					console.log("decodeDat seqNo : " + decodeDat.SeqNo)
           if(decodeDat.MsgType  == ems_msg_type_e.Msg_Type_Auth){
             console.log("Auth!!!!!")
           } else if(decodeDat.MsgType  == ems_msg_type_e.Msg_Type_OAM){
             console.log("OAM!!!!")
-            processOAMmsg(data)
+            processOAMmsg(data, decodeDat.SeqNo)
           }
 
         }
@@ -101,9 +98,8 @@ net.getConnection = function (){
     return client;
 }
 
-const resMap = new Map()
-net.writeData = function (socket, data, seq, res){
-  console.log('writeData start : ' + data)
+net.writeData = function (socket, data, seq){
+  console.log('writeData start : ' + data + ", seq : " + seq)
   var success = !socket.write(data);
   if(!success){
         (function(socket, data){
@@ -123,34 +119,36 @@ var manualHeating
 var roomConfig
 var ahuZoneConfigMsg
 var damperSchedulerConfig
-var processOAMmsg = function (data){
+var processOAMmsg = function (data, seq){
   var ret = 0;
-
-  console.log('processOAMmsg data : ' + data)
+	let res
   var oamMsgDat = oam_msg_t.decode(data, ems_msg_header_t.size(), {endian:"BE"});
-  console.log("oamMsgDat : " + oamMsgDat.OAMMsgType +", " + oamMsgDat.DataLen +", "  + oamMsgDat.Data + ", ems_sys_config_t.size() : " + ems_sys_config_t.size());
+  console.log("seq : " + seq + ", oamMsgDat : " + oamMsgDat.OAMMsgType +", " + oamMsgDat.DataLen +", "  + oamMsgDat.Data + ", room_config_t.size() : " + room_config_t.size());
   if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_sys_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config )
    && oamMsgDat.DataLen == ems_sys_config_t.size()){
-     console.log("oamMsgDat.OAMMsgType = " + oamMsgDat.OAMMsgType)
-     var emsSysConfigDat = ems_sys_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"BE"});
-     console.log("emsSysConfigDat : " + JSON.stringify(emsSysConfigDat))
-		 // emsSysConfigDat.toString())
-		 // router.testFunc();
+     var emsSysConfigDat = ems_sys_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"LE"});
+     router.setSeqMap(seq, JSON.stringify(emsSysConfigDat))
+		 //console.log("emsSysConfigDat : " + JSON.stringify(emsSysConfigDat))
+		 // let res = resMap.get(seq)
+		 // res.json(JSON.stringify(emsSysConfigDat));
   }
   else if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_cmd_floorRad_manual_heating && oamMsgDat.DataLen == manual_heating_msg_t.size()){
       console.log("oamMsgDat.OAMMsgType = " + oamMsgDa.OAMMsgType)
   }
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_room_config)
-   && oamMsgDat.DataLen == room_config_msg_t.size()){
-      console.log("oamMsgDat.OAMMsgType = " + oamMsgDat.OAMMsgType)
+   && oamMsgDat.DataLen == room_config_t.size()){
+	      var roomConfigDat = room_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"BE"});
+	      router.setSeqMap(seq, JSON.stringify(roomConfigDat))
   }
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_solBeach_zone_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_solBeach_zone_config)
    && oamMsgDat.DataLen == ahu_zone_config_msg_t.size()){
       console.log("oamMsgDat.OAMMsgType = " + oamMsgDat.OAMMsgType)
   }
-  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_solBeach_damper_scheduler || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_solBeach_damper_scheduler)
+  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_solBeach_damper_scheduler || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_solBeach_damper_scheduler)
    && oamMsgDat.DataLen == damper_scheduler_config_t.size()){
       console.log("oamMsgDat.OAMMsgType = " + oamMsgDat.OAMMsgType)
+	      var damperScheConfigDat = damper_scheduler_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"BE"});
+	      router.setSeqMap(seq, JSON.stringify(damperScheConfigDat))
   }
   else {
       console.log("else!!!! oamMsgDat.OAMMsgType = " + oamMsgDat.OAMMsgType)
@@ -422,8 +420,8 @@ net.getSizeDampControlConf_t = function(){
 }
 
 var pid_control_conf_t = new struct("pid_control_conf_t", [
-    "PIDCtrlMode", struct.int32(),
-    "ControlStepValue", struct.float32(),
+    "PIDCtrlMode", struct.uint32(),
+    "ControlStepValue", struct.uint32(),
     "Kp", struct.float32(),
     "Ki", struct.float32(),
     "Kd", struct.float32(),
@@ -620,9 +618,10 @@ var room_config_t = new struct("room_config_t", [
     "Tsurf_cr", struct.float32(),
     "CheckInOutEnable", struct.int32(),
     "CheckInTime", struct.uint32(),
-    "CheckOutTime", struct.uint32()
+    "CheckOutTime", struct.uint32(),
+    "szDesc", struct.char(32)
 ]);
-net.makeRoomConfig_t = function(roomNo, area, direction, exteriorWallCnt, troom_set, tsurf_set, troom_cr, tsurf_cr, checkInOutEnable, checkInTime, checkOutTime){
+net.makeRoomConfig_t = function(roomNo, area, direction, exteriorWallCnt, troom_set, tsurf_set, troom_cr, tsurf_cr, checkInOutEnable, checkInTime, checkOutTime, szDesc){
   var buffer = new Buffer(room_config_t.size());
   room_config_t.encode(buffer,0, {
     RoomNo: roomNo,
@@ -635,7 +634,8 @@ net.makeRoomConfig_t = function(roomNo, area, direction, exteriorWallCnt, troom_
     Tsurf_cr: tsurf_cr,
     CheckInOutEnable: checkInOutEnable,
     CheckInTime: checkInTime,
-    CheckOutTime: checkOutTime
+    CheckOutTime: checkOutTime,
+    szDesc: szDesc
   },{endian:"BE"})
   return buffer;
 }
@@ -644,9 +644,9 @@ net.getSizeRoomConfig_t = function(){
 }
 
 
-var ahu_zone_config_t = new struct("ahu_zone_config_t", [
-    "Index", struct.uint16(),
-    "NotifyOccupantState", struct.uint8(),
+var ahu_zone_config_msg_t = new struct("ahu_zone_config_msg_t", [
+    "AhuIndex", struct.uint16(),
+    "NotifyOccupantsState", struct.uint8(),
     "HCMode", struct.char(),
     "DamperAutoManual", struct.char(),
     "Tzone_set", struct.float32(),
@@ -654,11 +654,39 @@ var ahu_zone_config_t = new struct("ahu_zone_config_t", [
     "PPMco2_set", struct.int32(),
     "Desc", struct.char(32)
 ]);
-net.makeAhuZoneConfig_t = function(index, notifyOccupantState, hcMode, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, desc){
+net.makeAhuZoneConfigMsg_t = function(ahuIndex, notifyOccupantsState, hcMode, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, desc){
   var buffer = new Buffer(ahu_zone_config_t.size());
   ahu_zone_config_t.encode(buffer,0, {
-    Index: index,
-    NotifyOccupantState: notifyOccupantState,
+    AhuIndex: ahuIndex,
+    NotifyOccupantsState: notifyOccupantsState,
+    HCMode: hcMode,
+    DamperAutoManual: damperAutoManual,
+    Tzone_set: tzone_set,
+    Rdamp_set: rdamp_set,
+    PPMco2_set: ppmCo2_set,
+    Desc: desc
+  },{endian:"BE"})
+  return buffer;
+}
+net.getSizeAhuZoneConfig_t = function(){
+  return ahu_zone_config_t.size()
+}
+
+var ahu_zone_config_t = new struct("ahu_zone_config_t", [
+    "AhuIndex", struct.uint16(),
+    "NotifyOccupantsState", struct.uint8(),
+    "HCMode", struct.char(),
+    "DamperAutoManual", struct.char(),
+    "Tzone_set", struct.float32(),
+    "Rdamp_set", struct.float32(),
+    "PPMco2_set", struct.int32(),
+    "Desc", struct.char(32)
+]);
+net.makeAhuZoneConfig_t = function(ahuIndex, notifyOccupantsState, hcMode, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, desc){
+  var buffer = new Buffer(ahu_zone_config_t.size());
+  ahu_zone_config_t.encode(buffer,0, {
+    AhuIndex: ahuIndex,
+    NotifyOccupantsState: notifyOccupantsState,
     HCMode: hcMode,
     DamperAutoManual: damperAutoManual,
     Tzone_set: tzone_set,
@@ -695,7 +723,7 @@ net.getSizeDamperScheduler_t = function(){
 var damper_scheduler_config_t = new struct("damper_scheduler_t", [
     "AhuIndex", struct.uint16(),
     "Reserved", struct.uint16(),
-    "tSch", struct.type(damper_scheduler_t, 2)
+    "tSch", struct.type(damper_scheduler_t, 12)
 ]);
 net.makeDamperSchedulerConfig_t = function(ahuIndex, reserved, tSch){
   var buffer = new Buffer(damper_scheduler_config_t.size());

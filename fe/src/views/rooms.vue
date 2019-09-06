@@ -787,6 +787,7 @@ export default {
       roomTitle: '객실 예약',
       settingTitle: '객실 설정',
       roomStat: [],
+      roomConfigs: [],
       roomsSchedule: [],
       roomStatInfo: {
         roomNo: 0,
@@ -1096,8 +1097,28 @@ export default {
       this.$data.roomScheduleModal = true
     },
     settingRoom: function (roomNo) {
-      this.initRoomStatInfo()
-      this.getRoomStatInfo(roomNo)
+      //this.initRoomStatInfo()
+      // this.getRoomStatInfo(roomNo)
+      axios.get(`http://localhost:3000/api/rooms/getRoomConfig/${roomNo}`)
+        .then((r) => {
+          this.roomConfigs = r.data
+          alert(this.roomConfigs)
+        })
+        .catch((e) => {
+          console.error(e.message)
+        })
+          // alert(this.roomsSchedule.length)
+          // for(var i=0; i < this.roomsSchedule.length ; i++){
+          //   this.events.push({
+          //     idx: this.roomsSchedule[i].idx,
+          //     roomNo: this.roomsSchedule[i].roomNo,
+          //     name: this.roomsSchedule[i].subsName,
+          //     details: this.roomsSchedule[i].strDesc,
+          //     start: this.roomsSchedule[i].strCheckInTime,
+          //     end: this.roomsSchedule[i].strCheckOutTime,
+          //     color: 'grey darken-1'
+          //   })
+          // }
       this.$data.settingRoomModal = true
     },
     reserveRoomSche: function () {

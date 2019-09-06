@@ -20,9 +20,9 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/rooms.vue')
     },
     {
-      path: '/test',
-      name: 'test',
-      component: test
+      path: '/emsSysConfig',
+      name: 'config',
+      component: () => import(/* webpackChunkName: "about" */ './views/test.vue')
     },
     {
       path: '*',

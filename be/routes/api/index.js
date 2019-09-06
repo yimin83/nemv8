@@ -4,6 +4,11 @@ var router = express.Router();
 
 /* GET home page. */
 router.use('/rooms', require('./rooms'))
+router.use('/emsSysConfig', require('./rooms'))
+router.use('/damperConfig', require('./rooms'))
+router.use('/getRoomConfig', require('./rooms'))
+
+
 
 
 router.all('*', function(req, res, next) {

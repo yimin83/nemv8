@@ -70,8 +70,8 @@ export default {
         },
         {
           icon: 'favorite',
-          title: '테스트',
-          to: { path: '/test' }
+          title: '설정',
+          to: { path: '/emsSysConfig' }
         },
         {
           icon: 'help',

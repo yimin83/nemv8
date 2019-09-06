@@ -7,13 +7,25 @@ var EMS_ID = 'NB_ADMIN'
 var EMS_PASSWORD = 'FLOWERSTONE_81'
 var UserLevel = 1
 var _ems_web_client = 0x81
-var oam_get_sys_config = 2
 var EMS_VERSION = 0x0101
 var EMS_PREAMBLE = 0x1B04
 var Msg_Type_Auth = 0x10
 var Msg_Type_OAM = 0x60
 var Msg_Status_OK = 0
 var web_interface = 0x80
+
+const oam_msg_type_e = {
+	oam_set_sys_config : 1,		// if you change this, you should change _ems_msg_type_stat_e [_set_sys_config] too
+	oam_get_sys_config : 2,			// get sys config
+	oam_cmd_floorRad_manual_heating : 3,
+	oam_cmd_floorRad_room_state : 4,
+	oam_set_floorRad_room_config : 5,
+	oam_get_floorRad_room_config : 6,
+	oam_set_solBeach_zone_config : 7,
+	oam_get_solBeach_zone_config : 8,
+	oam_set_solBeach_damper_scheduler : 9,
+	oam_get_solBeach_damper_scheduler : 10
+};
 
 mysqlDB.connect();
 var client = net.getConnection();
@@ -29,18 +41,12 @@ msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq
 net.writeData(client, fullBuffer, null);
 
 var dataLen = 0
+var IntervalA;
 // const startCallback = Date.now();
 // while (Date.now() - startCallback < 10000) {
 // }
-msgBuffer = net.makeOamMsg_t(oam_get_sys_config, dataLen, null);
-totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-nSeq = counter.get();
-msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-fullBuffer = new Buffer(totalSize);
-msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
-net.writeData(client, fullBuffer, nSeq, null);
 
+const seqMap = new Map()
 router.get('/', function(req, res, next) {
   mysqlDB.query("SELECT * FROM RoomStat;", function(err, result, fields){
     if(err){
@@ -53,26 +59,47 @@ router.get('/', function(req, res, next) {
   });
 });
 
-router.get('/setting', function(req, res, next) {
-  // mysqlDB.query("SELECT * FROM RoomStat;", function(err, result, fields){
-  //   if(err){
-  //     console.log("쿼리문에 오류가 있습니다.");
-  //   }
-  //   else{
-  //     res.json(result);
-  //     //console.log(result)
-  //   }
-  // });
-  msgBuffer = net.makeOamMsg_t(oam_get_sys_config, dataLen, null);
+router.get('/emsSysConfig', function(req, res, next) {
+  dataLen = 0;
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_sys_config, dataLen, null);
   totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
   nSeq = counter.get();
   msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
   fullBuffer = new Buffer(totalSize);
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
   msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
-  net.writeData(client, fullBuffer, nSeq, null);
+  net.writeData(client, fullBuffer, nSeq);
+  IntervalA = setInterval(checkMap, 1000, nSeq, res);
 });
 
+router.get('/damperConfig/:ahuIndex', function(req, res, next) {
+  console.log("######################### damperConfig ######################### ")
+  const ahuIndex = req.params.ahuIndex
+  var dataBuffer = new Buffer(4)
+  dataBuffer.writeUInt32LE(ahuIndex);
+  console.log("ahuIndex : "+ahuIndex+", dataBuffer : " + dataBuffer.toString('hex'))
+  dataLen = 0;
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_solBeach_damper_scheduler, dataLen, dataBuffer);
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
+  nSeq = counter.get();
+  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
+  fullBuffer = new Buffer(totalSize);
+  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
+  net.writeData(client, fullBuffer, nSeq);
+  IntervalA = setInterval(checkMap, 1000, nSeq, res);
+});
+
+var checkMap = function(seq, res) {
+  console.log("######################### checkMap ######################### ")
+  var json = seqMap.get(seq)
+  if(json != "" && json != null){
+    clearInterval(IntervalA)
+    res.json(seqMap.get(nSeq))
+    console.log("configSetting seqMap.get(nSeq) : " + seqMap.get(nSeq))
+    seqMap.delete(nSeq)
+  }
+}
 router.get('/:roomNo', (req, res, next) => { // 수정
   const roomNo = req.params.roomNo
   console.log(req.body)
@@ -85,6 +112,34 @@ router.get('/:roomNo', (req, res, next) => { // 수정
         //console.log(result)
       }
     });
+
+    // dataLen = 0;
+    // msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_config, dataLen, null);
+    // totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
+    // nSeq = counter.get();
+    // msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
+    // fullBuffer = new Buffer(totalSize);
+    // msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+    // msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
+    // net.writeData(client, fullBuffer, nSeq);
+    // IntervalA = setInterval(checkMap, 1000, nSeq, res);
+});
+router.get('/getRoomConfig/:roomNo', (req, res, next) => { // 수정
+  const roomNo = req.params.roomNo
+  console.log("######################### getRoomConfig ######################### ")
+  var dataBuffer = new Buffer(4)
+  dataBuffer.writeUInt32LE(roomNo);
+  console.log("roomNo : "+roomNo+", dataBuffer : " + dataBuffer.toString('hex'))
+  dataLen = 0;
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_config, dataLen, dataBuffer);
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
+  nSeq = counter.get();
+  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
+  fullBuffer = new Buffer(totalSize);
+  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
+  net.writeData(client, fullBuffer, nSeq);
+  IntervalA = setInterval(checkMap, 1000, nSeq, res);
 });
 
 router.post('/', (req, res, next) => { // 생성
@@ -159,7 +214,6 @@ router.delete('/:idx', (req, res, next) => { // 삭제
       }
   });
 })
-
 exports.getMysqlDB = function () {
     console.log('getMysqlDB!!!!!!!!!!!!!!!!!!' );
     //return mysqlDB;
@@ -169,7 +223,16 @@ exports.getNet = function () {
     //return client;
 };
 exports.testFunc = function (res) {
-    console.log('testFunc!!!!!!!!!!!!!!!!!!' );
+    console.log('testFunc!!!!!!!!!!!!!!!!!! ' + res );
     //res.redirect("/");
+};
+
+exports.setSeqMap = function (seq, jsonData) {
+    console.log('getEmsSysConfig !!!!!!!!!!!!!!!!!! seq : ' + seq );
+    //res.redirect("/");
+    seqMap.set(seq, jsonData)
+    console.log('getEmsSysConfig !!!!!!!!!!!!!!!!!! seqMap.get(seq) : ' + seqMap.get(seq));
+
+
 };
 module.exports = router;
