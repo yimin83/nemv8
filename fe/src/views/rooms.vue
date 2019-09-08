@@ -617,31 +617,121 @@
         <v-card-text>
           <v-container fluid grid-list-xl>
             <v-layout row wrap>
-              <v-flex xs6>
+              <!-- <v-flex xs6>
                 <v-checkbox
                   v-model="bestChkbox"
                   :label="`베스트룸`"
                 ></v-checkbox>
-              </v-flex>
+              </v-flex> -->
               <v-flex xs6>
                 <v-text-field
-                  label="설정온도"
+                  label="RoomNo"
                   hint=''
                   persistent-hint
                   required
-                  v-model="roomStatInfo.setTemp"
+                  v-model="roomConfigs.RoomNo"
                 ></v-text-field>
               </v-flex>
               <v-flex xs6>
                 <v-text-field
-                  label="온도범위"
+                  label="Area"
                   hint=''
                   persistent-hint
                   required
-                  v-model="roomStatInfo.controlRange"
+                  v-model="roomConfigs.Area"
                 ></v-text-field>
               </v-flex>
               <v-flex xs6>
+                <v-text-field
+                  label="Direction"
+                  hint=''
+                  persistent-hint
+                  required
+                  v-model="roomConfigs.Direction"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs6>
+                <v-text-field
+                  label="ExteriorWallCnt"
+                  hint=''
+                  persistent-hint
+                  required
+                  v-model="roomConfigs.ExteriorWallCnt"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs6>
+                <v-text-field
+                  label="Troom_set"
+                  hint=''
+                  persistent-hint
+                  required
+                  v-model="roomConfigs.Troom_set"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs6>
+                <v-text-field
+                  label="Tsurf_set"
+                  hint=''
+                  persistent-hint
+                  required
+                  v-model="roomConfigs.Tsurf_set"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs6>
+                <v-text-field
+                  label="Troom_cr"
+                  hint=''
+                  persistent-hint
+                  required
+                  v-model="roomConfigs.Troom_cr"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs6>
+                <v-text-field
+                  label="Tsurf_set"
+                  hint=''
+                  persistent-hint
+                  required
+                  v-model="roomConfigs.Tsurf_cr"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs6>
+                <v-text-field
+                  label="CheckInOutEnable"
+                  hint=''
+                  persistent-hint
+                  required
+                  v-model="roomConfigs.CheckInOutEnable"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs6>
+                <v-text-field
+                  label="CheckInTime"
+                  hint=''
+                  persistent-hint
+                  required
+                  v-model="roomConfigs.CheckInTime"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs6>
+                <v-text-field
+                  label="CheckOutTime"
+                  hint=''
+                  persistent-hint
+                  required
+                  v-model="roomConfigs.CheckOutTime"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs6>
+                <v-text-field
+                  label="strDesc"
+                  hint=''
+                  persistent-hint
+                  required
+                  v-model="roomConfigs.strDesc"
+                ></v-text-field>
+              </v-flex>
+              <!-- <v-flex xs6>
                 <v-select
                   :items="heatingModes"
                   v-model="heatingMode"
@@ -668,7 +758,7 @@
                   required
                   v-model="roomStatInfo.heatingTimeSec"
                 ></v-text-field>
-              </v-flex>
+              </v-flex> -->
             </v-layout>
           </v-container>
         </v-card-text>
@@ -789,6 +879,20 @@ export default {
       roomStat: [],
       roomConfigs: [],
       roomsSchedule: [],
+      roomConfig:{
+        RoomNo:0,
+        Area:0,
+        Direction:0,
+        ExteriorWallCnt:0,
+        Troom_set:0,
+        Tsurf_set:0,
+        Troom_cr:0,
+        Tsurf_cr:0,
+        CheckInOutEnable:0,
+        CheckInTime:0,
+        CheckOutTime:0,
+        strDesc: ''
+      },
       roomStatInfo: {
         roomNo: 0,
         heatingMode: 0,
@@ -835,7 +939,9 @@ export default {
       reserveStartDate: '',
       reserveEndDate: '',
       roomNo: 0,
-      roomIdx: 0
+      roomIdx: 0,
+      trnCheckInTime:0,
+      trnCheckOutTime:0
     }
   },
   computed: {
@@ -1101,8 +1207,14 @@ export default {
       // this.getRoomStatInfo(roomNo)
       axios.get(`http://localhost:3000/api/rooms/getRoomConfig/${roomNo}`)
         .then((r) => {
-          this.roomConfigs = r.data
-          alert(this.roomConfigs)
+          this.roomConfigs = JSON.parse(r.data)
+          this.trnCheckInTime = new Date(this.roomConfigs.CheckInTime*1000).toISOString().
+  replace(/T/, ' ').      // replace T with a space
+  replace(/\..+/, '')
+          this.trnCheckOutTime = new Date(this.roomConfigs.CheckOutTime*1000).toISOString().
+  replace(/T/, ' ').      // replace T with a space
+  replace(/\..+/, '') 
+          alert(this.trnCheckInTime +", "+this.trnCheckOutTime)
         })
         .catch((e) => {
           console.error(e.message)

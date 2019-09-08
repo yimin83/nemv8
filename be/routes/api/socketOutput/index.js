@@ -52,6 +52,9 @@ net.getConnection = function (){
     // 접속 종료 시 처리
     client.on('close', function() {
         console.log("socketOutput client Socket Closed : " + " localport : " + local_port);
+				// client.setTimeout(1000, function() {
+				// 		net_client.connect(15000, 'localhost');
+		    // })
     });
 
 // 데이터 수신 후 처리
@@ -82,7 +85,24 @@ net.getConnection = function (){
 
     client.on('error', function(err) {
         console.log('socketOutput client Socket Error: '+ JSON.stringify(err));
+				client.connect(15000, 'localhost');
+				// client.socket.reconnect();
     });
+
+		client.on('disconnect', function(){
+			console.log('disconnected..');
+		});
+
+		// client.on('reconnect', (attemptNumber) => {
+		// 	console.log('socketOutput client reconnect attemptNumber: '+attemptNumber);
+		//   // else the socket will automatically try to reconnect
+		// });
+		// client.on('reconnecting', function(delay, attempt) {
+	  // if (attempt === max_socket_reconnects) {
+	  //   setTimeout(function(){ socket.socket.reconnect(); }, 5000);
+	  //   return console.log("Failed to reconnect. Lets try that again in 5 seconds.");
+	  // }
+		// });
 
     client.on('timeout', function() {
         console.log('socketOutput client Socket timeout: ');
@@ -737,4 +757,6 @@ net.makeDamperSchedulerConfig_t = function(ahuIndex, reserved, tSch){
 net.getSizeDamperSchedulerConfig_t = function(){
   return damper_scheduler_config_t.size()
 }
+
+
 module.exports = net;
