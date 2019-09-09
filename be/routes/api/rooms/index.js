@@ -48,7 +48,7 @@ var IntervalA;
 
 const seqMap = new Map()
 router.get('/', function(req, res, next) {
-  mysqlDB.query("SELECT * FROM RoomStat;", function(err, result, fields){
+  mysqlDB.query("SELECT * FROM floor_rad_room;", function(err, result, fields){
     if(err){
       console.log("쿼리문에 오류가 있습니다.");
     }
@@ -67,7 +67,7 @@ router.get('/emsSysConfig', function(req, res, next) {
   msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
   fullBuffer = new Buffer(totalSize);
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
+  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
   net.writeData(client, fullBuffer, nSeq);
   IntervalA = setInterval(checkMap, 1000, nSeq, res);
 });
@@ -85,7 +85,7 @@ router.get('/damperConfig/:ahuIndex', function(req, res, next) {
   msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
   fullBuffer = new Buffer(totalSize);
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
+  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
   net.writeData(client, fullBuffer, nSeq);
   IntervalA = setInterval(checkMap, 1000, nSeq, res);
 });
@@ -100,10 +100,11 @@ var checkMap = function(seq, res) {
     seqMap.delete(nSeq)
   }
 }
-router.get('/:roomNo', (req, res, next) => { // 수정
-  const roomNo = req.params.roomNo
-  console.log(req.body)
-    mysqlDB.query("SELECT * FROM RoomsSchedule where roomNo = ?;", [roomNo], function(err, result, fields){
+router.get('/:usRoomNo', (req, res, next) => { // 수정
+  const usRoomNo = req.params.usRoomNo
+	console.log("get room schedule : " + usRoomNo)
+	console.log(req.body)
+    mysqlDB.query("SELECT * FROM RoomsSchedule where usRoomNo = ?;", [usRoomNo], function(err, result, fields){
       if(err){
         console.log("쿼리문에 오류가 있습니다.");
       }
@@ -137,16 +138,16 @@ router.get('/getRoomConfig/:roomNo', (req, res, next) => { // 수정
   msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
   fullBuffer = new Buffer(totalSize);
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
+  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
   net.writeData(client, fullBuffer, nSeq);
   IntervalA = setInterval(checkMap, 1000, nSeq, res);
 });
 
 router.post('/', (req, res, next) => { // 생성
   console.log('post body : '+ req.body)
-  const {roomNo, checkInOutEnbale, strCheckInTime, checkInTime, strCheckOutTime, checkOutTime, subsName, subsTel, resDate, peopleCnt, strDesc} = req.body
-  mysqlDB.query("INSERT INTO RoomsSchedule (idx, roomNo, checkInOutEnbale, strCheckInTime, checkInTime, strCheckOutTime, checkOutTime, subsName, subsTel, resDate, peopleCnt, strDesc) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-  [ null, roomNo, (checkInOutEnbale==true?1:0), strCheckInTime, checkInTime, strCheckOutTime, checkOutTime, subsName, subsTel, resDate, peopleCnt, strDesc], function (err, rows, fields) {
+  const {usRoomNo, nCheckInOutEnbale, nCheckInTime, nCheckOutTime, szSubsName, szSubsTel, tReserveDate, ucPeopleCnt, szDesc} = req.body
+  mysqlDB.query("INSERT INTO RoomsSchedule (nIdx, usRoomNo, nCheckInOutEnbale, nCheckInTime, nCheckOutTime, szSubsName, szSubsTel, tReserveDate, ucPeopleCnt, szDesc) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+  [ null, usRoomNo, (nCheckInOutEnbale==true?1:0), nCheckInTime, nCheckOutTime, szSubsName, szSubsTel, tReserveDate, ucPeopleCnt, szDesc], function (err, rows, fields) {
     if (!err) {
       // var client = net.getConnection();
       // var buffer = net.makeSetRoomConfig(roomNo, 1, );
@@ -164,29 +165,47 @@ router.post('/', (req, res, next) => { // 생성
 });
 router.put('/:type', (req, res, next) => { // 수정
   const type = req.params.type
-  console.log('type : ' + type + 'body : '+req.body)
+  console.log('type : ' + type + 'body : '+ req.body)
   if(type == "roomStat"){
-    const { roomNo, heatingMode, setTemp, controlRange, heatingTimeSec, roomState, roomType, pos, isBestRoom, boilerOn }  = req.body
-    mysqlDB.query('update RoomStat set heatingMode=?, setTemp=?, controlRange=?, heatingTimeSec=?, roomState=?, roomType=?, pos=?, isBestRoom=?, boilerOn=? where roomNo=?',
-      [ heatingMode, setTemp, controlRange, heatingTimeSec, roomState, roomType, pos, isBestRoom, boilerOn, roomNo], function (err, rows, fields) {
-        if (!err) {
-          // var client = net.getConnection();
-          // var buffer = net.makeSetRoomConfig(roomNo, 1, );
-          // net.writeData(client, buffer);
-          // buffer = net.makeSetRoomState(roomNo, 1);
-          // net.writeData(client, buffer);
-          // console.log('Room net.makeData() : '+ net.makeData());
-          res.send({ success: true })
-          //res.redirect("/");
-        } else {
-            res.send('error : ' + err);
-            console.log(err)
-        }
-    });
-  }else {
-    const {idx, roomNo, checkInOutEnbale, strCheckInTime, checkInTime, strCheckOutTime, checkOutTime, subsName, subsTel, resDate, peopleCnt, strDesc} = req.body
-    mysqlDB.query("update RoomsSchedule set roomNo=?, checkInOutEnbale=?, strCheckInTime=?, checkInTime=?, strCheckOutTime=?, checkOutTime=?, subsName=?, subsTel=?, resDate=?, peopleCnt=?, strDesc=? where idx=?",
-    [ roomNo, (checkInOutEnbale==true?1:0), strCheckInTime, checkInTime, strCheckOutTime, checkOutTime, subsName, subsTel, resDate, peopleCnt, strDesc, idx], function (err, rows, fields) {
+    const { RoomNo, Area, Direction, ExteriorWallCnt, Troom_set, Tsurf_set, Troom_cr, Tsurf_cr, CheckInOutEnable,
+			CheckInTime, CheckOutTime, szDesc, HeatingMode, HeatingTimeSec, Tset, Tset_cr} = req.body
+    // mysqlDB.query('update room_info set direction=?, exterior_wall_cnt=?, area=? where roomNo=?',
+    //   [ direction, exterior_wall_cnt, area, roomNo ], function (err, rows, fields) {
+    //     if (!err) {
+    //       // var client = net.getConnection();
+    //       // var buffer = net.makeSetRoomConfig(roomNo, 1, );
+    //       // net.writeData(client, buffer);
+    //       // buffer = net.makeSetRoomState(roomNo, 1);
+    //       // net.writeData(client, buffer);
+    //       // console.log('Room net.makeData() : '+ net.makeData());
+    //       res.send({ success: true })
+    //       //res.redirect("/");
+    //     } else {
+    //         res.send('error : ' + err);
+    //         console.log(err)
+    //     }
+    // });
+
+		console.log(RoomNo + " , " +Area + " , " +Direction + " , " +ExteriorWallCnt + " , " +Troom_set + " , " +Tsurf_set + " , " +Troom_cr + " , " +Tsurf_cr + " , " +CheckInOutEnable + " , " +CheckInTime + " , " +CheckOutTime + " , " +szDesc)
+		var dataBuffer = new Buffer(net.getSizeRoomConfig_t())
+	  dataBuffer = net.makeRoomConfig_t(RoomNo, Area, Direction, ExteriorWallCnt, Troom_set, Tsurf_set, Troom_cr, Tsurf_cr, CheckInOutEnable, CheckInTime, CheckOutTime, szDesc);
+	  console.log("RoomNo : "+RoomNo+", dataBuffer : " + dataBuffer.toString('hex'))
+		dataLen = net.getSizeRoomConfig_t();
+	  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_floorRad_room_config, dataLen, dataBuffer);
+	  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
+	  nSeq = counter.get();
+	  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
+	  fullBuffer = new Buffer(totalSize);
+	  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+		msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
+	  dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
+	  net.writeData(client, fullBuffer, nSeq);
+	  IntervalA = setInterval(checkMap, 1000, nSeq, res);
+		// makeRoomConfig_t = function(roomNo, area, direction, exteriorWallCnt, troom_set, tsurf_set, troom_cr, tsurf_cr, checkInOutEnable, checkInTime, checkOutTime, szDesc)
+  } else {
+    const {nIdx, usRoomNo, nCheckInOutEnbale, nCheckInTime, nCheckOutTime, szSubsName, szSubsTel, tReserveDate, ucPeopleCnt, szDesc} = req.body
+    mysqlDB.query("update RoomsSchedule set usRoomNo=?, nCheckInOutEnbale=?, nCheckInTime=?, nCheckOutTime=? szSubsName=?, szSubsTel=?, tReserveDate=?, ucPeopleCnt=?, szDesc=? where nIdx=?",
+		[ usRoomNo, (nCheckInOutEnbale==true?1:0), nCheckInTime, nCheckOutTime, szSubsName, szSubsTel, tReserveDate, ucPeopleCnt, szDesc, nIdx], function (err, rows, fields) {
         if (!err) {
           // var client = net.getConnection();
           // var buffer = net.makeSetRoomConfig(roomNo, setTemp, 4);
@@ -202,10 +221,10 @@ router.put('/:type', (req, res, next) => { // 수정
   }
 });
 
-router.delete('/:idx', (req, res, next) => { // 삭제
-  const idx = req.params.idx
+router.delete('/:nIdx', (req, res, next) => { // 삭제
+  const nIdx = req.params.nIdx
   //console.log('idx : ' + idx)
-  mysqlDB.query('delete from RoomsSchedule where idx=?', [idx], function (err, rows, fields) {
+  mysqlDB.query('delete from RoomsSchedule where nIdx=?', [nIdx], function (err, rows, fields) {
       if (!err) {
         res.send({ success: true })
         console.log("delete ok")
