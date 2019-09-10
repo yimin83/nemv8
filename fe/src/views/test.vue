@@ -310,6 +310,24 @@
                             <span class="headline">Damper Control Scheduler</span>
                           </v-card-title>
                           <v-card-text>
+                            <v-row align="center">
+                              <v-col cols="3">
+                                <v-subheader>AhuIndex : </v-subheader>
+                              </v-col>
+                              <v-col cols="2">
+                                <v-select
+                                  v-model="damperSchsConfig.AhuIndex"
+                                  :items="AhuIndexs"
+                                  item-text="AhuIndex"
+                                  item-value="AhuIndex"
+                                  label="AhuIndex"
+                                  persistent-hint
+                                  return-object
+                                  single-line
+                                  width:10px
+                                ></v-select>
+                              </v-col>
+                            </v-row>
                             <v-simple-table>
                               <thead>
                                 <tr>
@@ -333,7 +351,7 @@
                           </v-card-text>
                           <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="blue darken-1" flat @click="applyDamperSch()">Apply</v-btn>
+                            <v-btn color="blue darken-1" flat @click="applyDamperSch(damperSchsConfig.AhuIndex)">Apply</v-btn>
                             <v-btn color="blue darken-1" flat @click="closeDamperSch()">Cancel</v-btn>
                           </v-card-actions>
                         </v-card>
@@ -362,6 +380,29 @@
     },
     data () {
       return {
+        select: { AhuIndex: 2},
+        AhuIndexs: [
+          { AhuIndex: 1 },
+          { AhuIndex: 2 },
+          { AhuIndex: 3 },
+          { AhuIndex: 4 },
+          { AhuIndex: 5 },
+          { AhuIndex: 6 },
+          { AhuIndex: 7 },
+          { AhuIndex: 8 },
+          { AhuIndex: 9 },
+          { AhuIndex: 10 },
+          { AhuIndex: 11 },
+          { AhuIndex: 12 },
+          { AhuIndex: 13 },
+          { AhuIndex: 14 },
+          { AhuIndex: 15 },
+          { AhuIndex: 16 },
+          { AhuIndex: 17 },
+          { AhuIndex: 18 },
+          { AhuIndex: 19 },
+          { AhuIndex: 20 },
+        ],
         itemsPerPage: 3,
         damperSchModal: false,
         configs:[],
@@ -407,9 +448,17 @@
           })
         this.$data.damperSchModal = true
       },
-      applyDamperSch: function () {
-        alert("applyDamperSch")
-        this.$data.damperSchModal = false
+      applyDamperSch: function (AhuIndex) {
+        // alert(JSON.stringify(this.damperSchsConfig))
+        axios.put('http://localhost:3000/api/rooms/damperConfig', { damperConfig:this.damperSchsConfig })
+          .then((r) => {
+            this.openDamperSch(AhuIndex)
+          })
+          .catch((e) => {
+            alert(e.message)
+            console.error(e.message)
+          })
+        // this.$data.damperSchModal = false
       },
       closeDamperSch: function () {
         // alert("closeDamperSch")

@@ -20,12 +20,14 @@ const oam_msg_type_e = {
 	oam_get_sys_config : 2,			// get sys config
 	oam_cmd_floorRad_manual_heating : 3,
 	oam_cmd_floorRad_room_state : 4,
-	oam_set_floorRad_room_config : 5,
-	oam_get_floorRad_room_config : 6,
-	oam_set_solBeach_zone_config : 7,
-	oam_get_solBeach_zone_config : 8,
-	oam_set_solBeach_damper_scheduler : 9,
-	oam_get_solBeach_damper_scheduler : 10
+	oam_cmd_checkIn : 5,
+	oam_set_floorRad_room_config : 6,
+	oam_get_floorRad_room_config : 7,
+	oam_set_solBeach_zone_config : 8,
+	oam_get_solBeach_zone_config : 9,
+	oam_set_solBeach_damper_scheduler : 10,
+	oam_get_solBeach_damper_scheduler : 11,
+	oam_event_alarm : 12
 };
 
 net.getConnection = function (){
@@ -158,9 +160,9 @@ var processOAMmsg = function (data, seq){
   }
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_room_config)
    && oamMsgDat.DataLen == room_config_t.size()){
-	      var roomConfigDat = room_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"BE"});
-				if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_config)
-	      	router.setSeqMap(seq, JSON.stringify(roomConfigDat))
+      var roomConfigDat = room_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"BE"});
+			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_config)
+      	router.setSeqMap(seq, JSON.stringify(roomConfigDat))
   }
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_solBeach_zone_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_solBeach_zone_config)
    && oamMsgDat.DataLen == ahu_zone_config_msg_t.size()){
@@ -168,10 +170,9 @@ var processOAMmsg = function (data, seq){
   }
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_solBeach_damper_scheduler || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_solBeach_damper_scheduler)
    && oamMsgDat.DataLen == damper_scheduler_config_t.size()){
-      console.log("oamMsgDat.OAMMsgType = " + oamMsgDat.OAMMsgType)
-	      var damperScheConfigDat = damper_scheduler_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"BE"});
-				if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_solBeach_damper_scheduler)
-	      	router.setSeqMap(seq, JSON.stringify(damperScheConfigDat))
+      var damperScheConfigDat = damper_scheduler_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"BE"});
+			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_solBeach_damper_scheduler)
+      	router.setSeqMap(seq, JSON.stringify(damperScheConfigDat))
   }
   else {
       console.log("else!!!! oamMsgDat.OAMMsgType = " + oamMsgDat.OAMMsgType)
@@ -761,5 +762,24 @@ net.getSizeDamperSchedulerConfig_t = function(){
   return damper_scheduler_config_t.size()
 }
 
+var check_in_cmd_t = new struct("check_in_cmd_t", [
+	"RoomNo", struct.uint16(),
+	"CheckInOutEnable", struct.int32(),
+	"CheckIn", struct.uint32(),
+	"CheckOut", struct.uint32(),
+]);
+net.makeCheckInCmd_t = function(roomNo, checkInOutEnable, checkIn, checkOut){
+  var buffer = new Buffer(check_in_cmd_t.size());
+  check_in_cmd_t.encode(buffer,0, {
+    RoomNo: roomNo,
+    CheckInOutEnable: checkInOutEnable,
+    CheckIn: checkIn,
+    CheckOut: checkOut
+  },{endian:"BE"})
+  return buffer;
+}
+net.getSizeCheckIn_t = function(){
+  return check_in_cmd_t.size()
+}
 
 module.exports = net;
