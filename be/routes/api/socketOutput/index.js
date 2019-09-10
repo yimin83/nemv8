@@ -147,7 +147,8 @@ var processOAMmsg = function (data, seq){
   if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_sys_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config )
    && oamMsgDat.DataLen == ems_sys_config_t.size()){
      var emsSysConfigDat = ems_sys_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"LE"});
-     router.setSeqMap(seq, JSON.stringify(emsSysConfigDat))
+		 if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config)
+		 	  router.setSeqMap(seq, JSON.stringify(emsSysConfigDat))
 		 //console.log("emsSysConfigDat : " + JSON.stringify(emsSysConfigDat))
 		 // let res = resMap.get(seq)
 		 // res.json(JSON.stringify(emsSysConfigDat));
@@ -158,7 +159,8 @@ var processOAMmsg = function (data, seq){
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_room_config)
    && oamMsgDat.DataLen == room_config_t.size()){
 	      var roomConfigDat = room_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"BE"});
-	      router.setSeqMap(seq, JSON.stringify(roomConfigDat))
+				if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_config)
+	      	router.setSeqMap(seq, JSON.stringify(roomConfigDat))
   }
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_solBeach_zone_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_solBeach_zone_config)
    && oamMsgDat.DataLen == ahu_zone_config_msg_t.size()){
@@ -168,7 +170,8 @@ var processOAMmsg = function (data, seq){
    && oamMsgDat.DataLen == damper_scheduler_config_t.size()){
       console.log("oamMsgDat.OAMMsgType = " + oamMsgDat.OAMMsgType)
 	      var damperScheConfigDat = damper_scheduler_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"BE"});
-	      router.setSeqMap(seq, JSON.stringify(damperScheConfigDat))
+				if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_solBeach_damper_scheduler)
+	      	router.setSeqMap(seq, JSON.stringify(damperScheConfigDat))
   }
   else {
       console.log("else!!!! oamMsgDat.OAMMsgType = " + oamMsgDat.OAMMsgType)
@@ -274,7 +277,7 @@ var var_temp_conf_t = new struct("var_temp_conf_t", [
     "HeatingDelatTemp", struct.float32(),
     "LowCoolingTemp", struct.float32()
 ]);
-net.makeOptimalStopConf_t = function(heatingHighTemp, heatingLowTemp, heatingDelatTemp, lowCoolingTemp){
+net.makeVarTempConf_t = function(heatingHighTemp, heatingLowTemp, heatingDelatTemp, lowCoolingTemp){
   var buffer = new Buffer(var_temp_conf_t.size());
   var_temp_conf_t.encode(buffer,0, {
     HeatingHighTemp: heatingHighTemp,
@@ -284,7 +287,7 @@ net.makeOptimalStopConf_t = function(heatingHighTemp, heatingLowTemp, heatingDel
   },{endian:"BE"})
   return buffer;
 }
-net.getSizeOptimalStopConf_t = function(){
+net.getSizeVarTempConf_t = function(){
   return var_temp_conf_t.size()
 }
 
@@ -292,7 +295,7 @@ var peak_demand_conf_t = new struct("peak_demand_conf_t", [
     "MaxHeatingRoom", struct.uint32(),
     "NightMaxHeatingRoom", struct.uint32()
 ]);
-net.makeOptimalStopConf_t = function(maxHeatingRoom, nightMaxHeatingRoom){
+net.makePeakDemandConf_t = function(maxHeatingRoom, nightMaxHeatingRoom){
   var buffer = new Buffer(peak_demand_conf_t.size());
   peak_demand_conf_t.encode(buffer,0, {
     MaxHeatingRoom: maxHeatingRoom,
@@ -300,7 +303,7 @@ net.makeOptimalStopConf_t = function(maxHeatingRoom, nightMaxHeatingRoom){
   },{endian:"BE"})
   return buffer;
 }
-net.getSizeOptimalStopConf_t = function(){
+net.getSizePeakDemandConf_t = function(){
   return peak_demand_conf_t.size()
 }
 
@@ -556,7 +559,7 @@ net.makeEmsSysConf_t = function(packetMinIntervalSec, controlPeriodSec, tAddr, t
     tRemoteAddr: tRemoteAddr,
     tFloorRadConf: tFloorRadConf,
     tSolBeachConf: tSolBeachConf
-  },{endian:"BE"})
+  },{endian:"LE"})
   return buffer;
 }
 net.getSizeEmsSysConf_t = function(){
@@ -645,7 +648,7 @@ net.makeRoomConfig_t = function(roomNo, area, direction, exteriorWallCnt, troom_
   var buffer = new Buffer(room_config_t.size());
   room_config_t.encode(buffer,0, {
     RoomNo: roomNo,
-    area: area,
+    Area: area,
     Direction: direction,
     ExteriorWallCnt: exteriorWallCnt,
     Troom_set: troom_set,

@@ -18,7 +18,7 @@
                 </v-list-item>
                 <v-list-item>
                   <v-list-item-content>EMS Remote:</v-list-item-content>
-                  <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" :rules="rules" v-model="configs.tAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 :rules="rules" v-model="configs.tRemoteAddr.EMSPortNo"></v-text-field></v-list-item-content>
+                  <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" :rules="rules" v-model="configs.tRemoteAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 :rules="rules" v-model="configs.tRemoteAddr.EMSPortNo"></v-text-field></v-list-item-content>
                 </v-list-item>
                 <v-list-item>
                   <v-list-item-content>MinPktIntervalSec:</v-list-item-content>
@@ -347,8 +347,8 @@
           </v-col>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click="applyDamperSch()">Apply</v-btn>
-            <v-btn color="blue darken-1" flat @click="closeDamperSch()">Cancel</v-btn>
+            <v-btn color="blue darken-1" flat @click="applyEmsSysConfig()">Apply</v-btn>
+            <v-btn color="blue darken-1" flat @click="getEmsSysConfig()">Cancel</v-btn>
           </v-card-actions>
         </v-row>
       </template>
@@ -383,6 +383,16 @@
             this.configs = JSON.parse(r.data)
           })
           .catch((e) => {
+            console.error(e.message)
+          })
+      },
+      applyEmsSysConfig () {
+        axios.put('http://localhost:3000/api/rooms/emsSysConfig', { configs:this.configs })
+          .then((r) => {
+            this.getEmsSysConfig()
+          })
+          .catch((e) => {
+            alert(e.message)
             console.error(e.message)
           })
       },

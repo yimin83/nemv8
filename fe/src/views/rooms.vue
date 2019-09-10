@@ -801,8 +801,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn v-if="roomStatInfo.usManHeatingMode == 1" color="blue darken-1" flat @click="cmdManualHeating(roomStatInfo.roomNo)">난방</v-btn>
-          <v-btn color="blue darken-1" flat @click="saveSettingRoom(roomStatInfo.roomNo)">저장</v-btn>
+          <v-btn v-if="roomStatInfo.usManHeatingMode == 1" color="blue darken-1" flat @click="cmdManualHeating(roomConfigs.RoomNo)">난방</v-btn>
+          <v-btn color="blue darken-1" flat @click="saveSettingRoom(roomConfigs.RoomNo)">저장</v-btn>
           <v-btn color="blue darken-1" flat @click.native="settingRoomModal = false">닫기</v-btn>
         </v-card-actions>
       </v-card>
@@ -1239,62 +1239,65 @@ export default {
               color: 'grey darken-1'
             })
           }
+          getRoomConfig(usRoomNo)
         })
         .catch((e) => {
           console.error(e.message)
         })
       this.$data.roomScheduleModal = true
     },
-    settingRoom: function (roomNo) {
-      //this.initRoomStatInfo()
-      // this.getRoomStatInfo(roomNo)
+    getRoomConfig: function (roomNo) {
       axios.get(`http://localhost:3000/api/rooms/getRoomConfig/${roomNo}`)
         .then((r) => {
           this.roomConfigs = JSON.parse(r.data)
-          this.trnCheckInTime = new Date(this.roomConfigs.CheckInTime*1000).toISOString().
-                                                                            replace(/T/, ' ').      // replace T with a space
-                                                                            replace(/\..+/, '')
-          this.trnCheckOutTime = new Date(this.roomConfigs.CheckOutTime*1000).toISOString().
-                                                                            replace(/T/, ' ').      // replace T with a space
-                                                                            replace(/\..+/, '')
-          this.roomStatInfo.Area = this.roomConfigs.Area
-          this.roomStatInfo.Direction = this.roomConfigs.Direction
-          this.roomStatInfo.ExteriorWallCnt = this.roomConfigs.ExteriorWallCnt
-          this.roomStatInfo.szDesc = this.roomConfigs.szDesc
-          // alert(this.trnCheckInTime +", "+this.trnCheckOutTime)
-          for (var i = 0; i < this.roomStat.length; i++) {
-             if (this.roomStat[i].roomNo == roomNo) {
-               this.roomStatInfo.usRoomNo = this.roomStat[i].usRoomNo
-               this.roomStatInfo.ucRoomState = this.roomStat[i].ucRoomState
-               this.roomStatInfo.ucTotalStatus = this.roomStat[i].ucTotalStatus
-               this.roomStatInfo.ucSetStatus = this.roomStat[i].ucSetStatus
-               this.roomStatInfo.ucCurStatus = this.roomStat[i].ucCurStatus
-               this.roomStatInfo.nCheckInOutEnable = this.roomStat[i].nCheckInOutEnable
-               this.roomStatInfo.nCheckInTime = this.roomStat[i].nCheckInTime
-               this.roomStatInfo.nCheckOutTime = this.roomStat[i].nCheckOutTime
-               this.roomStatInfo.fTset = this.roomStat[i].fTset
-               this.roomStatInfo.fTsurf_set = this.roomStat[i].fTsurf_set
-               this.roomStatInfo.fTsurf_cur = this.roomStat[i].fTsurf_cur
-               this.roomStatInfo.fTroom_set = this.roomStat[i].fTroom_set
-               this.roomStatInfo.fTroom_cur = this.roomStat[i].fTroom_cur
-               this.roomStatInfo.usManHeatingMode = this.roomStat[i].usManHeatingMode
-               this.heatingMode == (this.roomStatInfo.usManHeatingMode  == 0) ? '자동':'수동'
-               this.toggleHeatingMode()
-               this.roomStatInfo.ulManHeatingTimeSec = this.roomStat[i].ulManHeatingTimeSec
-               this.roomStatInfo.fManTset = this.roomStat[i].fManTset
-               this.roomStatInfo.fManTset_cr = this.roomStat[i].fManTset_cr
-               this.roomStatInfo.nSetLastTime = this.roomStat[i].nSetLastTime
-               // this.bestChkbox = this.roomStat[i].isBestRoom
-               // this.roomStatInfo.boilerOn = this.roomStat[i].boilerOn
-               break
-             }
-           }
-
         })
         .catch((e) => {
           console.error(e.message)
         })
-      this.$data.settingRoomModal = true
+    },
+    settingRoom: function (roomNo) {
+      //this.initRoomStatInfo()
+      // this.getRoomStatInfo(roomNo)
+      getRoomConfig(roomNo)
+      this.trnCheckInTime = new Date(this.roomConfigs.CheckInTime*1000).toISOString().
+                                                                        replace(/T/, ' ').      // replace T with a space
+                                                                        replace(/\..+/, '')
+      this.trnCheckOutTime = new Date(this.roomConfigs.CheckOutTime*1000).toISOString().
+                                                                        replace(/T/, ' ').      // replace T with a space
+                                                                        replace(/\..+/, '')
+      this.roomStatInfo.Area = this.roomConfigs.Area
+      this.roomStatInfo.Direction = this.roomConfigs.Direction
+      this.roomStatInfo.ExteriorWallCnt = this.roomConfigs.ExteriorWallCnt
+      this.roomStatInfo.szDesc = this.roomConfigs.szDesc
+      // alert(this.trnCheckInTime +", "+this.trnCheckOutTime)
+      for (var i = 0; i < this.roomStat.length; i++) {
+         if (this.roomStat[i].roomNo == roomNo) {
+           this.roomStatInfo.usRoomNo = this.roomStat[i].usRoomNo
+           this.roomStatInfo.ucRoomState = this.roomStat[i].ucRoomState
+           this.roomStatInfo.ucTotalStatus = this.roomStat[i].ucTotalStatus
+           this.roomStatInfo.ucSetStatus = this.roomStat[i].ucSetStatus
+           this.roomStatInfo.ucCurStatus = this.roomStat[i].ucCurStatus
+           this.roomStatInfo.nCheckInOutEnable = this.roomStat[i].nCheckInOutEnable
+           this.roomStatInfo.nCheckInTime = this.roomStat[i].nCheckInTime
+           this.roomStatInfo.nCheckOutTime = this.roomStat[i].nCheckOutTime
+           this.roomStatInfo.fTset = this.roomStat[i].fTset
+           this.roomStatInfo.fTsurf_set = this.roomStat[i].fTsurf_set
+           this.roomStatInfo.fTsurf_cur = this.roomStat[i].fTsurf_cur
+           this.roomStatInfo.fTroom_set = this.roomStat[i].fTroom_set
+           this.roomStatInfo.fTroom_cur = this.roomStat[i].fTroom_cur
+           this.roomStatInfo.usManHeatingMode = this.roomStat[i].usManHeatingMode
+           this.heatingMode == (this.roomStatInfo.usManHeatingMode  == 0) ? '자동':'수동'
+           this.toggleHeatingMode()
+           this.roomStatInfo.ulManHeatingTimeSec = this.roomStat[i].ulManHeatingTimeSec
+           this.roomStatInfo.fManTset = this.roomStat[i].fManTset
+           this.roomStatInfo.fManTset_cr = this.roomStat[i].fManTset_cr
+           this.roomStatInfo.nSetLastTime = this.roomStat[i].nSetLastTime
+           // this.bestChkbox = this.roomStat[i].isBestRoom
+           // this.roomStatInfo.boilerOn = this.roomStat[i].boilerOn
+           break
+         }
+       }
+       this.$data.settingRoomModal = true
     },
     reserveRoomSche: function () {
       this.type = 'roomSche'
@@ -1304,7 +1307,12 @@ export default {
       var nCheckOutTime = Math.round(new Date(this.roomScheInfo.strCheckOutTime).getTime()/1000);
 
       axios.post('http://localhost:3000/api/rooms/', {
-        usRoomNo: this.roomScheInfo.roomNo, nCheckInOutEnbale: true, nCheckInTime: nCheckInTime, nCheckOutTime: nCheckOutTime, szSubsName: this.roomScheInfo.subsName, szSubsTel: this.roomScheInfo.subsTel, tReserveDate: null, ucPeopleCnt: this.roomScheInfo.peopleCnt, szDesc: this.roomScheInfo.strDesc
+        usRoomNo: this.roomScheInfo.roomNo, nCheckInOutEnbale: true, nCheckInTime: nCheckInTime,
+        nCheckOutTime: nCheckOutTime, szSubsName: this.roomScheInfo.subsName,
+        szSubsTel: this.roomScheInfo.subsTel, tReserveDate: null, ucPeopleCnt: this.roomScheInfo.peopleCnt,
+        szDesc: this.roomScheInfo.strDesc, Area: this.roomConfigs.Area, Direction: this.roomConfigs.Direction,
+        ExteriorWallCnt: this.roomConfigs.ExteriorWallCnt, Troom_set: this.roomConfigs.Troom_set,
+        Tsurf_set:this.roomConfigs.Tsurf_set, Troom_cr: this.roomConfigs.Troom_cr, Tsurf_cr: this.roomConfigs.Tsurf_cr
       })
         .then((r) => {
           this.$data.rsvRoomModal = false
@@ -1324,7 +1332,12 @@ export default {
       var nCheckInTime = Math.round(new Date(this.roomScheInfo.strCheckInTime).getTime()/1000);
       var nCheckOutTime = Math.round(new Date(this.roomScheInfo.strCheckOutTime).getTime()/1000);
       axios.put(`http://localhost:3000/api/rooms/${this.type}`, {
-        nIdx: idx, usRoomNo: this.roomScheInfo.roomNo, nCheckInOutEnbale: true, nCheckInTime: nCheckInTime, nCheckOutTime: nCheckOutTime, szSubsName: this.roomScheInfo.subsName, szSubsTel: this.roomScheInfo.subsTel, tReserveDate: null, ucPeopleCnt: this.roomScheInfo.peopleCnt, szDesc: this.roomScheInfo.strDesc
+        nIdx: idx, usRoomNo: this.roomScheInfo.roomNo, nCheckInOutEnbale: true, nCheckInTime: nCheckInTime,
+        nCheckOutTime: nCheckOutTime, szSubsName: this.roomScheInfo.subsName, szSubsTel: this.roomScheInfo.subsTel,
+        tReserveDate: null, ucPeopleCnt: this.roomScheInfo.peopleCnt, szDesc: this.roomScheInfo.strDesc,
+        Area: this.roomConfigs.Area, Direction: this.roomConfigs.Direction, ExteriorWallCnt: this.roomConfigs.ExteriorWallCnt,
+        Troom_set: this.roomConfigs.Troom_set, Tsurf_set:this.roomConfigs.Tsurf_set, Troom_cr: this.roomConfigs.Troom_cr,
+        Tsurf_cr: this.roomConfigs.Tsurf_cr
       })
         .then((r) => {
           this.$data.rsvRoomModal = false
@@ -1351,17 +1364,18 @@ export default {
       this.rsvRoomModal = false
     },
     saveSettingRoom: function (roomNo) {
+      var nCheckInTime = Math.round(new Date(this.trnCheckInTime).getTime()/1000+(9*3600));
+      var nCheckOutTime = Math.round(new Date(this.trnCheckOutTime).getTime()/1000+(9*3600));
       axios.put(`http://localhost:3000/api/rooms/${'roomStat'}`, {
         RoomNo: this.roomConfigs.RoomNo, Area: this.roomConfigs.Area, Direction: this.roomConfigs.Direction, ExteriorWallCnt: this.roomConfigs.ExteriorWallCnt,
         Troom_set: this.roomConfigs.Troom_set, Tsurf_set:this.roomConfigs.Tsurf_set, Troom_cr: this.roomConfigs.Troom_cr, Tsurf_cr: this.roomConfigs.Tsurf_cr,
-        CheckInOutEnable: this.roomConfigs.CheckInOutEnable, CheckInTime: this.roomConfigs.CheckInTime, CheckOutTime:this.roomConfigs.CheckOutTime, szDesc:  this.roomConfigs.szDesc,
+        CheckInOutEnable: this.roomConfigs.CheckInOutEnable, CheckInTime: nCheckInTime, CheckOutTime:nCheckOutTime, szDesc:  this.roomConfigs.szDesc,
         HeatingMode: this.roomStatInfo.usManHeatingMode, HeatingTimeSec: this.roomStatInfo.ulManHeatingTimeSec, Tset: this.roomStatInfo.fManTset, Tset_cr: this.roomStatInfo.fManTset_cr
 
       })
         .then((r) => {
-          this.$data.settingRoomModal = false
-          console.log('okok2')
-          this.getRooms()
+          // this.$data.settingRoomModal = false
+          this.settingRoom(roomNo)
         })
         .catch((e) => {
           console.log(e.message)
