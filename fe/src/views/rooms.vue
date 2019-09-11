@@ -503,7 +503,7 @@
                   hint=''
                   persistent-hint
                   required
-                  v-model="roomScheInfo.subsName"
+                  v-model="roomScheInfo.szSubsName"
                 ></v-text-field>
               </v-flex>
               <v-flex xs6>
@@ -512,7 +512,7 @@
                   hint=''
                   persistent-hint
                   required
-                  v-model="roomScheInfo.subsTel"
+                  v-model="roomScheInfo.szSubsTel"
                 ></v-text-field>
               </v-flex>
               <v-flex xs6>
@@ -521,7 +521,7 @@
                   hint=''
                   persistent-hint
                   required
-                  v-model="roomScheInfo.peopleCnt"
+                  v-model="roomScheInfo.ucPeopleCnt"
                 ></v-text-field>
               </v-flex>
               <v-flex xs6>
@@ -601,9 +601,9 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn v-if="roomScheInfo.idx == 0" color="blue darken-1" flat @click="reserveRoomSche()">예약</v-btn>
-          <v-btn v-if="roomScheInfo.idx != 0" color="blue darken-1" flat @click="saveReserveRoom(roomScheInfo.idx)">저장</v-btn>
-          <v-btn v-if="roomScheInfo.idx != 0" color="blue darken-1" flat @click="cancelReserveRoom(roomScheInfo.idx)">예약취소</v-btn>
+          <v-btn v-if="roomScheInfo.nIdx == 0" color="blue darken-1" flat @click="reserveRoomSche()">예약</v-btn>
+          <v-btn v-if="roomScheInfo.nIdx != 0" color="blue darken-1" flat @click="saveReserveRoom(roomScheInfo.nIdx)">저장</v-btn>
+          <v-btn v-if="roomScheInfo.nIdx != 0" color="blue darken-1" flat @click="cancelReserveRoom(roomScheInfo.nIdx)">예약취소</v-btn>
           <v-btn color="blue darken-1" flat @click="closeReserveRoom()">닫기</v-btn>
         </v-card-actions>
       </v-card>
@@ -956,18 +956,18 @@ export default {
         nSetLastTime:0
       },
       roomScheInfo: {
-        idx: 0,
-        roomNo: 0,
-        checkInOutEnbale: 0,
+        nIdx: 0,
+        usRoomNo: 0,
+        nCheckInOutEnbale: 0,
         strCheckInTime: '',
-        checkInTime: 0,
+        nCheckInTime: 0,
         strCheckOutTime: '',
-        checkOutTime: 0,
-        subsName: '',
-        subsTel: '',
-        resDate: '',
-        peopleCnt: 0,
-        strDesc: ''
+        nCheckOutTime: 0,
+        szSubsName: '',
+        szSubsTel: '',
+        tReserveDate: '',
+        ucPeopleCnt: 0,
+        szDesc: ''
       },
       heatingModes: [
         { text: '자동' },
@@ -1137,18 +1137,18 @@ export default {
       this.roomStatInfo.nSetLastTime = 0
     },
     initRoomScheInfo: function () {
-      this.roomScheInfo.idx=0,
-      this.roomScheInfo.roomNo= 0,
-      this.roomScheInfo.checkInOutEnbale= 0,
+      this.roomScheInfo.nIdx=0,
+      this.roomScheInfo.usRoomNo= 0,
+      this.roomScheInfo.nCheckInOutEnbale= 0,
       this.roomScheInfo.strCheckInTime= '',
-      this.roomScheInfo.checkInTime= 0,
+      this.roomScheInfo.nCheckInTime= 0,
       this.roomScheInfo.strCheckOutTime= '',
-      this.roomScheInfo.checkOutTime= 0,
-      this.roomScheInfo.subsName= '',
-      this.roomScheInfo.subsTel= '',
-      this.roomScheInfo.resDate= '',
-      this.roomScheInfo.peopleCnt= 0,
-      this.roomScheInfo.strDesc= ''
+      this.roomScheInfo.nCheckOutTime= 0,
+      this.roomScheInfo.szSubsName= '',
+      this.roomScheInfo.szSubsTel= '',
+      this.roomScheInfo.tReserveDate= '',
+      this.roomScheInfo.ucPeopleCnt= 0,
+      this.roomScheInfo.szDesc= ''
       this.strCheckInTime = '14:00'
       this.strCheckOutTime = '12:00'
       this.autoCheckIn = true
@@ -1157,8 +1157,8 @@ export default {
       if(idx == 0) {
         this.roomTitle = '객실 예약'
         this.autoCheckIn = true
-        this.roomScheInfo.idx = idx
-        this.roomScheInfo.roomNo = this.roomNo
+        this.roomScheInfo.nIdx = idx
+        this.roomScheInfo.usRoomNo = this.roomNo
         this.roomScheInfo.strCheckInTime = this.reserveStartDate
         this.startDate = this.reserveStartDate.substr(0, 10)
         this.strCheckInTime = this.reserveStartDate.substr(10, 6)
@@ -1169,33 +1169,31 @@ export default {
       else{
         this.roomTitle = '객실 예약 정보'
         for (var i = 0; i < this.roomsSchedule.length; i++) {
-          if (this.roomsSchedule[i].idx == idx) {
-            this.roomScheInfo.idx = this.roomsSchedule[i].idx
-            this.roomScheInfo.roomNo = this.roomsSchedule[i].roomNo
-            this.roomScheInfo.checkInOutEnbale = this.roomsSchedule[i].checkInOutEnbale
+          if (this.roomsSchedule[i].nIdx == idx) {
+            this.roomScheInfo.nIdx = this.roomsSchedule[i].nIdx
+            this.roomScheInfo.usRoomNo = this.roomsSchedule[i].usRoomNo
+            this.roomScheInfo.nCheckInOutEnbale = this.roomsSchedule[i].nCheckInOutEnbale
             this.autoCheckIn = true
-            this.roomScheInfo.strCheckInTime = this.roomsSchedule[i].strCheckInTime
-            this.roomScheInfo.checkInTime = this.roomsSchedule[i].checkInTime
-            this.roomScheInfo.strCheckOutTime = this.roomsSchedule[i].strCheckOutTime
-            this.roomScheInfo.checkOutTime = this.roomsSchedule[i].checkOutTime
-            if(this.roomsSchedule[i].strCheckInTime != null && this.roomsSchedule[i].strCheckInTime.trim() != '') {
-              this.roomScheInfo.strCheckInTime = this.roomsSchedule[i].strCheckInTime
-              this.startDate = this.roomScheInfo.strCheckInTime.substr(0, 10)
-              this.strCheckInTime = this.roomScheInfo.strCheckInTime.substr(10, 6)
-              if(this.strCheckInTime.trim() != '14:00'.trim())
-                this.autoCheckIn = false
-            }
-            if(this.roomsSchedule[i].strCheckOutTime != null && this.roomsSchedule[i].strCheckOutTime.trim() != '') {
-              this.roomScheInfo.strCheckOutTime = this.roomsSchedule[i].strCheckOutTime
-              this.endDate = this.roomScheInfo.strCheckOutTime.substr(0, 10)
-              this.strCheckOutTime = this.roomScheInfo.strCheckOutTime.substr(10, 6)
-              if((!this.autoCheckIn) || this.strCheckOutTime.trim() != '12:00')
-                this.autoCheckIn = false
-            }
-            this.roomScheInfo.subsName = this.roomsSchedule[i].subsName
-            this.roomScheInfo.subsTel = this.roomsSchedule[i].subsTel
-            this.roomScheInfo.peopleCnt = this.roomsSchedule[i].peopleCnt
-            this.roomScheInfo.strDesc = this.roomsSchedule[i].strDesc
+            this.roomScheInfo.nCheckInTime = this.roomsSchedule[i].nCheckInTimee
+            this.roomScheInfo.strCheckInTime = new Date(this.roomsSchedule[i].nCheckInTime*1000).toISOString().
+                                                                              replace(/T/, ' ').      // replace T with a space
+                                                                              replace(/\..+/, '')
+            this.startDate = this.roomScheInfo.strCheckInTime.substr(0, 10)
+            this.strCheckInTime = this.roomScheInfo.strCheckInTime.substr(10, 6)
+            if(this.strCheckInTime.trim() != '14:00'.trim())
+              this.autoCheckIn = false
+            this.roomScheInfo.nCheckOutTime = this.roomsSchedule[i].nCheckOutTime
+            this.roomScheInfo.strCheckOutTime = new Date(this.roomsSchedule[i].nCheckOutTime*1000).toISOString().
+                                                                              replace(/T/, ' ').      // replace T with a space
+                                                                              replace(/\..+/, '')
+            this.endDate = this.roomScheInfo.strCheckOutTime.substr(0, 10)
+            this.strCheckOutTime = this.roomScheInfo.strCheckOutTime.substr(10, 6)
+            if((!this.autoCheckIn) || this.strCheckOutTime.trim() != '12:00')
+              this.autoCheckIn = false
+            this.roomScheInfo.szSubsName = this.roomsSchedule[i].szSubsName
+            this.roomScheInfo.szSubsTel = this.roomsSchedule[i].szSubsTel
+            this.roomScheInfo.ucPeopleCnt = this.roomsSchedule[i].ucPeopleCnt
+            this.roomScheInfo.szDesc = this.roomsSchedule[i].szDesc
             break
           }
         }
@@ -1228,15 +1226,22 @@ export default {
       axios.get(`http://localhost:3000/api/rooms/${usRoomNo}`)
         .then((r) => {
           this.roomsSchedule = r.data
-          // alert(this.roomsSchedule.length)
+          //alert(JSON.stringify(this.roomsSchedule))
           for(var i=0; i < this.roomsSchedule.length ; i++){
+
+            var strCheckInTime = new Date(this.roomsSchedule[i].nCheckInTime*1000).toISOString().
+                                                                              replace(/T/, ' ').      // replace T with a space
+                                                                              replace(/\..+/, '')
+            var strCheckOutTime = new Date(this.roomsSchedule[i].nCheckOutTime*1000).toISOString().
+                                                                              replace(/T/, ' ').      // replace T with a space
+                                                                              replace(/\..+/, '')
             this.events.push({
-              idx: this.roomsSchedule[i].idx,
-              roomNo: this.roomsSchedule[i].roomNo,
-              name: this.roomsSchedule[i].subsName,
-              details: this.roomsSchedule[i].strDesc,
-              start: this.roomsSchedule[i].strCheckInTime,
-              end: this.roomsSchedule[i].strCheckOutTime,
+              idx: this.roomsSchedule[i].nIdx,
+              roomNo: this.roomsSchedule[i].usRoomNo,
+              name: this.roomsSchedule[i].szSubsName,
+              details: this.roomsSchedule[i].szDesc,
+              start: strCheckInTime,
+              end: strCheckOutTime,
               color: 'grey darken-1'
             })
           }
@@ -1312,16 +1317,16 @@ export default {
     },
     reserveRoomSche: function () {
       this.type = 'roomSche'
-      this.roomScheInfo.strCheckInTime = this.startDate + " " + this.strCheckInTime
-      this.roomScheInfo.strCheckOutTime = this.endDate + " " + this.strCheckOutTime
-      var nCheckInTime = Math.round(new Date(this.roomScheInfo.strCheckInTime).getTime()/1000);
-      var nCheckOutTime = Math.round(new Date(this.roomScheInfo.strCheckOutTime).getTime()/1000);
+      this.roomScheInfo.strCheckInTime = this.startDate + this.strCheckInTime
+      this.roomScheInfo.strCheckOutTime = this.endDate + this.strCheckOutTime
+      var nCheckInTime = Math.round((new Date(this.roomScheInfo.strCheckInTime).getTime()+(9*3600*1000))/1000);
+      var nCheckOutTime = Math.round((new Date(this.roomScheInfo.strCheckOutTime).getTime()+(9*3600*1000))/1000);
 
       axios.post('http://localhost:3000/api/rooms/', {
-        usRoomNo: this.roomScheInfo.roomNo, nCheckInOutEnbale: true, nCheckInTime: nCheckInTime,
-        nCheckOutTime: nCheckOutTime, szSubsName: this.roomScheInfo.subsName,
-        szSubsTel: this.roomScheInfo.subsTel, tReserveDate: null, ucPeopleCnt: this.roomScheInfo.peopleCnt,
-        szDesc: this.roomScheInfo.strDesc, Area: this.roomConfigs.Area, Direction: this.roomConfigs.Direction,
+        usRoomNo: this.roomScheInfo.usRoomNo, nCheckInOutEnable: true, nCheckInTime: nCheckInTime,
+        nCheckOutTime: nCheckOutTime, szSubsName: this.roomScheInfo.szSubsName,
+        szSubsTel: this.roomScheInfo.szSubsTel, tReserveDate: null, ucPeopleCnt: this.roomScheInfo.ucPeopleCnt,
+        szDesc: this.roomScheInfo.szDesc, Area: this.roomConfigs.Area, Direction: this.roomConfigs.Direction,
         ExteriorWallCnt: this.roomConfigs.ExteriorWallCnt, Troom_set: this.roomConfigs.Troom_set,
         Tsurf_set:this.roomConfigs.Tsurf_set, Troom_cr: this.roomConfigs.Troom_cr, Tsurf_cr: this.roomConfigs.Tsurf_cr
       })
@@ -1341,12 +1346,12 @@ export default {
       this.type = 'roomSche'
       this.roomScheInfo.strCheckInTime = this.startDate + " " + this.strCheckInTime
       this.roomScheInfo.strCheckOutTime = this.endDate + " " + this.strCheckOutTime
-      var nCheckInTime = Math.round(new Date(this.roomScheInfo.strCheckInTime).getTime()/1000);
-      var nCheckOutTime = Math.round(new Date(this.roomScheInfo.strCheckOutTime).getTime()/1000);
+      var nCheckInTime = Math.round((new Date(this.roomScheInfo.strCheckInTime).getTime()+(9*3600*1000))/1000);
+      var nCheckOutTime = Math.round((new Date(this.roomScheInfo.strCheckOutTime).getTime()+(9*3600*1000))/1000);
       axios.put(`http://localhost:3000/api/rooms/${this.type}`, {
-        nIdx: idx, usRoomNo: this.roomScheInfo.roomNo, nCheckInOutEnbale: true, nCheckInTime: nCheckInTime,
-        nCheckOutTime: nCheckOutTime, szSubsName: this.roomScheInfo.subsName, szSubsTel: this.roomScheInfo.subsTel,
-        tReserveDate: null, ucPeopleCnt: this.roomScheInfo.peopleCnt, szDesc: this.roomScheInfo.strDesc,
+        nIdx: idx, usRoomNo: this.roomScheInfo.usRoomNo, nCheckInOutEnable: true, nCheckInTime: nCheckInTime,
+        nCheckOutTime: nCheckOutTime, szSubsName: this.roomScheInfo.szSubsName, szSubsTel: this.roomScheInfo.szSubsTel,
+        tReserveDate: null, ucPeopleCnt: this.roomScheInfo.ucPeopleCnt, szDesc: this.roomScheInfo.szDesc,
         Area: this.roomConfigs.Area, Direction: this.roomConfigs.Direction, ExteriorWallCnt: this.roomConfigs.ExteriorWallCnt,
         Troom_set: this.roomConfigs.Troom_set, Tsurf_set:this.roomConfigs.Tsurf_set, Troom_cr: this.roomConfigs.Troom_cr,
         Tsurf_cr: this.roomConfigs.Tsurf_cr
@@ -1364,7 +1369,8 @@ export default {
     },
     cancelReserveRoom: function (nIdx) {
       this.events.pop()
-      axios.delete(`http://localhost:3000/api/rooms/${nIdx}`)
+      axios.delete(`http://localhost:3000/api/rooms/${nIdx}`, {
+        RoomNo: this.roomScheInfo.usRoomNo})
         .then((r) => {
           this.$data.rsvRoomModal = false
           this.scheduleRoom(this.roomNo)
@@ -1378,8 +1384,8 @@ export default {
       this.rsvRoomModal = false
     },
     saveSettingRoom: function (roomNo) {
-      var nCheckInTime = Math.round(new Date(this.trnCheckInTime).getTime()/1000+(9*3600));
-      var nCheckOutTime = Math.round(new Date(this.trnCheckOutTime).getTime()/1000+(9*3600));
+      var nCheckInTime = Math.round((new Date(this.trnCheckInTime).getTime()+(9*3600))/1000);
+      var nCheckOutTime = Math.round((new Date(this.trnCheckOutTime).getTime()+(9*3600))/1000);
       axios.put(`http://localhost:3000/api/rooms/${'roomStat'}`, {
         RoomNo: this.roomConfigs.RoomNo, Area: this.roomConfigs.Area, Direction: this.roomConfigs.Direction, ExteriorWallCnt: this.roomConfigs.ExteriorWallCnt,
         Troom_set: this.roomConfigs.Troom_set, Tsurf_set:this.roomConfigs.Tsurf_set, Troom_cr: this.roomConfigs.Troom_cr, Tsurf_cr: this.roomConfigs.Tsurf_cr,
