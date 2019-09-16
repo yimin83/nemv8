@@ -138,7 +138,7 @@ var checkRecentRsvRoomsData = function (usRoomNo, nCheckInTime){
           <!-- 반환값에 추가 -->
           result.push(index[row.id]);
         }
-        해당 행이 인덱스에 있건 없건 간에 해당 인덱스의 내역을 체워줌
+        //해당 행이 인덱스에 있건 없건 간에 해당 인덱스의 내역을 체워줌
         index[row.id].histories.push({
             historyId:row.historyId,
             historyName:row.historyName
@@ -289,6 +289,60 @@ router.put('/emsSysConfig', (req, res, next) => { // 수정
 	res.send({ success: true })
 });
 
+
+router.get('/ahusConfig', function(req, res, next) {
+	console.log("################## ahusConfig!!!!")
+  mysqlDB.query("SELECT * FROM ahu_info;", function(err, result, fields){
+    if(err){
+      console.log("쿼리문에 오류가 있습니다.");
+    }
+    else{
+      res.json(result);
+      //console.log(result)
+    }
+  });
+});
+
+router.get('/ahusConfig/:ahuIndex', function(req, res, next) {
+  const ahuIndex = req.params.ahuIndex
+  var dataBuffer = new Buffer(4)
+  dataBuffer.writeUInt32LE(ahuIndex);
+  console.log("ahuIndex : "+ahuIndex+", dataBuffer : " + dataBuffer.toString('hex'))
+  dataLen = 0;
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_solBeach_zone_config, dataLen, dataBuffer);
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
+  nSeq = counter.get();
+  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
+  fullBuffer = new Buffer(totalSize);
+  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
+  net.writeData(client, fullBuffer, nSeq);
+  IntervalA = setInterval(checkMap, 1000, nSeq, res);
+});
+
+router.put('/ahusConfig', (req, res, next) => { // 수정
+	console.log("ahusConfig req.body.config : " + JSON.stringify(req.body.config))
+	var dataBuffer = new Buffer(net.getSizeAhuZoneConfig_t())
+	dataBuffer = net.makeAhuZoneConfigMsg_t(
+		req.body.config.AhuIndex, req.body.config.NotifyOccupantsState,
+		req.body.config.HCMode, req.body.config.FanAutoManual,
+		req.body.config.DamperAutoManual, req.body.config.Tzone_set,
+		req.body.config.Rdamp_set, req.body.config.PPMco2_set, req.body.config.Desc
+	);
+	console.log(dataBuffer.toString('hex'))
+	dataLen = net.getSizeAhuZoneConfig_t();
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_solBeach_zone_config, dataLen, null);
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
+	nSeq = counter.get();
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
+	fullBuffer = new Buffer(totalSize);
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
+	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
+	net.writeData(client, fullBuffer, nSeq);
+	res.send({ success: true })
+});
+
 router.get('/damperConfig/:ahuIndex', function(req, res, next) {
   const ahuIndex = req.params.ahuIndex
   var dataBuffer = new Buffer(4)
@@ -316,6 +370,28 @@ router.put('/damperConfig', (req, res, next) => { // 수정
 	console.log("damperConfig : " + dataBuffer.toString('hex'))
 	dataLen = net.getSizeDamperSchedulerConfig_t();
   msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_solBeach_damper_scheduler, dataLen, null);
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
+	nSeq = counter.get();
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
+	fullBuffer = new Buffer(totalSize);
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
+	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
+	net.writeData(client, fullBuffer, nSeq);
+	res.send({ success: true })
+});
+
+
+router.put('/cmdManualHeating', (req, res, next) => { // 수정
+	console.log("cmdManualHeating  values : " + req.body.RoomNo + ", "+ req.body.HeatingMode + ", "+ req.body.HeatingTimeSec + ", "+ req.body.Tset + ", "+ req.body.Tset_cr)
+	var dataBuffer = new Buffer(net.getSizeDamperSchedulerConfig_t())
+	// "Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},
+	dataBuffer = net.makeManualHeating_t(
+		req.body.RoomNo, req.body.HeatingMode, req.body.HeatingTimeSec, req.body.Tset, req.body.Tset_cr
+	);
+	console.log("cmdManualHeating : " + dataBuffer.toString('hex'))
+	dataLen = net.getSizeManualHeating_t();
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_cmd_floorRad_manual_heating, dataLen, null);
   totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
 	nSeq = counter.get();
 	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);

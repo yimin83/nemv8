@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
-import test from './views/test.vue'
 
 Vue.use(Router)
 
@@ -20,9 +19,14 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/rooms.vue')
     },
     {
+      path: '/ahusConfig',
+      name: 'ahus',
+      component: () => import(/* webpackChunkName: "about" */ './views/ahus.vue')
+    },
+    {
       path: '/emsSysConfig',
       name: 'config',
-      component: () => import(/* webpackChunkName: "about" */ './views/test.vue')
+      component: () => import(/* webpackChunkName: "about" */ './views/config.vue')
     },
     {
       path: '*',

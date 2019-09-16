@@ -1,12 +1,5 @@
 <template>
   <v-app>
-    <v-toolbar
-      app
-      :clipped-left="clipped">
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title v-text="title"></v-toolbar-title>
-      <v-spacer></v-spacer>
-    </v-toolbar>
     <v-navigation-drawer
     persistent
     :mini-variant="miniVariant"
@@ -67,6 +60,11 @@ export default {
           icon: 'favorite',
           title: '객실예약',
           to: { path: '/rooms' }
+        },
+        {
+          icon: 'favorite',
+          title: '공조기설정',
+          to: { path: '/ahusConfig' }
         },
         {
           icon: 'favorite',
