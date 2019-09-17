@@ -769,7 +769,7 @@ net.getSizeDamperSchedulerConfig_t = function(){
 
 var check_in_cmd_t = new struct("check_in_cmd_t", [
 	"RoomNo", struct.uint16(),
-	"CheckInOutEnable", struct.int32(),
+	"CheckInOutEnable", struct.uint16(),
 	"CheckIn", struct.uint32(),
 	"CheckOut", struct.uint32(),
 ]);

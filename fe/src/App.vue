@@ -63,13 +63,13 @@ export default {
         },
         {
           icon: 'favorite',
-          title: '공조기설정',
-          to: { path: '/ahusConfig' }
+          title: '설정',
+          to: { path: '/emsSysConfig' }
         },
         {
           icon: 'favorite',
-          title: '설정',
-          to: { path: '/emsSysConfig' }
+          title: '공조기설정',
+          to: { path: '/ahusConfig' }
         },
         {
           icon: 'help',

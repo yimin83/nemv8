@@ -17,8 +17,12 @@
               <v-card-title
               style='cursor: pointer'
               @click='scheduleRoom(room.usRoomNo)'>
-                <b>{{room.usRoomNo}}호</b>
+                {{room.usRoomNo}}호
               </v-card-title>
+              <v-card-text>
+                <div><b>{{room.ahu_desc}}</b></div>
+                <div><b>{{room.co2}}</b></div>
+              </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn fab color='primary' @click='settingRoom(room.usRoomNo)'>
@@ -48,8 +52,14 @@
             <v-card-title
             style='cursor: pointer'
             @click='scheduleRoom(room.usRoomNo)'>
-              <b>{{room.usRoomNo}}호</b>
+              {{room.usRoomNo}}호
             </v-card-title>
+            <v-card-text>
+              <div>{{room.ucRoomState}}</div>
+              <div>{{room.ucCurStatus}}</div>
+              <div>{{room.fTroom_cur}}</div>
+              <div>{{room.fTsurf_cur}}</div>
+            </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn fab color='primary' @click='settingRoom(room.usRoomNo)'>
@@ -527,7 +537,7 @@
               <v-flex xs6>
                 <v-switch
                  v-model='autoCheckIn'
-                 :label='`${!autoCheckIn?'수동체크인아웃시간':'기본체크인아웃시간'}`'
+                 :label="`${!autoCheckIn ? '수동체크인아웃시간' : '기본체크인아웃시간'}`"
                  @change='toggleAutoCheckIn()'
                 ></v-switch>
               </v-flex>
@@ -1263,12 +1273,24 @@ export default {
       axios.get(`http://localhost:3000/api/rooms/getRoomConfig/${roomNo}`)
         .then((r) => {
           this.roomConfigs = JSON.parse(r.data)
-          this.trnCheckInTime = new Date(this.roomConfigs.CheckInTime*1000).toISOString().
-                                                                            replace(/T/, ' ').      // replace T with a space
-                                                                            replace(/\..+/, '')
-          this.trnCheckOutTime = new Date(this.roomConfigs.CheckOutTime*1000).toISOString().
-                                                                            replace(/T/, ' ').      // replace T with a space
-                                                                            replace(/\..+/, '')
+          if(this.roomConfigs.CheckInTime != '0') {
+            this.trnCheckInTime = new Date(this.roomConfigs.CheckInTime*1000).toISOString().
+                                                                              replace(/T/, ' ').      // replace T with a space
+                                                                              replace(/\..+/, '')
+
+          }
+          else {
+            this.trnCheckInTime = 0
+          }
+          if(this.roomConfigs.CheckOutTime != '0') {
+            this.trnCheckOutTime = new Date(this.roomConfigs.CheckOutTime*1000).toISOString().
+                                                                              replace(/T/, ' ').      // replace T with a space
+                                                                              replace(/\..+/, '')
+
+          }
+          else {
+            this.trnCheckOutTime = 0
+          }
           this.roomStatInfo.Area = this.roomConfigs.Area
           this.roomStatInfo.Direction = this.roomConfigs.Direction
           this.roomStatInfo.ExteriorWallCnt = this.roomConfigs.ExteriorWallCnt
@@ -1344,7 +1366,7 @@ export default {
       var nCheckInTime = Math.round((new Date(this.roomScheInfo.strCheckInTime).getTime()+(9 * 3600 * 1000)) / 1000)
       var nCheckOutTime = Math.round((new Date(this.roomScheInfo.strCheckOutTime).getTime()+(9 * 3600* 1000)) / 1000)
       axios.put(`http://localhost:3000/api/rooms/${this.type}`, {
-        nIdx: idx, usRoomNo: this.roomScheInfo.usRoomNo, nCheckInOutEnable: true, nCheckInTime: nCheckInTime,
+        nIdx: idx, usRoomNo: this.roomScheInfo.usRoomNo, nCheckInOutEnable: 1, nCheckInTime: nCheckInTime,
         nCheckOutTime: nCheckOutTime, szSubsName: this.roomScheInfo.szSubsName, szSubsTel: this.roomScheInfo.szSubsTel,
         tReserveDate: null, ucPeopleCnt: this.roomScheInfo.ucPeopleCnt, szDesc: this.roomScheInfo.szDesc,
         Area: this.roomConfigs.Area, Direction: this.roomConfigs.Direction, ExteriorWallCnt: this.roomConfigs.ExteriorWallCnt,
@@ -1354,7 +1376,7 @@ export default {
         .then((r) => {
           this.$data.rsvRoomModal = false
           // this.pop('객실 상태 변경')
-          this.scheduleRoom(this.roomNo)
+          this.scheduleRoom(this.roomScheInfo.usRoomNo)
         })
         .catch((e) => {
         //  this.pop(e.message)
@@ -1364,11 +1386,10 @@ export default {
     },
     cancelReserveRoom: function (nIdx) {
       this.events.pop()
-      axios.delete(`http://localhost:3000/api/rooms/${nIdx}`, {
-        RoomNo: this.roomScheInfo.usRoomNo})
+      axios.delete(`http://localhost:3000/api/rooms/`, { data: { nIdx: nIdx, usRoomNo : this.roomScheInfo.usRoomNo } } )
         .then((r) => {
           this.$data.rsvRoomModal = false
-          this.scheduleRoom(this.roomNo)
+          this.scheduleRoom(this.roomScheInfo.usRoomNo)
         })
         .catch((e) => {
           alert(e.message)
@@ -1379,8 +1400,8 @@ export default {
       this.rsvRoomModal = false
     },
     saveSettingRoom: function (roomNo) {
-      var nCheckInTime = Math.round((new Date(this.trnCheckInTime).getTime()+(9*3600)) / 1000)
-      var nCheckOutTime = Math.round((new Date(this.trnCheckOutTime).getTime()+(9*3600)) / 1000)
+      var nCheckInTime = (this.trnCheckInTime != '0' ) ? Math.round((new Date(this.trnCheckInTime).getTime()+(9*3600)) / 1000) : this.trnCheckInTime
+      var nCheckOutTime =(this.trnCheckOutTime != '0' ) ?  Math.round((new Date(this.trnCheckOutTime).getTime()+(9*3600)) / 1000): this.trnCheckInTime
       axios.put(`http://localhost:3000/api/rooms/${'roomStat'}`, {
         RoomNo: this.roomConfigs.RoomNo, Area: this.roomConfigs.Area, Direction: this.roomConfigs.Direction, ExteriorWallCnt: this.roomConfigs.ExteriorWallCnt,
         Troom_set: this.roomConfigs.Troom_set, Tsurf_set: this.roomConfigs.Tsurf_set, Troom_cr: this.roomConfigs.Troom_cr, Tsurf_cr: this.roomConfigs.Tsurf_cr,
