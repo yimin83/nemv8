@@ -9,6 +9,7 @@ router.use('/damperConfig', require('./rooms'))
 router.use('/getRoomConfig', require('./rooms'))
 router.use('/ahusConfig', require('./rooms'))
 router.use('/cmdManualHeating', require('./rooms'))
+router.use('/cmdRoomState', require('./rooms'))
 
 
 

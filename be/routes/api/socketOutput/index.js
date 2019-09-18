@@ -37,35 +37,26 @@ net.getConnection = function (){
     var local_port = "";
 
     client = net_client.connect({port: 15000, host:'localhost'}, function() {
-
-        console.log("socketOutput connect log======================================================================");
-        console.log('socketOutput connect success');
-        console.log('socketOutput local = ' + this.localAddress + ':' + this.localPort);
-        console.log('socketOutput remote = ' + this.remoteAddress + ':' +this.remotePort);
-
-        local_port = this.localPort;
-
-        //this.setEncoding('utf8');
+        console.log("================================= net_client.connect start =====================================");
+        console.log('connect success');
+        console.log('local = ' + this.localAddress + ':' + this.localPort);
+        console.log('remote = ' + this.remoteAddress + ':' +this.remotePort);
+				local_port = this.localPort;
+				//this.setEncoding('utf8');
         //this.setTimeout(600000); // timeout : 10분
-        console.log("socketOutput client setting Encoding:binary, timeout:600000" );
-        console.log("socketOutput client connect localport : " + local_port);
+				console.log("=================================  net_client.connect end  =====================================");
     });
 
     // 접속 종료 시 처리
     client.on('close', function() {
-        console.log("socketOutput client Socket Closed : " + " localport : " + local_port);
-				// client.setTimeout(1000, function() {
-				// 		net_client.connect(15000, 'localhost');
-		    // })
+			console.log("================================= client.on.close start =====================================");
+			console.log("client Socket Closed : " + " localport : " + local_port);
+			console.log("=================================   client.on.close end  =====================================");
     });
 
 // 데이터 수신 후 처리
     client.on('data', function(data) {
         console.log("socketOutput data recv log======================================================================");
-        //recvData.push(data);
-        // var buff = Buffer.from(data, 'base64');
-        // console.log("socketOutput buff : " + buff.toString('base64'));
-        // console.log("socketOutput buff.length : " + buff.length);
         if(data.length > 0){
             //bufTestRevc = new Buffer.alloc(6);
           var decodeDat = ems_msg_header_t.decode(data, 0, {endian:"BE"});
@@ -78,7 +69,6 @@ net.getConnection = function (){
           }
 
         }
-        //client.end();
     });
 
     client.on('end', function() {
@@ -88,23 +78,11 @@ net.getConnection = function (){
     client.on('error', function(err) {
         console.log('socketOutput client Socket Error: '+ JSON.stringify(err));
 				client.connect(15000, 'localhost');
-				// client.socket.reconnect();
     });
 
 		client.on('disconnect', function(){
 			console.log('disconnected..');
 		});
-
-		// client.on('reconnect', (attemptNumber) => {
-		// 	console.log('socketOutput client reconnect attemptNumber: '+attemptNumber);
-		//   // else the socket will automatically try to reconnect
-		// });
-		// client.on('reconnecting', function(delay, attempt) {
-	  // if (attempt === max_socket_reconnects) {
-	  //   setTimeout(function(){ socket.socket.reconnect(); }, 5000);
-	  //   return console.log("Failed to reconnect. Lets try that again in 5 seconds.");
-	  // }
-		// });
 
     client.on('timeout', function() {
         console.log('socketOutput client Socket timeout: ');
@@ -121,7 +99,7 @@ net.getConnection = function (){
 }
 
 net.writeData = function (socket, data, seq){
-  console.log('writeData start : ' + data + ", seq : " + seq)
+  console.log('writeData start : ' + data.toString('hex') + ", seq : " + seq)
   var success = !socket.write(data);
   if(!success){
         (function(socket, data){
@@ -145,7 +123,7 @@ var processOAMmsg = function (data, seq){
   var ret = 0;
 	let res
   var oamMsgDat = oam_msg_t.decode(data, ems_msg_header_t.size(), {endian:"BE"});
-  console.log("seq : " + seq + ", oamMsgDat : " + oamMsgDat.OAMMsgType +", " + oamMsgDat.DataLen +", "  + oamMsgDat.Data + ", ahu_zone_config_msg_t.size() : " + ahu_zone_config_msg_t.size());
+  console.log("seq : " + seq + ", oamMsgDat : " + oamMsgDat.OAMMsgType +", " + oamMsgDat.DataLen +", "  + oamMsgDat.Data + ", ems_sys_config_t.size() : " + ems_sys_config_t.size());
   if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_sys_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config )
    && oamMsgDat.DataLen == ems_sys_config_t.size()){
      var emsSysConfigDat = ems_sys_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"LE"});
@@ -467,6 +445,7 @@ net.getSizePidControlConf_t = function(){
 var co2_conf_t = new struct("co2_conf_t", [
 		"ControlMode", struct.uint32(),
     "PPMco2_rate_wf", struct.int32(),
+		"PPMco2_wf", struct.int32(),
     "PPMco2_empty", struct.int32(),
     "PPMco2_occupied", struct.int32(),
     "PPMco2_inc_rate", struct.int32(),
@@ -474,11 +453,12 @@ var co2_conf_t = new struct("co2_conf_t", [
     "PPMco2_inc_time", struct.int32(),
     "PPMco2_dec_time", struct.int32()
 ]);
-net.makeCo2Conf_t = function( controlMode, ppmCo2_rate_wf, ppmCo2_empty, ppmCo2_occupied, ppmCo2_inc_rate, ppmCo2_dec_rate, ppmCo2_inc_time, ppmCo2_dec_time){
+net.makeCo2Conf_t = function( controlMode, ppmCo2_rate_wf, ppmCo2_wf, ppmCo2_empty, ppmCo2_occupied, ppmCo2_inc_rate, ppmCo2_dec_rate, ppmCo2_inc_time, ppmCo2_dec_time){
   var buffer = new Buffer(co2_conf_t.size());
   co2_conf_t.encode(buffer,0, {
 		ControlMode: controlMode,
     PPMco2_rate_wf: ppmCo2_rate_wf,
+		PPMco2_wf: ppmCo2_wf,
     PPMco2_empty: ppmCo2_empty,
     PPMco2_occupied: ppmCo2_occupied,
     PPMco2_inc_rate: ppmCo2_inc_rate,
