@@ -278,6 +278,19 @@ router.get('/ahusConfig', function(req, res, next) {
     }
   });
 });
+router.get('/zones', function(req, res, next) {
+	console.log("############ get zones ")
+  mysqlDB.query("SELECT * FROM solbeach_zone;", function(err, result, fields){
+    if(err){
+      console.log("쿼리문에 오류가 있습니다.");
+    }
+    else{
+			// console.log(JSON.stringify(result))
+      res.json(result);
+      //console.log(result)
+    }
+  });
+});
 
 router.get('/ahusConfig/:ahuIndex', function(req, res, next) {
   const ahuIndex = req.params.ahuIndex
@@ -378,21 +391,17 @@ router.put('/cmdManualHeating', (req, res, next) => { // 수정
 	res.send({ success: true })
 });
 
-
 router.put('/cmdRoomState/:roomNo', (req, res, next) => { // 수정
 	const roomNo = req.params.roomNo
 	console.log("############ put cmdRoomState roomNo : " + roomNo)
-  var dataBuffer = new Buffer(8)
-	var dataBuffer0 = new Buffer(4)
-	var dataBuffer1 = new Buffer(4)
-  dataBuffer0.writeUInt16LE(roomNo);
-  dataBuffer1.writeUInt16LE(3);
-	dataBuffer0.copy(dataBuffer, 0, 0, 4);
-	dataBuffer1.copy(dataBuffer, 4, 0, 4);
-	console.log("/cmdRoomState/:roomNo hex : " +dataBuffer.toString('hex'))
-	// "Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},
+  var data = new Uint32Array(2);
+	data[0] = roomNo;
+	data[1] = 2;
 	dataLen = 0;
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_cmd_floorRad_room_state, dataLen, dataBuffer);
+	// console.log("/cmdRoomState/:roomNo hex : " +data.toString('hex'))
+	dataLen = 0;
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_cmd_floorRad_room_state, dataLen, data);
+	// console.log("/cmdRoomState/:roomNo msgBuffer : " +msgBuffer.toString('hex'))
   totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
 	nSeq = counter.get();
 	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);

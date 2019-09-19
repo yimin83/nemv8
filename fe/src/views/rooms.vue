@@ -1,7 +1,7 @@
 <template>
   <v-container grid-list-md>
     <v-divider class='my-3'></v-divider>
-    난방 중 객실 수 : {{this.CurStatus}}, 난방 준비 중 객실 수 : {{this.SetStatus}}
+    난방(보일러 on) : {{this.SetStatus}}({{this.CurStatus}})
     <v-divider class='my-3'></v-divider>
     <v-layout row wrap >
       <v-icon color="gray">delete_outline</v-icon>: 예약가능&nbsp;
@@ -23,7 +23,7 @@
         color="light-blue accent-1"
         outlined
       >
-        <div>바닥온도</div>
+        <div>온수관표면온도</div>
       </v-card>
     </v-layout>
     <v-divider class='my-3'></v-divider>

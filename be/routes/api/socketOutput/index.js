@@ -151,6 +151,12 @@ var processOAMmsg = function (data, seq){
 			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_solBeach_damper_scheduler)
       	router.setSeqMap(seq, JSON.stringify(damperScheConfigDat))
   }
+
+  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_event_alarm || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_event_alarm)){
+      var damperScheConfigDat = damper_scheduler_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"BE"});
+			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_solBeach_damper_scheduler)
+      	router.setSeqMap(seq, JSON.stringify(damperScheConfigDat))
+  }
   else {
       console.log("else!!!! oamMsgDat.OAMMsgType = " + oamMsgDat.OAMMsgType)
 			ret = -1;
@@ -765,6 +771,34 @@ net.makeCheckInCmd_t = function(roomNo, checkInOutEnable, checkIn, checkOut){
 }
 net.getSizeCheckIn_t = function(){
   return check_in_cmd_t.size()
+}
+
+
+
+var ems_alarm_t = new struct("ems_alarm_t", [
+	"Time", struct.uint32(),
+	"Seq", struct.uint16(),
+	"SiteInfo", struct.uint16(),
+	"Module", struct.uint16(),
+	"Level", struct.uint16(),
+	"ModuleIndex", struct.uint16(),
+	"szContent", struct.char(256)
+]);
+net.makeEmsAlarm_t = function(ulTime, usSeq, usSiteInfo, usModule, usLevel, usModuleIndex, szContent){
+  var buffer = new Buffer(ems_alarm_t.size());
+  ems_alarm_t.encode(buffer,0, {
+    Time: ulTime,
+    Seq: usSeq,
+    SiteInfo: usSiteInfo,
+    Module: usModule,
+    Level: usLevel,
+    ModuleIndex: usModuleIndex,
+    szContent: szContent
+  },{endian:"BE"})
+  return buffer;
+}
+net.getSizeEmsAlarm_t = function(){
+  return ems_alarm_t.size()
 }
 
 module.exports = net;

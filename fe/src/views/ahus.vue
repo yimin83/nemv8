@@ -1,33 +1,35 @@
 <template>
   <v-container grid-list-md>
+    <v-divider class='my-3'></v-divider>
     <v-layout row wrap>
       <v-flex
-          v-for='ahu in ahus'
-          :key='ahu'
+          v-for='zone in this.mergezones'
+          :key='zone'
           text-xs-left
         >
         <v-item >
           <v-card
-            color='blue-grey darken-2'
-            class='white--text mx-auto'
+            :elevation="10"
+            color='grey lighten-3' class='ma-0 pa-0'
             full-width
-            max-width='200px'
-            style='cursor: pointer'
-            @click='settingAhu(ahu.ahu_id);'>
+            width='180px'
+            lg=12
+            md=12
+            sm=3
+            xs=3
+            @click='settingAhu(zone.ahu.ahu_id);'>
             <v-card-title>
-              <b>{{ahu.ahu_name}}</b>
+              <b>{{zone.ahu.ahu_name}}</b>
             </v-card-title>
             <v-card-text>
-              <div><b>{{ahu.ahu_desc}}</b></div>
-              <div><b>{{ahu.co2}}</b></div>
+              <div><b>{{zone.ahu.ahu_desc}}</b></div>
+              <div><b>co2: {{zone.ahu.co2}}</b></div>
+              <div><b>fan동작:{{zone.zone.cMode_manual_mode}}</b></div>
+              <div><b>냉난방모드:{{zone.zone.cMode_hc_mode}}</b></div>
+              <div><b>Damper 현재 값:{{zone.zone.fData_damper_outer_set}}</b></div>
+              <div><b>AHU zone 온도:{{zone.zone.fData_temp_supply}}</b></div>
+              <div><b>CO2 현재값:{{zone.zone.nPPMco2_cur}}</b></div>
             </v-card-text>
-            <!-- <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn fab color='primary' @click='settingAhu(ahu.ahu_id);'>
-                <v-icon dark>build</v-icon>
-              </v-btn>
-              <v-spacer></v-spacer>
-            </v-card-actions> -->
           </v-card>
         </v-item>
       </v-flex>
@@ -146,11 +148,14 @@ import axios from 'axios'
 export default {
   mounted () {
     this.getAhus()
+    this.getZones()
   },
   data () {
     return {
       settingTitle : '',
+      mergezones : [],
       ahus : [],
+      zones : [],
       ahuConfig : [],
       rsvRoomModal: false,
       roomScheduleModal: false,
@@ -168,7 +173,22 @@ export default {
           console.error(e.message)
         })
     },
-
+    getZones () {
+      axios.get('http://localhost:3000/api/rooms/zones')
+        .then((r) => {
+          this.zones = r.data
+          this.mergeZonesAhu()
+        })
+        .catch((e) => {
+          alert("getZones error : " +e.message)
+          console.error(e.message)
+        })
+    },
+    mergeZonesAhu () {
+      for(var i = 0; i < this.zones.length; i++){
+        this.mergezones.push({ zone:this.zones[i], ahu:this.ahus[i]})
+      }
+    },
     settingAhu: function (ahuIndex) {
       axios.get(`http://localhost:3000/api/rooms/ahusConfig/${ahuIndex}`)
         .then((r) => {
