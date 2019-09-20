@@ -73,8 +73,13 @@ export default {
         },
         {
           icon: 'help',
+          title: '트랜드',
+          to: { path: '/trend' }
+        },
+        {
+          icon: 'help',
           title: '이력',
-          to: { path: '/help' }
+          to: { path: '/history' }
         }
       ],
       miniVariant: false,

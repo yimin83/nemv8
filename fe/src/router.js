@@ -29,6 +29,11 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/config.vue')
     },
     {
+      path: '/trend',
+      name: 'trend',
+      component: () => import(/* webpackChunkName: "about" */ './views/trend.vue')
+    },
+    {
       path: '*',
       name: 'e404',
       component: () => import(/* webpackChunkName: "about" */ './views/e404.vue')
