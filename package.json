@@ -8,9 +8,11 @@
   },
   "main": "index.js",
   "dependencies": {
+    "create-jqwidgets-vue-app": "^1.0.0",
     "express": "^4.17.1",
     "express-generator": "^4.16.1",
-    "vuetify": "^2.0.0-beta.0"
+    "vuetify": "^2.0.0-beta.0",
+    "ws": "^7.1.2"
   },
   "devDependencies": {
     "sass": "^1.17.4",
