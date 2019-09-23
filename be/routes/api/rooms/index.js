@@ -51,7 +51,7 @@ var roomsArr = [];
 var makeRsvRoomsArr = function () {
 	mysqlDB.query("SELECT * FROM floor_rad_room;", function(err, result, fields){
     if(err){
-      console.log("쿼리문에 오류가 있습니다.");
+      console.log("############ makeRsvRoomsArr 쿼리문에 오류가 있습니다.");
     }
     else{
 			if(result!=null){
@@ -94,7 +94,7 @@ function refreshRsvRooms (option, callback) {
 	for(var i=0;i<roomsArr.length;i++){
 		mysqlDB.query("SELECT * FROM roomsschedule where usRoomNo = ? ORDER BY nCheckInTime asc limit 1;", [roomsArr[i].usRoomNo], function(err, result, fields){
 	    if(err){
-	      console.log("쿼리문에 오류가 있습니다. err : " + err);
+	      console.log("############ refreshRsvRooms 쿼리문에 오류가 있습니다. err : " + err);
 	    }
 	    else{
 				if(result.length != 0  ){
@@ -133,7 +133,7 @@ var checkRsvRoomsArr = function (){
 	for(var i=0;i<roomsArr.length;i++){
 		mysqlDB.query("SELECT * FROM roomsschedule where usRoomNo = ? ORDER BY nCheckInTime asc limit 1;", [roomsArr[i].usRoomNo], function(err, result, fields){
 	    if(err){
-	      console.log("쿼리문에 오류가 있습니다. err : " + err);
+	      console.log("############ checkRsvRoomsArr 쿼리문에 오류가 있습니다. err : " + err);
 	    }
 	    else{
 				if(result.length != 0  ){
@@ -156,7 +156,7 @@ router.get('/', function(req, res, next) {
 	console.log("############ get floor_rad_room ############")
   mysqlDB.query("SELECT * FROM floor_rad_room;", function(err, result, fields){
     if(err){
-      console.log("쿼리문에 오류가 있습니다.");
+      console.log("############ get floor_rad_room 쿼리문에 오류가 있습니다.");
     }
     else{
       res.json(result);
@@ -270,7 +270,7 @@ router.get('/ahusConfig', function(req, res, next) {
 	console.log("############ get ahusConfig ")
   mysqlDB.query("SELECT * FROM ahu_info;", function(err, result, fields){
     if(err){
-      console.log("쿼리문에 오류가 있습니다.");
+      console.log("############ get ahusConfig 쿼리문에 오류가 있습니다.");
     }
     else{
       res.json(result);
@@ -282,7 +282,7 @@ router.get('/zones', function(req, res, next) {
 	console.log("############ get zones ")
   mysqlDB.query("SELECT * FROM solbeach_zone;", function(err, result, fields){
     if(err){
-      console.log("쿼리문에 오류가 있습니다.");
+      console.log("############ get zones 쿼리문에 오류가 있습니다.");
     }
     else{
 			// console.log(JSON.stringify(result))
@@ -427,7 +427,7 @@ router.get('/:usRoomNo', (req, res, next) => { // 수정
 	// console.log("get room schedule : " + usRoomNo)
     mysqlDB.query("SELECT * FROM RoomsSchedule where usRoomNo = ?;", [usRoomNo], function(err, result, fields){
       if(err){
-        console.log("쿼리문에 오류가 있습니다.");
+        console.log("###### /:usRoomNo 쿼리문에 오류가 있습니다.");
       }
       else{
         res.json(result);
@@ -460,7 +460,7 @@ router.post('/', (req, res, next) => { // 생성
   mysqlDB.query("INSERT INTO RoomsSchedule (nIdx, usRoomNo, nCheckInOutEnable, nCheckInTime, nCheckOutTime, szSubsName, szSubsTel, tReserveDate, ucPeopleCnt, szDesc) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
   [ null, usRoomNo, nCheckInOutEnable, nCheckInTime, nCheckOutTime, szSubsName, szSubsTel, tReserveDate, ucPeopleCnt, szDesc], function (err, rows, fields) {
     if (err) {
-        res.send('error : ' + err);
+        res.send('###### post error : ' + err);
         console.log(err)
     }
   });
@@ -505,7 +505,7 @@ router.put('/:type', (req, res, next) => { // 수정
     mysqlDB.query("UPDATE RoomsSchedule SET usRoomNo = ?, nCheckInOutEnable = ?, nCheckInTime = ?, nCheckOutTime = ?, szSubsName = ?, szSubsTel = ?, ucPeopleCnt = ?, szDesc = ? WHERE nIdx = ?",
 		[ usRoomNo, nCheckInOutEnable, nCheckInTime, nCheckOutTime, szSubsName, szSubsTel, ucPeopleCnt, szDesc, nIdx], function (err, rows, fields) {
 			if (err) {
-	        res.send('error : ' + err);
+	        res.send('############ roomschedule update error : ' + err);
 	        console.log(err)
 	    }
     });
@@ -534,7 +534,7 @@ router.delete('/', (req, res, next) => { // 삭제
       if (!err) {
 				res.send({ success: true })
       } else {
-				res.send('error : ' + err);
+				res.send('############ delete roomschedule error : ' + err);
       }
   });
 	clearRsvRoomsArr(usRoomNo)
@@ -577,6 +577,23 @@ var processCmdCheckIn = function(datas) {
 		net.writeData(client, fullBuffer, nSeq);
 	}
 }
+
+
+router.get('/getRoomTrend/:usRoomNo', (req, res, next) => { // 수정
+	const usRoomNo = req.params.usRoomNo
+	console.log("############ get /getRoomConfig/:roomNo  roomNo : "+usRoomNo)
+  // console.log("######################### getRoomConfig ######################### ")
+	mysqlDB.query("SELECT fTroom_cur, fTsurf_cur, fManTset, nCheckInTime FROM floor_rad_room_record WHERE usRoomNo = ?;", [usRoomNo], function(err, result, fields){
+		if(err){
+			console.log("getRoomTrend 쿼리문에 오류가 있습니다. err : " + err);
+		}
+		else{
+			console.log(JSON.stringify(result))
+			res.json(result);
+		}
+	});
+});
+
 exports.getMysqlDB = function () {
     console.log('getMysqlDB!!!!!!!!!!!!!!!!!!' );
     //return mysqlDB;

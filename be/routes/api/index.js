@@ -11,7 +11,7 @@ router.use('/ahusConfig', require('./rooms'))
 router.use('/zones', require('./rooms'))
 router.use('/cmdManualHeating', require('./rooms'))
 router.use('/cmdRoomState', require('./rooms'))
-
+router.use('/getRoomTrend', require('./rooms'))
 
 
 

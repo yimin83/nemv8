@@ -5,8 +5,6 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify';
-import 'chart.js'
-import 'hchs-vue-charts'
 // import Chartkick from 'chartkick'
 // // import VueChartkick from 'vue-chartkick'
 import VueApexCharts from 'vue-apexcharts'
