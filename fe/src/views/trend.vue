@@ -1,104 +1,72 @@
 <template>
-  <section class="container">
-    <div class="columns">
-      <div class="column">
-        <h3>Line Chart</h3>
-        <chartjs-line></chartjs-line>
-      </div>
-     </div>
-   </section>
- </template>
- <script>
-   export default {
-     name: 'VueCharts',
-     data () {
-       return {
-         datacollection: {
-           labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-            datasets: [
-              {
-                label: 'Data One',
-                backgroundColor: '#f87979',
-                pointBackgroundColor: 'white',
-                borderWidth: 1,
-                pointBorderColor: '#249EBF',
-                data: [40, 20, 30, 50, 90, 10, 20, 40, 50, 70, 90, 100]
-              }
-            ]
-          },
-          options: {
-            scales: {
-              yAxes: [{
-                ticks: {
-                  beginAtZero: true
-                },
-                gridLines: {
-                  display: true
-                }
-              }],
-              xAxes: [ {
-                gridLines: {
-                  display: false
-                }
-              }]
-            },
-            legend: {
-              display: true
-            },
-            responsive: true,
-            maintainAspectRatio: false
-          }
-        }
+  <div class="example">
+    <apexchart width="500" height="350" type="line" :options="chartOptions" :series="series"></apexchart>
+    <div>
+       <button @click="updateChart">Update!</button>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'LineExample',
+  data: function() {
+    return {
+      chartOptions: {
+        xaxis: {
+          type: 'datetime',
+          categories: ['01/01/2003', '02/01/2003','03/01/2003','04/01/2003','05/01/2003','06/01/2003','07/01/2003','08/01/2003'],
+        },
       },
-      mounted () {
-        this.renderChart(this.datacollection, this.options)
+      series: [{
+        name: 'Series A',
+        data: [30, 40, 45, 50, 49, 60, 70, 91]
+      }, {
+        name: 'Series B',
+        data: [23, 43, 54, 12, 44, 52, 32, 11]
+      }]
+    }
+  },
+  methods: {
+      generateDayWiseTimeSeries(baseval, count, yrange) {
+        var i = 0;
+        var series = [];
+        while (i < count) {
+          var x = baseval;
+          var y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
+          series.push([x, y]);
+          baseval += 86400000;
+          i++;
+        }
+        return series;
+      },
+      updateChart() {
+        let series = [
+            {
+            name: 'South',
+            data: this.generateDayWiseTimeSeries(new Date('11 Feb 2017').getTime(), 20, {
+              min: 10,
+              max: 60
+            })
+          },
+          {
+            name: 'North',
+            data: this.generateDayWiseTimeSeries(new Date('11 Feb 2017').getTime(), 20, {
+              min: 10,
+              max: 20
+            })
+          },
+
+          {
+            name: 'Central',
+            data: this.generateDayWiseTimeSeries(new Date('11 Feb 2017').getTime(), 20, {
+              min: 10,
+              max: 15
+            })
+          }
+        ]
+        this.series = series
       }
-   }
-   //   import { Line } from 'vue-chartjs'
-   //
-   //   export default {
-   //     extends: Line,
-   //     data () {
-   //       return {
-   //         datacollection: {
-   //           labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-   //            datasets: [
-   //              {
-   //                label: 'Data One',
-   //                backgroundColor: '#f87979',
-   //                pointBackgroundColor: 'white',
-   //                borderWidth: 1,
-   //                pointBorderColor: '#249EBF',
-   //                data: [40, 20, 30, 50, 90, 10, 20, 40, 50, 70, 90, 100]
-   //              }
-   //            ]
-   //          },
-   //          options: {
-   //            scales: {
-   //              yAxes: [{
-   //                ticks: {
-   //                  beginAtZero: true
-   //                },
-   //                gridLines: {
-   //                  display: true
-   //                }
-   //              }],
-   //              xAxes: [ {
-   //                gridLines: {
-   //                  display: false
-   //                }
-   //              }]
-   //            },
-   //            legend: {
-   //              display: true
-   //            },
-   //            responsive: true,
-   //            maintainAspectRatio: false
-   //          }
-   //        }
-   //      },
-   //      mounted () {
-   //        this.renderChart(this.datacollection, this.options)
-   //      }
-   //    }
- </script>
+  }
+}
+</script>
