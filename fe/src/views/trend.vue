@@ -1,30 +1,40 @@
 <template>
-  <div class="example">
-    <apexchart width="1000" height="700" type="line" :options="chartOptions" :series="series" ></apexchart>
-    <div>
-       <button @click="updateChart">Update!</button>
-    </div>
-  </div>
+  <v-container grid-list-md>
+    <v-layout row wrap >
+      <div>
+        <br>
+        <v-select
+          :items='roomNos'
+          v-model='roomNo'
+          auto
+          label='room number'
+          hide-details
+          height=13
+          class='pa-0'
+          @change='toggleRoomNos()'
+        ></v-select>
+      </div>
+      <div>
+        <apexchart width="1000" height="700" type="line" :options="chartOptions" :series="series" ></apexchart>
+      </div>
+    </v-layout>
+  </v-container>
 </template>
-
 <script>
 import axios from 'axios'
 export default {
   mounted () {
     this.getTrend(201)
+    this.getRooms()
   },
   name: 'LineExample',
   data: function() {
     return {
       datas:[],
       series:[],
-      chartOptions: {
-        xaxis: {
-          type: 'datetime',
-          format: 'yyyy MM dd',
-          categories: ['01/01/2003', '02/01/2003','03/01/2003','04/01/2003','05/01/2003','06/01/2003','07/01/2003','08/01/2003'],
-        },
-      },
+      chartOptions: [],
+      roomNos:[],
+      roomNo:201
     }
   },
   methods: {
@@ -71,20 +81,23 @@ export default {
           alert(e.message)
           console.error(e.message)
         })
-        //   chartOptions: {
-        //     xaxis: {
-        //       type: 'datetime',
-        //       categories: ['01/01/2003', '02/01/2003','03/01/2003','04/01/2003','05/01/2003','06/01/2003','07/01/2003','08/01/2003'],
-        //     },
-        //   },
-        //   series: [{
-        //     name: 'Series A',
-        //     data: [30, 40, 45, 50, 49, 60, 70, 91]
-        //   }, {
-        //     name: 'Series B',
-        //     data: [23, 43, 54, 12, 44, 52, 32, 11]
-        //   }]
-
+    },
+    getRooms() {
+      axios.get('http://localhost:3000/api/rooms')
+        .then((r) => {
+          var roomsData = [];
+          for(var i = 0; i < r.data.length; i++){
+            roomsData.push(r.data[i].usRoomNo)
+          }
+          this.roomNos = roomsData
+        })
+        .catch((e) => {
+          alert(e.message)
+          console.error(e.message)
+        })
+    },
+    toggleRoomNos: function () {
+      this.getTrend(this.roomNo)
     },
     generateDayWiseTimeSeries(baseval, count, yrange) {
       var i = 0;

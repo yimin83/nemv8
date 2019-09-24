@@ -19,6 +19,11 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/rooms.vue')
     },
     {
+      path: '/roomsConfig',
+      name: 'roomsConfig',
+      component: () => import(/* webpackChunkName: "about" */ './views/roomsConfig.vue')
+    },
+    {
       path: '/ahusConfig',
       name: 'ahus',
       component: () => import(/* webpackChunkName: "about" */ './views/ahus.vue')

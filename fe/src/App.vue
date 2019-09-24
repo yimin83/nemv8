@@ -63,6 +63,11 @@ export default {
         },
         {
           icon: 'favorite',
+          title: '객실설정',
+          to: { path: '/roomsConfig' }
+        },
+        {
+          icon: 'favorite',
           title: '설정',
           to: { path: '/emsSysConfig' }
         },

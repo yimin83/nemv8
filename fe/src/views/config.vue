@@ -13,11 +13,11 @@
               <v-divider></v-divider>
               <v-list dense>
                 <v-list-item>
-                  <v-list-item-content>EMS Local:{{configs.PacketMinIntervalSec}}</v-list-item-content>
+                  <v-list-item-content>System Local:</v-list-item-content>
                   <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" :rules="rules" v-model="configs.tAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 :rules="rules" v-model="configs.tAddr.EMSPortNo"></v-text-field></v-list-item-content>
                 </v-list-item>
                 <v-list-item>
-                  <v-list-item-content>EMS Remote:</v-list-item-content>
+                  <v-list-item-content>System Remote:</v-list-item-content>
                   <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" :rules="rules" v-model="configs.tRemoteAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 :rules="rules" v-model="configs.tRemoteAddr.EMSPortNo"></v-text-field></v-list-item-content>
                 </v-list-item>
                 <v-list-item>
@@ -51,7 +51,10 @@
                                 name="input-3-3"
                                 filled
                                 auto-grow
-                                value="OptionValue MH:1 SCH:2 PD:4 VT:8 PH:16 OS:32 DR:64 DAMP:12"
+                                readonly
+                                height=110
+                                class='ma-0 pa-0'
+                                value="OptionValue - MH:1 SCH:2 PD:4 VT:8 PH:16 OS:32 DR:64 DAMP:128, OCCUP:256"
                               ></v-textarea>
                             </v-list-item>
                             <v-list-item>

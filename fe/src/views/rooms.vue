@@ -470,16 +470,16 @@
                   </v-btn>
                 </template>
                 <v-list>
-                  <v-list-item @click='calType = 'day''>
+                  <v-list-item @click="calType = 'day'">
                     <v-list-item-title>Day</v-list-item-title>
                   </v-list-item>
-                  <v-list-item @click='calType = 'week''>
+                  <v-list-item @click="calType = 'week'">
                     <v-list-item-title>Week</v-list-item-title>
                   </v-list-item>
-                  <v-list-item @click='calType = 'month''>
+                  <v-list-item @click="calType = 'month'">
                     <v-list-item-title>Month</v-list-item-title>
                   </v-list-item>
-                  <v-list-item @click='calType = '4day''>
+                  <v-list-item @click="calType = '4day'">
                     <v-list-item-title>4 days</v-list-item-title>
                   </v-list-item>
                 </v-list>
