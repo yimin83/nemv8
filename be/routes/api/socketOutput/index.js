@@ -18,16 +18,25 @@ const ems_msg_type_e = {
 const oam_msg_type_e = {
 	oam_set_sys_config : 1,		// if you change this, you should change _ems_msg_type_stat_e [_set_sys_config] too
 	oam_get_sys_config : 2,			// get sys config
+
 	oam_cmd_floorRad_manual_heating : 3,
 	oam_cmd_floorRad_room_state : 4,
 	oam_cmd_checkIn : 5,
-	oam_set_floorRad_room_config : 6,
-	oam_get_floorRad_room_config : 7,
-	oam_set_solBeach_zone_config : 8,
-	oam_get_solBeach_zone_config : 9,
-	oam_set_solBeach_damper_scheduler : 10,
-	oam_get_solBeach_damper_scheduler : 11,
-	oam_event_alarm : 12
+	oam_cmd_load_db : 6,
+
+	oam_set_floorRad_room_config : 7,
+	oam_get_floorRad_room_config : 8,
+
+	oam_set_solBeach_zone_config : 9,
+	oam_get_solBeach_zone_config : 10,
+
+	oam_set_solBeach_damper_scheduler : 11,
+	oam_get_solBeach_damper_scheduler : 12,
+
+	oam_set_floorRad_room_state : 13,
+	oam_get_floorRad_room_state : 14,
+
+	oam_event_alarm : 15
 };
 
 net.getConnection = function (){
@@ -322,22 +331,28 @@ net.getSizeDemandResponseConf_t = function(){
 }
 
 var pre_heating_conf_t = new struct("pre_heating_conf_t", [
-    "Option", struct.int32(),
+    "Option", struct.uint32(),
+    "RerservedRoomOption", struct.uint32(),
     "Tout_avg", struct.float32(),
     "WF_Toutdoor", struct.int32(),
     "WF_Tdiff", struct.int32(),
     "IncTempRate", struct.float32(),
-    "DecTempRate", struct.float32()
+    "DecTempRate", struct.float32(),
+    "PH_StartTimeErrRange", struct.int32(),
+    "PH_LowLoadStartTimeErrRange", struct.int32()
 ]);
-net.makePreHeatingConf_t = function(option, tout_avg, wf_Toutdoor, wf_Tdiff, incTempRate, decTempRate){
+net.makePreHeatingConf_t = function(option, rerservedRoomOption, tout_avg, wf_Toutdoor, wf_Tdiff, incTempRate, decTempRate, ph_StartTimeErrRange, ph_LowLoadStartTimeErrRange){
   var buffer = new Buffer(pre_heating_conf_t.size());
   pre_heating_conf_t.encode(buffer,0, {
     Option: option,
+    RerservedRoomOption: rerservedRoomOption,
     Tout_avg: tout_avg,
     WF_Toutdoor: wf_Toutdoor,
     WF_Tdiff: wf_Tdiff,
     IncTempRate: incTempRate,
-    DecTempRate: decTempRate
+    DecTempRate: decTempRate,
+    PH_StartTimeErrRange: ph_StartTimeErrRange,
+    PH_LowLoadStartTimeErrRange: ph_LowLoadStartTimeErrRange
   },{endian:"BE"})
   return buffer;
 }
@@ -354,6 +369,8 @@ var floor_rad_conf_t = new struct("floor_rad_conf_t", [
     "Troom_cr", struct.float32(),
     "Tsurf_cr", struct.float32(),
     "Tctrl_res", struct.float32(),
+    "CheckInHour", struct.int32(),
+    "RR_CheckInHour", struct.int32(),
     "TelNumber0", struct.char(12),
     "TelNumber1", struct.char(12),
     "TelNumber2", struct.char(12),
@@ -365,7 +382,7 @@ var floor_rad_conf_t = new struct("floor_rad_conf_t", [
     "tDemandResponse", demand_response_conf_t,
     "tPreHeating", pre_heating_conf_t // reserved.
 ]);
-net.makeFloorRadConf_t = function(controlOption, roomCount, useTsurf, troom_set, tsurf_set, troom_cr, tsurf_cr, tctrl_res, telNumber0, telNumber1, telNumber2, telNumber3, telNumber4, tVariableTemp, tPeak, tOptimalStop, tDemandResponse, tPreHeating){
+net.makeFloorRadConf_t = function(controlOption, roomCount, useTsurf, troom_set, tsurf_set, troom_cr, tsurf_cr, tctrl_res, checkInHour, rr_CheckInHour, telNumber0, telNumber1, telNumber2, telNumber3, telNumber4, tVariableTemp, tPeak, tOptimalStop, tDemandResponse, tPreHeating){
   var buffer = new Buffer(floor_rad_conf_t.size());
   floor_rad_conf_t.encode(buffer,0, {
     ControlOption: controlOption,
@@ -376,6 +393,8 @@ net.makeFloorRadConf_t = function(controlOption, roomCount, useTsurf, troom_set,
     Troom_cr: troom_cr,
     Tsurf_cr: tsurf_cr,
     Tctrl_res: tctrl_res,
+    CheckInHour: checkInHour,
+    RR_CheckInHour: rr_CheckInHour,
 		TelNumber0: telNumber0,
 		TelNumber1: telNumber1,
 		TelNumber2: telNumber2,
@@ -599,16 +618,34 @@ net.getSizeOamMsg_t = function(){
 var manual_heating_t = new struct("manual_heating_t", [
     "RoomNo", struct.uint16(),
     "HeatingMode", struct.uint16(),
-    "HeatingTimeSec", struct.uint32(),
+    "SchedulerUsed", struct.uint8(),
+    "HeatingTimeSec", struct.int32(),
+    "HeatingStopTimeSec", struct.int32(),
+    "HeatingLeftTime", struct.int32(),
+    "HeatingStopLeftTime", struct.int32(),
+    "TodayStartTime", struct.int32(),
+    "TotalHeatingTimeSec", struct.int32(),
+    "TotalLeftTime", struct.int32(),
+    "HeatingStartTime", struct.int32(),
+    "HeatingEndTime", struct.int32(),
     "Tset", struct.float32(),
     "Tset_cr", struct.float32()
 ]);
-net.makeManualHeating_t = function(roomNo, heatingMode, heatingTimeSec, tset, tset_cr){
+net.makeManualHeating_t = function(roomNo, heatingMode, schedulerUsed, heatingTimeSec, heatingStopTimeSec, heatingLeftTime, heatingStopLeftTime, todayStartTime, totalHeatingTimeSec, totalLeftTime, heatingStartTime, heatingEndTime, tset, tset_cr){
   var buffer = new Buffer(manual_heating_t.size());
   manual_heating_t.encode(buffer,0, {
     RoomNo: roomNo,
     HeatingMode: heatingMode,
+    SchedulerUsed: schedulerUsed,
     HeatingTimeSec: heatingTimeSec,
+    HeatingStopTimeSec: heatingStopTimeSec,
+    HeatingLeftTime: heatingLeftTime,
+    HeatingStopLeftTime: heatingStopLeftTime,
+    TodayStartTime: todayStartTime,
+    TotalHeatingTimeSec: totalHeatingTimeSec,
+    TotalLeftTime: totalLeftTime,
+    HeatingStartTime: heatingStartTime,
+    HeatingEndTime: heatingEndTime,
     Tset: tset,
     Tset_cr: tset_cr
   },{endian:"BE"})
@@ -623,29 +660,25 @@ var room_config_t = new struct("room_config_t", [
     "Area", struct.uint8(),
     "Direction", struct.uint8(),
     "ExteriorWallCnt", struct.uint8(),
+		"Priority", struct.uint8(),
     "Troom_set", struct.float32(),
     "Tsurf_set", struct.float32(),
     "Troom_cr", struct.float32(),
     "Tsurf_cr", struct.float32(),
-    "CheckInOutEnable", struct.int32(),
-    "CheckInTime", struct.uint32(),
-    "CheckOutTime", struct.uint32(),
     "szDesc", struct.char(32)
 ]);
-net.makeRoomConfig_t = function(roomNo, area, direction, exteriorWallCnt, troom_set, tsurf_set, troom_cr, tsurf_cr, checkInOutEnable, checkInTime, checkOutTime, szDesc){
+net.makeRoomConfig_t = function(roomNo, area, direction, exteriorWallCnt, priority, troom_set, tsurf_set, troom_cr, tsurf_cr, checkInOutEnable, checkInTime, checkOutTime, szDesc){
   var buffer = new Buffer(room_config_t.size());
   room_config_t.encode(buffer,0, {
     RoomNo: roomNo,
     Area: area,
     Direction: direction,
     ExteriorWallCnt: exteriorWallCnt,
+		Priority: priority,
     Troom_set: troom_set,
     Tsurf_set: tsurf_set,
     Troom_cr: troom_cr,
     Tsurf_cr: tsurf_cr,
-    CheckInOutEnable: checkInOutEnable,
-    CheckInTime: checkInTime,
-    CheckOutTime: checkOutTime,
     szDesc: szDesc
   },{endian:"BE"})
   return buffer;
@@ -799,6 +832,72 @@ net.makeEmsAlarm_t = function(ulTime, usSeq, usSiteInfo, usModule, usLevel, usMo
 }
 net.getSizeEmsAlarm_t = function(){
   return ems_alarm_t.size()
+}
+
+var floor_rad_room_state_t = new struct("floor_rad_room_state_t", [
+    "RoomNo", struct.uint16(),
+    "HeatingMode", struct.uint16(),
+    "RoomState", struct.uint8(),
+    "ReservedRoomType", struct.uint8(),
+    "ReservedRoomHour", struct.float32(),
+    "CheckInOutEnable", struct.float32(),
+    "CheckInTime", struct.int32(),
+    "CheckOutTime", struct.int32(),
+    "Tset", struct.float32(),
+    "Tcr", struct.float32(),
+    "reserved", struct.uint8(3),
+    "MH_HeatingTimeSec", struct.int32(),
+    "MH_HeatingStopTimeSec", struct.int32(),
+    "MH_TotalHeatingTimeSec", struct.int32(),
+    "MH_TodayStartTime", struct.int32(),
+    "MH_Tset", struct.float32(),
+    "MH_Tcr", struct.float32(),
+    "PreHeatingOption", struct.uint32(),
+    "OptimalNeedTime", struct.uint32(),
+    "PreHeatingStartTime", struct.uint32(),
+    "MH_StartTime", struct.uint32(),
+    "MH_EndTime", struct.uint32(),
+    "MH_HeatingLeftTime", struct.uint32(),
+    "TempInc", struct.float32(),
+    "TempDec", struct.float32(),
+    "Troom_cur", struct.float32(),
+    "Tsurf_cur", struct.float32()
+]);
+net.makeFloorRadRoomState_t = function(	roomNo, heatingMode, roomState, reservedRoomType, reservedRoomHour, checkInOutEnable, checkInTime, checkOutTime, tSet, tCr, reserved, mh_HeatingTimeSec, mh_HeatingStopTimeSec, mh_TotalHeatingTimeSec, mh_TodayStartTime, mh_Tset, mh_Tcr, preHeatingOption, optimalNeedTime, preHeatingStartTime, mh_StartTime, mh_EndTime, mh_HeatingLeftTime, tempInc, tempDec, tRoom_cur, tSurf_cur){
+  var buffer = new Buffer(floor_rad_room_state_t.size());
+  floor_rad_room_state_t.encode(buffer,0, {
+		RoomNo: roomNo,
+    HeatingMode: heatingMode,
+    RoomState: roomState,
+    ReservedRoomType: reservedRoomType,
+    ReservedRoomHour: reservedRoomHour,
+    CheckInOutEnable: checkInOutEnable,
+    CheckInTime: checkInTime,
+    CheckOutTime: checkOutTime,
+    Tset: tSet,
+    Tcr: tCr,
+    reserved: reserved,
+    MH_HeatingTimeSec: mh_HeatingTimeSec,
+    MH_HeatingStopTimeSec: mh_HeatingStopTimeSec,
+    MH_TotalHeatingTimeSec: mh_TotalHeatingTimeSec,
+    MH_TodayStartTime: mh_TodayStartTime,
+    MH_Tset: mh_Tset,
+    MH_Tcr: mh_Tcr,
+    PreHeatingOption: preHeatingOption,
+    OptimalNeedTime: optimalNeedTime,
+    PreHeatingStartTime: preHeatingStartTime,
+    MH_StartTime: mh_StartTime,
+    MH_EndTime: mh_EndTime,
+    MH_HeatingLeftTime: mh_HeatingLeftTime,
+    TempInc: tempInc,
+    TempDec: tempDec,
+    Troom_cur: tRoom_cur,
+    Tsurf_cur: tSurf_cur,
+  },{endian:"BE"})
+  return buffer;
+}
+net.getSizeFloorRadRoomState = function(){
+  return floor_rad_room_state_t.size()
 }
 
 module.exports = net;

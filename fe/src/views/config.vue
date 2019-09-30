@@ -1,50 +1,168 @@
 <template>
   <v-container fluid>
       <template>
-        <v-row>
-          <v-col
-            cols="12"
-            sm="6"
-            md="2"
-            lg="2"
+        <v-card>
+          <v-tabs
+            v-model="tab"
+            background-color="deep-purple accent-4"
+            centered
+            dark
+            icons-and-text
           >
-            <v-card>
-              <v-card-title class="subheading font-weight-bold">Common Config</v-card-title>
-              <v-divider></v-divider>
-              <v-list dense>
-                <v-list-item>
-                  <v-list-item-content>System Local:</v-list-item-content>
-                  <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" :rules="rules" v-model="configs.tAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 :rules="rules" v-model="configs.tAddr.EMSPortNo"></v-text-field></v-list-item-content>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-content>System Remote:</v-list-item-content>
-                  <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" :rules="rules" v-model="configs.tRemoteAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 :rules="rules" v-model="configs.tRemoteAddr.EMSPortNo"></v-text-field></v-list-item-content>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-content>MinPktIntervalSec:</v-list-item-content>
-                  <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.PacketMinIntervalSec"></v-text-field></v-list-item-content>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-content>ControlPeriodSec:</v-list-item-content>
-                  <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.ControlPeriodSec"></v-text-field></v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-card>
-          </v-col>
-          <v-col
-            cols="12"
-            sm="6"
-            md="5"
-            lg="5"
-          >
-            <v-card>
-              <v-card-title class="subheading font-weight-bold">FloorRad Config</v-card-title>
-              <v-divider></v-divider>
-              <v-list dense>
-                <v-list-item>
-                    <template>
-                      <v-row>
-                        <v-col><v-card>
+            <v-tabs-slider></v-tabs-slider>
+            <v-tab href="#tab-1">
+              Common Config
+              <v-icon>mdi-phone</v-icon>
+            </v-tab>
+            <v-tab href="#tab-2">
+              FloorRad Config
+              <v-icon>mdi-heart</v-icon>
+            </v-tab>
+            <v-tab href="#tab-3">
+              SolBeach Config
+              <v-icon>mdi-account-box</v-icon>
+            </v-tab>
+          </v-tabs>
+          <v-tabs-items v-model="tab">
+            <v-tab-item
+              v-for="i in 3"
+              :key="i"
+              :value="'tab-' + i"
+            >
+              <v-card flat v-if='i == 1' max-width="400" class="mx-auto">
+                <v-list dense>
+                  <v-list-item>
+                    <v-list-item-content>System Local:</v-list-item-content>
+                    <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" :rules="rules" v-model="configs.tAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 :rules="rules" v-model="configs.tAddr.EMSPortNo"></v-text-field></v-list-item-content>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-content>System Remote:</v-list-item-content>
+                    <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" :rules="rules" v-model="configs.tRemoteAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 :rules="rules" v-model="configs.tRemoteAddr.EMSPortNo"></v-text-field></v-list-item-content>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-content>MinPktIntervalSec:</v-list-item-content>
+                    <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.PacketMinIntervalSec"></v-text-field></v-list-item-content>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-content>ControlPeriodSec:</v-list-item-content>
+                    <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.ControlPeriodSec"></v-text-field></v-list-item-content>
+                  </v-list-item>
+                </v-list>
+              </v-card>
+              <v-card flat v-if='i == 2'>
+                <v-list dense>
+                  <v-list-item>
+                      <template>
+                        <v-row>
+                          <v-col>
+                            <v-card
+                              max-width="400"
+                              class="mx-auto">
+                            <v-list>
+                              <v-card-title class="subheading font-weight-bold">FloorRad Config</v-card-title>
+                              <v-divider></v-divider>
+                              <v-list-item>
+                                <v-textarea
+                                  name="input-3-3"
+                                  filled
+                                  auto-grow
+                                  readonly
+                                  height=100
+                                  class='ma-0 pa-0'
+                                  value="OptionValue - MH:1 SCH:2 PD:4 VT:8 PH:16 OS:32 DR:64 DAMP:128, OCCUP:256"
+                                ></v-textarea>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>Option:</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.ControlOption"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>RoomCnt:</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.RoomCount"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>UseTsuf:</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.UseTsurf"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>Troom_set:</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.Troom_set"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>Tsurf_set:</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.Tsurf_set"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>Troom_cr:</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.Troom_cr"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>Tsurf_cr:</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.Tsurf_cr"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>Tsurf_res:</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.Tctrl_res"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>Check In Hour:</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.CheckInHour"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>Tsurf_res:</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.RR_CheckInHour"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                            </v-list>
+                          </v-card>
+                        </v-col>
+                        <v-col>
+                          <v-card
+                          max-width="400"
+                          class="mx-auto">
+                          <v-card-title class="subheading font-weight-bold">Control Para</v-card-title>
+                          <v-divider></v-divider>
+                          <v-list dense>
+                            <v-list-item>
+                              <v-list-item-title>PD_MaxHR:</v-list-item-title>
+                              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tPeak.MaxHeatingRoom"></v-text-field></v-list-item-title>
+                            </v-list-item>
+                            <v-list-item>
+                              <v-list-item-title>PD_NMaxHR:</v-list-item-title>
+                              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tPeak.NightMaxHeatingRoom"></v-text-field></v-list-item-title>
+                            </v-list-item>
+                            <v-list-item>
+                              <v-list-item-title>VT_Thigh:</v-list-item-title>
+                              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tVariableTemp.HeatingHighTemp"></v-text-field></v-list-item-title>
+                            </v-list-item>
+                            <v-list-item>
+                              <v-list-item-title>VT_Tlow:</v-list-item-title>
+                              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tVariableTemp.HeatingLowTemp"></v-text-field></v-list-item-title>
+                            </v-list-item>
+                            <v-list-item>
+                              <v-list-item-title>VT_Tdelta:</v-list-item-title>
+                              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tVariableTemp.HeatingDelatTemp"></v-text-field></v-list-item-title>
+                            </v-list-item>
+                            <v-list-item>
+                              <v-list-item-title>OS_TimeS:</v-list-item-title>
+                              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tOptimalStop.OptimalStopTimeSec"></v-text-field></v-list-item-title>
+                            </v-list-item>
+                            <v-list-item>
+                              <v-list-item-title>DR_Temp:</v-list-item-title>
+                              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tDemandResponse.DRTemp"></v-text-field></v-list-item-title>
+                            </v-list-item>
+                            <v-list-item>
+                              <v-list-item-title>DR_TimeH:</v-list-item-title>
+                              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tDemandResponse.DRTimeHour"></v-text-field></v-list-item-title>
+                            </v-list-item>
+                          </v-list>
+                        </v-card>
+                      </v-col>
+                      <v-col>
+                        <v-card
+                        max-width="400"
+                        class="mx-auto">
+                          <v-card-title class="subheading font-weight-bold">Pre Heating Control</v-card-title>
+                          <v-divider></v-divider>
                           <v-list dense>
                             <v-list-item>
                               <v-textarea
@@ -52,334 +170,304 @@
                                 filled
                                 auto-grow
                                 readonly
-                                height=110
+                                height=100
                                 class='ma-0 pa-0'
-                                value="OptionValue - MH:1 SCH:2 PD:4 VT:8 PH:16 OS:32 DR:64 DAMP:128, OCCUP:256"
+                                value="1:ML 2:IncDecStat 4:HeatRoomCnt 8:LowLoad"
                               ></v-textarea>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-content>Option:</v-list-item-content>
-                              <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.ControlOption"></v-text-field></v-list-item-content>
+                              <v-list-item-title>PH_Opt:</v-list-item-title>
+                              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tPreHeating.Option"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-content>RoomCnt:</v-list-item-content>
-                              <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.RoomCount"></v-text-field></v-list-item-content>
+                              <v-list-item-title>PH_RR_Opt:</v-list-item-title>
+                              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tPreHeating.RerservedRoomOption"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-content>UseTsuf:</v-list-item-content>
-                              <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.UseTsurf"></v-text-field></v-list-item-content>
+                              <v-list-item-title>PH_Tavg:</v-list-item-title>
+                              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tPreHeating.Tout_avg"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-content>Troom_set:</v-list-item-content>
-                              <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.Troom_set"></v-text-field></v-list-item-content>
+                              <v-list-item-title>PH_WFto:</v-list-item-title>
+                              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tPreHeating.WF_Toutdoor"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-content>Tsurf_set:</v-list-item-content>
-                              <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.Tsurf_set"></v-text-field></v-list-item-content>
+                              <v-list-item-title>PH_WFTdf:</v-list-item-title>
+                              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tPreHeating.WF_Tdiff"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-content>Troom_cr:</v-list-item-content>
-                              <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.Troom_cr"></v-text-field></v-list-item-content>
+                              <v-list-item-title>PH_STER:</v-list-item-title>
+                              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tPreHeating.PH_StartTimeErrRange"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-content>Tsurf_cr:</v-list-item-content>
-                              <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.Tsurf_cr"></v-text-field></v-list-item-content>
-                            </v-list-item>
-                            <v-list-item>
-                              <v-list-item-content>Tsurf_res:</v-list-item-content>
-                              <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.Tctrl_res"></v-text-field></v-list-item-content>
+                              <v-list-item-title>PH_LL_STE:</v-list-item-title>
+                              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tPreHeating.PH_LowLoadStartTimeErrRange"></v-text-field></v-list-item-title>
                             </v-list-item>
                           </v-list>
                         </v-card>
                       </v-col>
-                      <v-col><v-card>
-                        <v-card-title class="subheading font-weight-bold">Control Para</v-card-title>
-                        <v-divider></v-divider>
-                        <v-list dense>
-                          <v-list-item>
-                            <v-list-item-content>PD_MaxHR:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tPeak.MaxHeatingRoom"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>PD_NMaxHR:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tPeak.NightMaxHeatingRoom"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>VT_Thigh:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tVariableTemp.HeatingHighTemp"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>VT_Tlow:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tVariableTemp.HeatingLowTemp"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>VT_Tdelta:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tVariableTemp.HeatingDelatTemp"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>OS_TimeS:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tOptimalStop.OptimalStopTimeSec"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>DR_Temp:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tDemandResponse.DRTemp"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>DR_TimeH:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tDemandResponse.DRTimeHour"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>PH_Opt:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tPreHeating.Option"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>PH_Tavg:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tPreHeating.Tout_avg"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>PH_WFTo:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tPreHeating.WF_Toutdoor"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>PH_WFTdif:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tFloorRadConf.tPreHeating.WF_Tdiff"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                        </v-list>
-                      </v-card>
-                    </v-col>
-                    </v-row>
-                  </template>
-                </v-list-item>
-              </v-list>
-            </v-card>
-          </v-col>
-          <v-col
-            cols="12"
-            sm="6"
-            md="5"
-            lg="5"
-          >
-            <v-card>
-              <v-card-title class="subheading font-weight-bold">SolBeach Config</v-card-title>
-              <v-divider></v-divider>
-              <v-list dense>
-                <v-list-item>
-                    <template>
-                      <v-row>
+                      </v-row>
+                    </template>
+                  </v-list-item>
+                </v-list>
+              </v-card>
+                <v-card flat v-if='i == 3'>
+                  <v-list dense>
+                    <v-list-item>
+                        <template>
+                          <v-row>
+                            <v-col>
+                              <v-card>
+                              <v-list dense>
+                                <v-card-title class="subheading font-weight-bold">SolBeach Config</v-card-title>
+                                <v-divider></v-divider>
+                                <v-list-item>
+                                  <v-textarea
+                                    name="input-3-3"
+                                    filled
+                                    auto-grow
+                                    readonly
+                                    height=100
+                                    class='ma-0 pa-0'
+                                    value="OptionValue - MH:1 SCH:2 PD:4 VT:8 PH:16 OS:32 DR:64 DAMP:128, OCCUP:256"
+                                  ></v-textarea>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>Option:</v-list-item-title>
+                                  <v-list-item-title class="align-end "><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.ControlOption"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>ZoneCnt:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.ZoneCnt"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>HCMode:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.HCMode"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>Tzone_set:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.Tzone_set"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>PPMco2_set:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.PPMco2_set"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>Damper AM:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.DamperAutoManual"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>Tctrl_res:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.Tctrl_res"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>CO2PeriodSec:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.CO2LoadPeriodSec"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                              </v-list>
+                            </v-card>
+                          </v-col>
+                          <v-col>
+                            <v-card>
+                              <v-card-title class="subheading font-weight-bold">Damper Control</v-card-title>
+                              <v-divider></v-divider>
+                              <v-list dense>
+                                <v-list-item>
+                                  <v-textarea
+                                    name="input-3-3"
+                                    filled
+                                    auto-grow
+                                    readonly
+                                    height=100
+                                    class='ma-0 pa-0'
+                                    value="Nt:1 Ctrl:2 CtrlNt:6 sch:8"
+                                  ></v-textarea>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>Control Mode:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.DamperCtrlMode"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>Rdamp_set:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.Rdamp_set"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>Rdamp_min:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.Rdamp_min"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>Rdamp_max:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.Rdamp_max"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>Rdamp_res:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.Rdamp_ctrl_res"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>NifyInterval:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.NotifyIntervalSec"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>NifyStarHour:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.NotifyStartHour"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>NifyEndHour:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.NotifyEndHour"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                              </v-list>
+                            </v-card>
+                            <br>
+                            <center><v-btn color="primary" @click="openDamperSch(1);">DamperSch</v-btn></center>
+                            <v-dialog v-model="damperSchModal" persistent max-width="550px">
+                              <v-card>
+                                <v-card-title>
+                                  <span class="headline">Damper Control Scheduler</span>
+                                </v-card-title>
+                                <v-card-text>
+                                  <v-row align="center">
+                                    <v-col cols="3">
+                                      <v-subheader>AhuIndex : </v-subheader>
+                                    </v-col>
+                                    <v-col cols="2">
+                                      <v-select
+                                        v-model="damperSchsConfig.AhuIndex"
+                                        :items="AhuIndexs"
+                                        item-text="AhuIndex"
+                                        item-value="AhuIndex"
+                                        label="AhuIndex"
+                                        persistent-hint
+                                        return-object
+                                        single-line
+                                        width:10px
+                                      ></v-select>
+                                    </v-col>
+                                  </v-row>
+                                  <v-simple-table>
+                                    <thead>
+                                      <tr>
+                                        <th class="text-left" width="60px">Step</th>
+                                        <th class="text-left">Hour</th>
+                                        <th class="text-left">Minute</th>
+                                        <th class="text-left">Ratio(0~100)</th>
+                                        <th class="text-left">Ctrl Mode</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr v-for="(item, index) in damperSchsConfig.tSch" :key="item.idx">
+                                        <td>{{ index+1 }}</td>
+                                        <td><input type="text" v-model="item.Hour" size="3" maxlength="3" ></td>
+                                        <td><input type="text" v-model="item.Min" size="3" maxlength="3" ></td>
+                                        <td><input type="text" v-model="item.Ratio" size="3" maxlength="3" ></td>
+                                        <td><input type="text" v-model="item.Mode" size="3" maxlength="3" ></td>
+                                      </tr>
+                                    </tbody>
+                                  </v-simple-table>
+                                </v-card-text>
+                                <v-card-actions>
+                                  <v-spacer></v-spacer>
+                                  <v-btn color="blue darken-1" flat @click="applyDamperSch(damperSchsConfig.AhuIndex)">Apply</v-btn>
+                                  <v-btn color="blue darken-1" flat @click="closeDamperSch()">Cancel</v-btn>
+                                </v-card-actions>
+                              </v-card>
+                            </v-dialog>
+                          </v-col>
+                          <v-col>
+                            <v-card>
+                            <v-card-title class="subheading font-weight-bold">Occupant Control</v-card-title>
+                            <v-divider></v-divider>
+                            <v-list dense>
+                              <v-list-item>
+                                <v-textarea
+                                  name="input-3-3"
+                                  filled
+                                  auto-grow
+                                  readonly
+                                  height=100
+                                  class='ma-0 pa-0'
+                                  value="Ntfy:1 CtrlFan:2"
+                                ></v-textarea>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>Control Mode:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.ControlMode"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>CO2_rate_wf:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_rate_wf"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>CO2_wf:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_wf"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>CO2_empty:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_empty"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>CO2_occupied:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_occupied"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>CO2_inc_rate:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_inc_rate"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>CO2_dec_rate:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_dec_rate"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>CO2_inc_time:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_inc_time"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>CO2_dec_time:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_dec_time"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                            </v-list>
+                          </v-card>
+                        </v-col>
                         <v-col>
                           <v-card>
-                          <v-list dense>
-                            <v-list-item>
-                              <v-list-item-content>Option:</v-list-item-content>
-                              <v-list-item-content class="align-end "><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.ControlOption"></v-text-field></v-list-item-content>
-                            </v-list-item>
-                            <v-list-item>
-                              <v-list-item-content>ZoneCnt:</v-list-item-content>
-                              <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.ZoneCnt"></v-text-field></v-list-item-content>
-                            </v-list-item>
-                            <v-list-item>
-                              <v-list-item-content>HCMode:</v-list-item-content>
-                              <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.HCMode"></v-text-field></v-list-item-content>
-                            </v-list-item>
-                            <v-list-item>
-                              <v-list-item-content>Tzone_set:</v-list-item-content>
-                              <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.Tzone_set"></v-text-field></v-list-item-content>
-                            </v-list-item>
-                            <v-list-item>
-                              <v-list-item-content>PPMco2_set:</v-list-item-content>
-                              <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.PPMco2_set"></v-text-field></v-list-item-content>
-                            </v-list-item>
-                            <v-list-item>
-                              <v-list-item-content>Damper AM:</v-list-item-content>
-                              <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.DamperAutoManual"></v-text-field></v-list-item-content>
-                            </v-list-item>
-                            <v-list-item>
-                              <v-list-item-content>Tsurf_res:</v-list-item-content>
-                              <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.Tctrl_res"></v-text-field></v-list-item-content>
-                            </v-list-item>
-                            <v-list-item>
-                              <v-list-item-content>CO2PeriodSec:</v-list-item-content>
-                              <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.CO2LoadPeriodSec"></v-text-field></v-list-item-content>
-                            </v-list-item>
-                          </v-list>
-                        </v-card>
-                        <br>
-                        <v-card>
-                        <v-card-title class="subheading font-weight-bold">Occupant Control</v-card-title>
-                        <v-divider></v-divider>
-                        <v-list dense>
-                          <v-list-item>
-                            <v-list-item-content>Control Mode:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.ControlMode"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>CO2_rate_wf:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_rate_wf"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>CO2_wf:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_wf"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>CO2_empty:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_empty"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>CO2_pccupied:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_occupied"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>CO2_inc_rate:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_inc_rate"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>CO2_dec_rate:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_dec_rate"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>CO2_inc_time:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_inc_time"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>CO2_dec_time:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tC02Conf.PPMco2_dec_time"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                        </v-list>
-                      </v-card>
-                      </v-col>
-                      <v-col><v-card>
-                        <v-card-title class="subheading font-weight-bold">Damper Control</v-card-title>
-                        <v-divider></v-divider><br>
-                        <p class="text-center">Nt:1 Ctr:2 CtrlNt:6 sch:8</p>
-                        <v-list dense>
-                          <v-list-item>
-                            <v-list-item-content>Control Mode:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.DamperCtrlMode"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>Rdamp_set:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.Rdamp_set"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>Rdamp_min:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.Rdamp_min"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>Rdamp_max:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.Rdamp_max"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>Rdamp_res:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.Rdamp_ctrl_res"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>NifyInterval:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.NotifyIntervalSec"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>NifyStarHour:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.NotifyStartHour"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>NifyEndHour:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tRdamp.NotifyEndHour"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                        </v-list>
-                      </v-card>
-                      <br>
-                      <v-card>
-                        <v-card-title class="subheading font-weight-bold">PID Control</v-card-title>
-                        <v-divider></v-divider>
-                        <v-list dense>
-                          <v-list-item>
-                            <v-list-item-content>CtrlStepValue:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tPID.ControlStepValue"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>UserPID:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tPID.PIDCtrlMode"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>Kp:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tPID.Kp"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>Ki:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tPID.Ki"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>Kd:</v-list-item-content>
-                            <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tPID.Kd"></v-text-field></v-list-item-content>
-                          </v-list-item>
-                        </v-list>
-                      </v-card>
-                      <br>
-                      <center><v-btn color="primary" @click="openDamperSch(1);">DamperSch</v-btn></center>
-                      <v-dialog v-model="damperSchModal" persistent max-width="550px">
-                        <v-card>
-                          <v-card-title>
-                            <span class="headline">Damper Control Scheduler</span>
-                          </v-card-title>
-                          <v-card-text>
-                            <v-row align="center">
-                              <v-col cols="3">
-                                <v-subheader>AhuIndex : </v-subheader>
-                              </v-col>
-                              <v-col cols="2">
-                                <v-select
-                                  v-model="damperSchsConfig.AhuIndex"
-                                  :items="AhuIndexs"
-                                  item-text="AhuIndex"
-                                  item-value="AhuIndex"
-                                  label="AhuIndex"
-                                  persistent-hint
-                                  return-object
-                                  single-line
-                                  width:10px
-                                ></v-select>
-                              </v-col>
-                            </v-row>
-                            <v-simple-table>
-                              <thead>
-                                <tr>
-                                  <th class="text-left" width="60px">Step</th>
-                                  <th class="text-left">Hour</th>
-                                  <th class="text-left">Minute</th>
-                                  <th class="text-left">Ratio(0~100)</th>
-                                  <th class="text-left">Ctrl Mode</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr v-for="(item, index) in damperSchsConfig.tSch" :key="item.idx">
-                                  <td>{{ index+1 }}</td>
-                                  <td><input type="text" v-model="item.Hour" size="3" maxlength="3" ></td>
-                                  <td><input type="text" v-model="item.Min" size="3" maxlength="3" ></td>
-                                  <td><input type="text" v-model="item.Ratio" size="3" maxlength="3" ></td>
-                                  <td><input type="text" v-model="item.Mode" size="3" maxlength="3" ></td>
-                                </tr>
-                              </tbody>
-                            </v-simple-table>
-                          </v-card-text>
-                          <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn color="blue darken-1" flat @click="applyDamperSch(damperSchsConfig.AhuIndex)">Apply</v-btn>
-                            <v-btn color="blue darken-1" flat @click="closeDamperSch()">Cancel</v-btn>
-                          </v-card-actions>
-                        </v-card>
-                      </v-dialog>
-                    </v-col>
-                    </v-row>
-                  </template>
-                </v-list-item>
-              </v-list>
-            </v-card>
-          </v-col>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click="applyEmsSysConfig()">Apply</v-btn>
-            <v-btn color="blue darken-1" flat @click="getEmsSysConfig()">Cancel</v-btn>
-          </v-card-actions>
-        </v-row>
+                            <v-card-title class="subheading font-weight-bold">PID Control</v-card-title>
+                            <v-divider></v-divider>
+                            <v-list dense>
+                              <v-list-item>
+                                <v-list-item-title>CtrlStepValue:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tPID.ControlStepValue"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>UserPID:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tPID.PIDCtrlMode"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>Kp:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tPID.Kp"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>Ki:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tPID.Ki"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>Kd:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.tPID.Kd"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                            </v-list>
+                          </v-card>
+                        </v-col>
+                        </v-row>
+                      </template>
+                    </v-list-item>
+                  </v-list>
+                </v-card>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="blue darken-1" flat @click="applyEmsSysConfig()">Apply</v-btn>
+                  <v-btn color="blue darken-1" flat @click="getEmsSysConfig()">Cancel</v-btn>
+                </v-card-actions>
+            </v-tab-item>
+          </v-tabs-items>
+        </v-card>
       </template>
   </v-container>
 </template>
@@ -391,6 +479,7 @@
     },
     data () {
       return {
+        tab: null,
         select: { AhuIndex: 2},
         AhuIndexs: [
           { AhuIndex: 1 },

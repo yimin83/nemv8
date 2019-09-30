@@ -80,8 +80,13 @@
             </v-card-text>
             <v-card-actions class="ma-0 pa-0">
               <v-spacer></v-spacer>
-              <v-btn fab x-small color='grey darken-1' class=" ma-0 pa-0" @click='settingRoom(room.usRoomNo)'>
-                <v-icon dark>build</v-icon>
+              <v-btn color='grey darken-1' height=30 class=" ma-0 pa-0" x-small @click='cmdRoomState(room.usRoomNo, room.ucRoomState)'>
+                <label styel="font-size:3px;" v-if='room.ucRoomState != 2'>예비<br>난방</label>
+                <label styel="font-size:3px;" v-if='room.ucRoomState == 2'>예비<br>난방해제</label>
+              </v-btn>
+              <v-btn height=30 color='grey darken-1' class=" ma-1 pa-0" x-small @click='manualSettingRoom(room.usRoomNo)'>
+                <label styel="font-size:3px;" v-if='room.usManHeatingMode != 1'>수동<br>난방on</label>
+                <label styel="font-size:3px;" v-if=' room.usManHeatingMode == 1'>수동<br>난방off</label>
               </v-btn>
               <v-spacer></v-spacer>
             </v-card-actions>
@@ -256,10 +261,10 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model='settingRoomModal' persistent  max-width='500px'>
+    <v-dialog v-model='manualSettingRoomModal' persistent  max-width='500px'>
       <v-card>
         <v-card-title>
-          <span class='headline'>{{settingTitle}}</span>
+          <span class='headline'>{{manualHeatingTitle}}</span>
         </v-card-title>
         <v-card-text>
           <v-container fluid grid-list-xl>
@@ -271,134 +276,10 @@
                   persistent-hint
                   required
                   height=13
-                  v-model='roomConfigs.RoomNo'
+                  v-model='roomStatInfo.usRoomNo'
                 ></v-text-field>
               </v-flex>
               <v-flex xs6>
-                <v-text-field
-                  label='Area'
-                  hint=''
-                  persistent-hint
-                  required
-                  height=13
-                  v-model='roomConfigs.Area'
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs6>
-                <v-text-field
-                  label='Direction'
-                  hint=''
-                  persistent-hint
-                  required
-                  height=13
-                  v-model='roomConfigs.Direction'
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs6>
-                <v-text-field
-                  label='ExteriorWallCnt'
-                  hint=''
-                  persistent-hint
-                  required
-                  height=13
-                  v-model='roomConfigs.ExteriorWallCnt'
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs6>
-                <v-text-field
-                  label='Troom_set'
-                  hint=''
-                  persistent-hint
-                  required
-                  height=13
-                  v-model='roomConfigs.Troom_set'
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs6>
-                <v-text-field
-                  label='Tsurf_set'
-                  hint=''
-                  persistent-hint
-                  required
-                  v-model='roomConfigs.Tsurf_set'
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs6>
-                <v-text-field
-                  label='Troom_cr'
-                  hint=''
-                  persistent-hint
-                  required
-                  height=13
-                  v-model='roomConfigs.Troom_cr'
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs6>
-                <v-text-field
-                  label='Tsurf_set'
-                  hint=''
-                  persistent-hint
-                  required
-                  height=13
-                  v-model='roomConfigs.Tsurf_cr'
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs6>
-                <v-text-field
-                  label='CheckInOutEnable'
-                  hint=''
-                  persistent-hint
-                  required
-                  height=13
-                  v-model='roomConfigs.CheckInOutEnable'
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs6>
-                <v-text-field
-                  label='CheckInTime'
-                  hint=''
-                  persistent-hint
-                  required
-                  height=13
-                  v-model='trnCheckInTime'
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs6>
-                <v-text-field
-                  label='CheckOutTime'
-                  hint=''
-                  persistent-hint
-                  required
-                  height=13
-                  v-model='trnCheckOutTime'
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs6>
-                <v-text-field
-                  label='strDesc'
-                  hint=''
-                  persistent-hint
-                  required
-                  height=13
-                  v-model='roomConfigs.szDesc'
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs6>
-                <v-select
-                  :items='heatingModes'
-                  v-model='heatingMode'
-                  auto
-                  label='usManHeatingMode'
-                  hide-details
-                  height=13
-                  class='pa-0'
-                  @change='toggleHeatingMode()'
-                ></v-select>
-              </v-flex>
-              <v-flex xs6>
-                보일러 동작 상태 : {{roomStatInfo.ucCurStatus==1?'동작':'정지'}}
-              </v-flex>
-              <v-flex xs6 v-if='roomStatInfo.usManHeatingMode == 1'>
                 <v-text-field
                   label='ulManHeatingTimeSec'
                   hint=''
@@ -409,7 +290,7 @@
                   v-model='roomStatInfo.ulManHeatingTimeSec'
                 ></v-text-field>
               </v-flex>
-              <v-flex xs6 v-if='roomStatInfo.usManHeatingMode == 1'>
+              <v-flex xs6>
                 <v-text-field
                   label='fManTset'
                   hint=''
@@ -420,7 +301,7 @@
                   v-model='roomStatInfo.fManTset'
                 ></v-text-field>
               </v-flex>
-              <v-flex xs6 v-if='roomStatInfo.usManHeatingMode == 1'>
+              <v-flex xs6>
                 <v-text-field
                   label='fManTset_cr'
                   hint=''
@@ -436,10 +317,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color='blue darken-1' flat @click='cmdRoomState(roomConfigs.RoomNo)'>{{reservedTxt}}</v-btn>
-          <v-btn v-if='roomStatInfo.usManHeatingMode == 1' color='blue darken-1' flat @click='cmdManualHeating(roomConfigs.RoomNo)'>{{boilerOnOffTxt}}</v-btn>
-          <v-btn color='blue darken-1' flat @click='saveSettingRoom(roomConfigs.RoomNo)'>저장</v-btn>
-          <v-btn color='blue darken-1' flat @click.native='settingRoomModal = false'>닫기</v-btn>
+          <v-btn v-if='roomStatInfo.usManHeatingMode == 1' color='blue darken-1' flat @click='cmdManualHeating(roomConfigs.RoomNo)'>난방시작</v-btn>
+          <v-btn color='blue darken-1' flat @click.native='manualSettingRoomModal = false'>닫기</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -546,11 +425,11 @@ export default {
       events: [],
       rsvRoomModal: false,
       roomScheduleModal: false,
-      settingRoomModal: false,
+      manualSettingRoomModal: false,
       bestChkbox: false,
       roomTitle: '객실 예약',
-      settingTitle: '객실 설정',
-      boilerOnOffTxt: '난방시작',
+      manualHeatingTitle: '수동 난방 설정',
+      boilerOnOffTxt: '수동/<br/>난방on',
       reservedTxt:'예열시작',
       CurStatus:0,
       SetStatus:0,
@@ -573,22 +452,6 @@ export default {
       },
       roomStatInfo: {
         usRoomNo: 0,
-        Area:0,
-        Direction:0,
-        ExteriorWallCnt:0,
-        szDesc:0,
-        ucRoomState:0,
-        ucTotalStatus:0,
-        ucSetStatus:0,
-        ucCurStatus: 0,
-        nCheckInOutEnable:0,
-        nCheckInTime:0,
-        nCheckOutTime:0,
-        fTset: 0,
-        fTsurf_set:0,
-        fTsurf_cur:0,
-        fTroom_set:0,
-        fTroom_cur:0,
         usManHeatingMode:0,
         ulManHeatingTimeSec:0,
         fManTset:0,
@@ -752,47 +615,6 @@ export default {
       this.start = start
       this.end = end
     },
-    initRoomStatInfo: function () {
-      this.roomStatInfo.usRoomNo = 0
-      this.roomStatInfo.Area = 0,
-      this.roomStatInfo.Direction = 0,
-      this.roomStatInfo.ExteriorWallCnt = 0,
-      this.roomStatInfo.szDesc = '',
-      this.roomStatInfo.ucRoomState = 0
-      this.roomStatInfo.ucTotalStatus = 0
-      this.roomStatInfo.ucSetStatus = 0
-      this.roomStatInfo.ucCurStatus = 0
-      this.roomStatInfo.nCheckInOutEnable = 0
-      this.roomStatInfo.nCheckInTime = 0
-      this.roomStatInfo.nCheckOutTime = 0
-      this.roomStatInfo.fTset = 0
-      this.roomStatInfo.fTsurf_set = 0
-      this.roomStatInfo.fTsurf_cur = 0
-      this.roomStatInfo.fTroom_set = 0
-      this.roomStatInfo.fTroom_cur = 0
-      this.roomStatInfo.usManHeatingMode = 0
-      this.roomStatInfo.ulManHeatingTimeSec = 0
-      this.roomStatInfo.fManTset = 0
-      this.roomStatInfo.fManTset_cr = 0
-      this.roomStatInfo.nSetLastTime = 0
-    },
-    initRoomScheInfo: function () {
-      this.roomScheInfo.nIdx=0,
-      this.roomScheInfo.usRoomNo= 0,
-      this.roomScheInfo.nCheckInOutEnbale= 0,
-      this.roomScheInfo.strCheckInTime= '',
-      this.roomScheInfo.nCheckInTime= 0,
-      this.roomScheInfo.strCheckOutTime= '',
-      this.roomScheInfo.nCheckOutTime= 0,
-      this.roomScheInfo.szSubsName= '',
-      this.roomScheInfo.szSubsTel= '',
-      this.roomScheInfo.tReserveDate= '',
-      this.roomScheInfo.ucPeopleCnt= 0,
-      this.roomScheInfo.szDesc= ''
-      this.strCheckInTime = '14:00'
-      this.strCheckOutTime = '12:00'
-      this.autoCheckIn = true
-    },
     getRoomScheInfo: function (idx) {
       if(idx == 0) {
         this.roomTitle = '객실 예약'
@@ -839,7 +661,6 @@ export default {
         }
       }
     },
-
     getRooms () {
       axios.get('http://localhost:3000/api/rooms')
         .then((r) => {
@@ -901,79 +722,27 @@ export default {
         })
       this.$data.roomScheduleModal = true
     },
-    getRoomConfig: function (roomNo) {
-      axios.get(`http://localhost:3000/api/rooms/getRoomConfig/${roomNo}`)
-        .then((r) => {
-          this.roomConfigs = JSON.parse(r.data)
-        })
-        .catch((e) => {
-          alert(e.message)
-          console.error(e.message)
-        })
-    },
-    settingRoom: function (roomNo) {
+    manualSettingRoom: function (roomNo) {
       //this.initRoomStatInfo()
       // this.getRoomStatInfo(roomNo)
-      axios.get(`http://localhost:3000/api/rooms/getRoomConfig/${roomNo}`)
-        .then((r) => {
-          this.roomConfigs = JSON.parse(r.data)
-          if(this.roomConfigs.CheckInTime != '0') {
-            this.trnCheckInTime = new Date(this.roomConfigs.CheckInTime*1000).toISOString().
-                                                                              replace(/T/, ' ').      // replace T with a space
-                                                                              replace(/\..+/, '')
-
-          }
-          else {
-            this.trnCheckInTime = 0
-          }
-          if(this.roomConfigs.CheckOutTime != '0') {
-            this.trnCheckOutTime = new Date(this.roomConfigs.CheckOutTime*1000).toISOString().
-                                                                              replace(/T/, ' ').      // replace T with a space
-                                                                              replace(/\..+/, '')
-
-          }
-          else {
-            this.trnCheckOutTime = 0
-          }
-          this.roomStatInfo.Area = this.roomConfigs.Area
-          this.roomStatInfo.Direction = this.roomConfigs.Direction
-          this.roomStatInfo.ExteriorWallCnt = this.roomConfigs.ExteriorWallCnt
-          this.roomStatInfo.szDesc = this.roomConfigs.szDesc
-          for (var i = 0; i < this.roomStat.length; i++) {
-             if (this.roomStat[i].roomNo == roomNo) {
-               alert(this.roomStat[i].roomNo +', '+roomNo)
-               this.roomStatInfo.usRoomNo = this.roomStat[i].usRoomNo
-               this.roomStatInfo.ucRoomState = this.roomStat[i].ucRoomState
-               this.roomStatInfo.ucTotalStatus = this.roomStat[i].ucTotalStatus
-               this.roomStatInfo.ucSetStatus = this.roomStat[i].ucSetStatus
-               this.roomStatInfo.ucCurStatus = this.roomStat[i].ucCurStatus
-               this.boilerOnOffTxt = this.roomStatInfo.ucCurStatus == 1 ? '난방정지' : '난방시작'
-               this.roomStatInfo.nCheckInOutEnable = this.roomStat[i].nCheckInOutEnable
-               this.roomStatInfo.nCheckInTime = this.roomStat[i].nCheckInTime
-               this.roomStatInfo.nCheckOutTime = this.roomStat[i].nCheckOutTime
-               this.roomStatInfo.fTset = this.roomStat[i].fTset
-               this.roomStatInfo.fTsurf_set = this.roomStat[i].fTsurf_set
-               this.roomStatInfo.fTsurf_cur = this.roomStat[i].fTsurf_cur
-               this.roomStatInfo.fTroom_set = this.roomStat[i].fTroom_set
-               this.roomStatInfo.fTroom_cur = this.roomStat[i].fTroom_cur
-               this.roomStatInfo.usManHeatingMode = this.roomStat[i].usManHeatingMode
-               this.heatingMode == (this.roomStatInfo.usManHeatingMode  == 0) ? '자동':'수동'
-               this.toggleHeatingMode()
-               this.roomStatInfo.ulManHeatingTimeSec = this.roomStat[i].ulManHeatingTimeSec
-               this.roomStatInfo.fManTset = this.roomStat[i].fManTset
-               this.roomStatInfo.fManTset_cr = this.roomStat[i].fManTset_cr
-               this.roomStatInfo.nSetLastTime = this.roomStat[i].nSetLastTime
-               // this.bestChkbox = this.roomStat[i].isBestRoom
-               // this.roomStatInfo.boilerOn = this.roomStat[i].boilerOn
-               break
-             }
-           }
-           this.$data.settingRoomModal = true
-        })
-        .catch((e) => {
-          alert(e.message)
-          console.error(e.message)
-        })
+      this.getRooms()
+      for (var i = 0; i < this.roomStat.length; i++) {
+         if (this.roomStat[i].usRoomNo == roomNo) {
+           this.roomStatInfo.usRoomNo = this.roomStat[i].usRoomNo
+           this.roomStatInfo.usManHeatingMode = this.roomStat[i].usManHeatingMode
+           this.roomStatInfo.ulManHeatingTimeSec = this.roomStat[i].ulManHeatingTimeSec
+           this.roomStatInfo.fManTset = this.roomStat[i].fManTset
+           this.roomStatInfo.fManTset_cr = this.roomStat[i].fManTset_cr
+           this.roomStatInfo.nSetLastTime = this.roomStat[i].nSetLastTime
+           break
+         }
+       }
+       if(this.roomStatInfo.usManHeatingMode != 1) {
+         this.$data.manualSettingRoomModal = true
+       }
+       else {
+         this.cmdManualHeating(roomNo)
+       }
 
     },
     reserveRoomSche: function () {
@@ -1043,25 +812,6 @@ export default {
     closeReserveRoom: function (roomNo) {
       this.rsvRoomModal = false
     },
-    saveSettingRoom: function (roomNo) {
-      var nCheckInTime = (this.trnCheckInTime != '0' ) ? Math.round((new Date(this.trnCheckInTime).getTime()+(9*3600)) / 1000) : this.trnCheckInTime
-      var nCheckOutTime =(this.trnCheckOutTime != '0' ) ?  Math.round((new Date(this.trnCheckOutTime).getTime()+(9*3600)) / 1000): this.trnCheckInTime
-      axios.put(`http://localhost:3000/api/rooms/${'roomStat'}`, {
-        RoomNo: this.roomConfigs.RoomNo, Area: this.roomConfigs.Area, Direction: this.roomConfigs.Direction, ExteriorWallCnt: this.roomConfigs.ExteriorWallCnt,
-        Troom_set: this.roomConfigs.Troom_set, Tsurf_set: this.roomConfigs.Tsurf_set, Troom_cr: this.roomConfigs.Troom_cr, Tsurf_cr: this.roomConfigs.Tsurf_cr,
-        CheckInOutEnable: this.roomConfigs.CheckInOutEnable, CheckInTime: nCheckInTime, CheckOutTime:nCheckOutTime, szDesc:  this.roomConfigs.szDesc,
-        HeatingMode: this.roomStatInfo.usManHeatingMode, HeatingTimeSec: this.roomStatInfo.ulManHeatingTimeSec, Tset: this.roomStatInfo.fManTset, Tset_cr: this.roomStatInfo.fManTset_cr
-
-      })
-        .then((r) => {
-          // this.$data.settingRoomModal = false
-          this.settingRoom(roomNo)
-        })
-        .catch((e) => {
-          alert(e.message)
-          console.log(e.message)
-        })
-    },
     cmdManualHeating: function (roomNo) {
       //alert('cmdManualHeating usManHeatingMode : ' + this.roomStatInfo.usManHeatingMode + ', '+((this.roomStatInfo.usManHeatingMode == 1) ? 2 : 1))
       axios.put('http://localhost:3000/api/rooms/cmdManualHeating', {
@@ -1070,33 +820,26 @@ export default {
         Tset: this.roomStatInfo.fManTset, Tset_cr: this.roomStatInfo.fManTset_cr
       })
         .then((r) => {
-          // this.$data.settingRoomModal = false
-          this.settingRoom(roomNo)
+          // this.$data.manualSettingRoomModal = false
+          this.manualSettingRoom(roomNo)
         })
         .catch((e) => {
           alert(e.message)
           console.log(e.message)
         })
     },
-    cmdRoomState: function (roomNo) {
-      axios.put(`http://localhost:3000/api/rooms/cmdRoomState/${roomNo}`)
+    cmdRoomState: function (roomNo, ucRoomState) {
+      axios.put('http://localhost:3000/api/rooms/cmdRoomState', {
+        RoomNo: roomNo, RoomState: (ucRoomState == 2) ? 1 : 2
+      })
         .then((r) => {
-          // this.$data.settingRoomModal = false
+          // this.$data.manualSettingRoomModal = false
           this.getRooms()
-          this.settingRoom(roomNo)
         })
         .catch((e) => {
           alert(e.message)
           console.log(e.message)
         })
-    },
-    toggleAutoCheckIn: function () {
-    },
-    toggleBoilerOn: function () {
-    },
-    toggleHeatingMode: function () {
-      if (this.heatingMode == '자동') this.roomStatInfo.usManHeatingMode = 0
-      else this.roomStatInfo.usManHeatingMode = 1
     }
   }
 }

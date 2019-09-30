@@ -17,16 +17,25 @@ var web_interface = 0x80
 const oam_msg_type_e = {
 	oam_set_sys_config : 1,		// if you change this, you should change _ems_msg_type_stat_e [_set_sys_config] too
 	oam_get_sys_config : 2,			// get sys config
+
 	oam_cmd_floorRad_manual_heating : 3,
 	oam_cmd_floorRad_room_state : 4,
 	oam_cmd_checkIn : 5,
-	oam_set_floorRad_room_config : 6,
-	oam_get_floorRad_room_config : 7,
-	oam_set_solBeach_zone_config : 8,
-	oam_get_solBeach_zone_config : 9,
-	oam_set_solBeach_damper_scheduler : 10,
-	oam_get_solBeach_damper_scheduler : 11,
-	oam_event_alarm : 12
+	oam_cmd_load_db : 6,
+
+	oam_set_floorRad_room_config : 7,
+	oam_get_floorRad_room_config : 8,
+
+	oam_set_solBeach_zone_config : 9,
+	oam_get_solBeach_zone_config : 10,
+
+	oam_set_solBeach_damper_scheduler : 11,
+	oam_get_solBeach_damper_scheduler : 12,
+
+	oam_set_floorRad_room_state : 13,
+	oam_get_floorRad_room_state : 14,
+
+	oam_event_alarm : 15
 };
 
 mysqlDB.connect();
@@ -391,15 +400,13 @@ router.put('/cmdManualHeating', (req, res, next) => { // 수정
 	res.send({ success: true })
 });
 
-router.put('/cmdRoomState/:roomNo', (req, res, next) => { // 수정
-	const roomNo = req.params.roomNo
-	console.log("############ put cmdRoomState roomNo : " + roomNo)
+router.put('/cmdRoomState', (req, res, next) => { // 수정
+	console.log("############ put cmdRoomState values : " + JSON.stringify(req.body))
   var data = new Uint32Array(2);
-	data[0] = roomNo;
-	data[1] = 2;
+	data[0] = req.body.RoomNo;
+	data[1] = req.body.RoomState;
 	dataLen = 0;
 	// console.log("/cmdRoomState/:roomNo hex : " +data.toString('hex'))
-	dataLen = 0;
   msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_cmd_floorRad_room_state, dataLen, data);
 	// console.log("/cmdRoomState/:roomNo msgBuffer : " +msgBuffer.toString('hex'))
   totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;

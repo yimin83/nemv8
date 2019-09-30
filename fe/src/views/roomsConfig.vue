@@ -89,36 +89,6 @@
               </v-flex>
               <v-flex xs6>
                 <v-text-field
-                  label='CheckInOutEnable'
-                  hint=''
-                  persistent-hint
-                  required
-                  height=13
-                  v-model='roomConfig.CheckInOutEnable'
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs6>
-                <v-text-field
-                  label='CheckInTime'
-                  hint=''
-                  persistent-hint
-                  required
-                  height=13
-                  v-model='trnCheckInTime'
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs6>
-                <v-text-field
-                  label='CheckOutTime'
-                  hint=''
-                  persistent-hint
-                  required
-                  height=13
-                  v-model='trnCheckOutTime'
-                ></v-text-field>
-              </v-flex>
-              <v-flex xs6>
-                <v-text-field
                   label='strDesc'
                   hint=''
                   persistent-hint
@@ -172,24 +142,6 @@ export default {
         .then((r) => {
           this.roomConfig = JSON.parse(r.data)
           this.settingTitle = this.roomConfig.RoomNo +"호"
-          if(this.roomConfig.CheckInTime != '0') {
-            this.trnCheckInTime = new Date(this.roomConfig.CheckInTime*1000).toISOString().
-                                                                              replace(/T/, ' ').      // replace T with a space
-                                                                              replace(/\..+/, '')
-
-          }
-          else {
-            this.trnCheckInTime = 0
-          }
-          if(this.roomConfig.CheckOutTime != '0') {
-            this.trnCheckOutTime = new Date(this.roomConfig.CheckOutTime*1000).toISOString().
-                                                                              replace(/T/, ' ').      // replace T with a space
-                                                                              replace(/\..+/, '')
-
-          }
-          else {
-            this.trnCheckOutTime = 0
-          }
         })
         .catch((e) => {
           alert(e.message)
@@ -198,14 +150,10 @@ export default {
 
     },
     saveSettingRoom: function (roomNo) {
-      var nCheckInTime = (this.this.trnCheckInTime != '0' ) ? Math.round((new Date(this.trnCheckInTime).getTime()+(9*3600)) / 1000) : this.trnCheckInTime
-      var nCheckOutTime =(this.trnCheckOutTime != '0' ) ?  Math.round((new Date(this.trnCheckOutTime).getTime()+(9*3600)) / 1000): this.trnCheckInTime
       axios.put(`http://localhost:3000/api/rooms/${'roomStat'}`, {
         RoomNo: this.roomConfigs.RoomNo, Area: this.roomConfigs.Area, Direction: this.roomConfigs.Direction, ExteriorWallCnt: this.roomConfigs.ExteriorWallCnt,
         Troom_set: this.roomConfigs.Troom_set, Tsurf_set: this.roomConfigs.Tsurf_set, Troom_cr: this.roomConfigs.Troom_cr, Tsurf_cr: this.roomConfigs.Tsurf_cr,
-        CheckInOutEnable: this.roomConfigs.CheckInOutEnable, CheckInTime: nCheckInTime, CheckOutTime:nCheckOutTime, szDesc:  this.roomConfigs.szDesc,
-        HeatingMode: this.roomStatInfo.usManHeatingMode, HeatingTimeSec: this.roomStatInfo.ulManHeatingTimeSec, Tset: this.roomStatInfo.fManTset, Tset_cr: this.roomStatInfo.fManTset_cr
-
+        szDesc:  this.roomConfigs.szDesc
       })
         .then((r) => {
           // this.$data.settingRoomModal = false
