@@ -177,6 +177,21 @@ router.get('/', function(req, res, next) {
   });
 });
 
+router.get('/roomPriority', (req, res, next) => { // 수정
+	console.log("############1234121312412431234")
+	console.log("############ get /roomPriority ")
+	dataLen = 0;
+	msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_priority, dataLen, null);
+	totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
+	nSeq = counter.get();
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
+	fullBuffer = new Buffer(totalSize);
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
+	net.writeData(client, fullBuffer, nSeq);
+	IntervalA = setInterval(checkMap, 1000, nSeq, res);
+});
+
 router.get('/emsSysConfig', function(req, res, next) {
 	console.log("############ get emsSysConfig ##########")
   dataLen = 0;
@@ -450,7 +465,7 @@ router.get('/:usRoomNo', (req, res, next) => { // 수정
     });
 });
 router.get('/getRoomConfig/:roomNo', (req, res, next) => { // 수정
-const roomNo = req.params.roomNo
+	const roomNo = req.params.roomNo
 	console.log("############ get /getRoomConfig/:roomNo  roomNo : "+roomNo+", body : " + JSON.stringify(req.body))
   // console.log("######################### getRoomConfig ######################### ")
   var dataBuffer = new Buffer(2)
@@ -625,19 +640,6 @@ router.get('/getRoomStat/:roomNo', function(req, res, next) {
   IntervalA = setInterval(checkMap, 1000, nSeq, res);
 });
 
-router.get('/getRoomPriority', function(req, res, next) {
-	console.log("############ get /getRoomPriority ")
-  dataLen = 0;
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_priority, dataLen, null);
-  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-  nSeq = counter.get();
-  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-  fullBuffer = new Buffer(totalSize);
-  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-  net.writeData(client, fullBuffer, nSeq);
-  IntervalA = setInterval(checkMap, 1000, nSeq, res);
-});
 
 exports.getMysqlDB = function () {
     console.log('getMysqlDB!!!!!!!!!!!!!!!!!!' );

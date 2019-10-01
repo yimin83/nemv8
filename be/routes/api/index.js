@@ -11,9 +11,8 @@ router.use('/zones', require('./rooms'))
 router.use('/cmdManualHeating', require('./rooms'))
 router.use('/cmdRoomState', require('./rooms'))
 router.use('/getRoomConfig', require('./rooms'))
-router.use('/getRoomTrend', require('./rooms'))
-router.use('/getRoomStat', require('./rooms'))
-router.use('/getRoomPriority', require('./rooms'))
+// router.use('/getRoomTrend', require('./rooms'))
+// router.use('/roomPriority', require('./rooms'))
 
 
 

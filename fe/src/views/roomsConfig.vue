@@ -158,6 +158,18 @@ export default {
     }
   },
   methods: {
+    getRoomPriority () {
+      axios.get('http://localhost:3000/api/rooms/roomPriority')
+        .then((r) => {
+          alert('getRoomPriority : ' + JSON.stringify(r.data))
+          this.roomPrios = JSON.parse(r.data)
+
+        })
+        .catch((e) => {
+          alert(e.message)
+          console.error(e.message)
+        })
+    },
     getRoomStat (roomNo) {
       axios.get(`http://localhost:3000/api/rooms/getRoomStat/${roomNo}`)
         .then((r) => {
@@ -181,18 +193,6 @@ export default {
           console.error(e.message)
         })
 
-    },
-    getRoomPriority () {
-      axios.get('http://localhost:3000/api/rooms/getRoomPriority')
-        .then((r) => {
-          alert('getRoomPriority : ' + JSON.stringify(r.data))
-          this.roomPrios = JSON.parse(r.data)
-
-        })
-        .catch((e) => {
-          alert(e.message)
-          console.error(e.message)
-        })
     },
     getRooms () {
       axios.get('http://localhost:3000/api/rooms')
