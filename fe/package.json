@@ -26,6 +26,7 @@
     "vue-apexcharts": "^1.5.0",
     "vue-chartjs": "^3.4.2",
     "vue-chartkick": "^0.5.2",
+    "vue-momentjs": "^0.1.2",
     "vue-router": "^3.0.3",
     "vue-sweet-calendar": "^0.3.1",
     "vuetify": "^2.0.11",

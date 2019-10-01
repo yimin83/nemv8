@@ -6,12 +6,14 @@ var router = express.Router();
 router.use('/rooms', require('./rooms'))
 router.use('/emsSysConfig', require('./rooms'))
 router.use('/damperConfig', require('./rooms'))
-router.use('/getRoomConfig', require('./rooms'))
 router.use('/ahusConfig', require('./rooms'))
 router.use('/zones', require('./rooms'))
 router.use('/cmdManualHeating', require('./rooms'))
 router.use('/cmdRoomState', require('./rooms'))
+router.use('/getRoomConfig', require('./rooms'))
 router.use('/getRoomTrend', require('./rooms'))
+router.use('/getRoomStat', require('./rooms'))
+router.use('/getRoomPriority', require('./rooms'))
 
 
 

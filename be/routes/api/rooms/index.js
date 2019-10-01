@@ -35,7 +35,10 @@ const oam_msg_type_e = {
 	oam_set_floorRad_room_state : 13,
 	oam_get_floorRad_room_state : 14,
 
-	oam_event_alarm : 15
+	oam_set_floorRad_room_priority : 15,
+	oam_get_floorRad_room_priority : 16,
+
+	oam_event_alarm : 17
 };
 
 mysqlDB.connect();
@@ -194,15 +197,19 @@ router.put('/emsSysConfig', (req, res, next) => { // 수정
 	var dataBuffer = new Buffer(net.getSizeEmsSysConf_t())
 	dataBuffer = net.makeEmsSysConf_t(
 		req.body.configs.PacketMinIntervalSec, req.body.configs.ControlPeriodSec,
-		{IpAddress:req.body.configs.tAddr.IpAddress, EMSPortNo:req.body.configs.tAddr.EMSPortNo},
+		{IpAddress:req.body.configs.tAddr.IpAddress, PortNo:req.body.configs.tAddr.PortNo},
 		{LogOption:req.body.configs.tLog.LogOption, LogDir:req.body.configs.tLog.LogDir, StatFileName:req.body.configs.tLog.StatFileName,
 			LogFileName:req.body.configs.tLog.LogFileName, DBFileName:req.body.configs.tLog.DBFileName, LogPeriod:req.body.configs.tLog.LogPeriod,
 			StatPeriod:req.body.configs.tLog.StatPeriod, DBStatPeriod:req.body.configs.tLog.DBStatPeriod},
-		{IpAddress:req.body.configs.tRemoteAddr.IpAddress, EMSPortNo:req.body.configs.tRemoteAddr.EMSPortNo},
+		{tAddr:{IpAddress:req.body.configs.tDataBase.tAddr.IpAddress, PortNo:req.body.configs.tDataBase.tAddr.PortNo},
+		  Name:req.body.configs.tDataBase.Name, ID:req.body.configs.tDataBase.ID, PassWd:req.body.configs.tDataBase.PassWd},
+		{ID:req.body.configs.tSMS.ID, Key:req.body.configs.tSMS.Key},
+		{IpAddress:req.body.configs.tRemoteAddr.IpAddress, PortNo:req.body.configs.tRemoteAddr.PortNo},
 		{ControlOption:req.body.configs.tFloorRadConf.ControlOption, RoomCount:req.body.configs.tFloorRadConf.RoomCount,
 			UseTsurf:req.body.configs.tFloorRadConf.UseTsurf, Troom_set:req.body.configs.tFloorRadConf.Troom_set,
 			Tsurf_set:req.body.configs.tFloorRadConf.Tsurf_set, Troom_cr:req.body.configs.tFloorRadConf.Troom_cr,
 			Tsurf_cr:req.body.configs.tFloorRadConf.Tsurf_cr, Tctrl_res:req.body.configs.tFloorRadConf.Tctrl_res,
+			Tsurf_cr:req.body.configs.tFloorRadConf.Tsurf_init, Tctrl_res:req.body.configs.tFloorRadConf.Tset_inc,
 			TelNumber0:req.body.configs.tFloorRadConf.TelNumber0, TelNumber1:req.body.configs.tFloorRadConf.TelNumber1,
 			TelNumber2:req.body.configs.tFloorRadConf.TelNumber2, TelNumber3:req.body.configs.tFloorRadConf.TelNumber3,
 			TelNumber4:req.body.configs.tFloorRadConf.TelNumber4,
@@ -601,6 +608,37 @@ router.get('/getRoomTrend/:usRoomNo', (req, res, next) => { // 수정
 	});
 });
 
+router.get('/getRoomStat/:roomNo', function(req, res, next) {
+  const roomNo = req.params.roomNo
+  var dataBuffer = new Buffer(4)
+  dataBuffer.writeUInt32LE(roomNo);
+	console.log("############ get /getRoomStat/:roomNo : " + roomNo)
+  dataLen = 0;
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_state, dataLen, dataBuffer);
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
+  nSeq = counter.get();
+  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
+  fullBuffer = new Buffer(totalSize);
+  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
+  net.writeData(client, fullBuffer, nSeq);
+  IntervalA = setInterval(checkMap, 1000, nSeq, res);
+});
+
+router.get('/getRoomPriority', function(req, res, next) {
+	console.log("############ get /getRoomPriority ")
+  dataLen = 0;
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_priority, dataLen, null);
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
+  nSeq = counter.get();
+  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
+  fullBuffer = new Buffer(totalSize);
+  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
+  net.writeData(client, fullBuffer, nSeq);
+  IntervalA = setInterval(checkMap, 1000, nSeq, res);
+});
+
 exports.getMysqlDB = function () {
     console.log('getMysqlDB!!!!!!!!!!!!!!!!!!' );
     //return mysqlDB;
@@ -615,10 +653,9 @@ exports.testFunc = function (res) {
 };
 
 exports.setSeqMap = function (seq, jsonData) {
-    console.log('getEmsSysConfig !!!!!!!!!!!!!!!!!! seq : ' + seq );
     //res.redirect("/");
     seqMap.set(seq, jsonData)
-    console.log('getEmsSysConfig !!!!!!!!!!!!!!!!!! seqMap.get(seq) : ' + seqMap.get(seq));
+    console.log('setSeqMap seq : '+seq+' seqMap.get(seq) : ' + seqMap.get(seq));
 
 
 };

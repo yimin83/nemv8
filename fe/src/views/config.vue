@@ -4,7 +4,6 @@
         <v-card>
           <v-tabs
             v-model="tab"
-            background-color="deep-purple accent-4"
             centered
             dark
             icons-and-text
@@ -12,15 +11,12 @@
             <v-tabs-slider></v-tabs-slider>
             <v-tab href="#tab-1">
               Common Config
-              <v-icon>mdi-phone</v-icon>
             </v-tab>
             <v-tab href="#tab-2">
               FloorRad Config
-              <v-icon>mdi-heart</v-icon>
             </v-tab>
             <v-tab href="#tab-3">
               SolBeach Config
-              <v-icon>mdi-account-box</v-icon>
             </v-tab>
           </v-tabs>
           <v-tabs-items v-model="tab">
@@ -29,25 +25,61 @@
               :key="i"
               :value="'tab-' + i"
             >
-              <v-card flat v-if='i == 1' max-width="400" class="mx-auto">
-                <v-list dense>
-                  <v-list-item>
-                    <v-list-item-content>System Local:</v-list-item-content>
-                    <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" :rules="rules" v-model="configs.tAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 :rules="rules" v-model="configs.tAddr.EMSPortNo"></v-text-field></v-list-item-content>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-list-item-content>System Remote:</v-list-item-content>
-                    <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" :rules="rules" v-model="configs.tRemoteAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 :rules="rules" v-model="configs.tRemoteAddr.EMSPortNo"></v-text-field></v-list-item-content>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-list-item-content>MinPktIntervalSec:</v-list-item-content>
-                    <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.PacketMinIntervalSec"></v-text-field></v-list-item-content>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-list-item-content>ControlPeriodSec:</v-list-item-content>
-                    <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.ControlPeriodSec"></v-text-field></v-list-item-content>
-                  </v-list-item>
-                </v-list>
+              <v-card flat v-if='i == 1' max-width="1000" class="mx-auto">
+                <v-row>
+                  <v-col>
+                    <v-list dense>
+                    <v-list-item>
+                      <v-list-item-content>System Local:</v-list-item-content>
+                      <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" :rules="rules" v-model="configs.tAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 :rules="rules" v-model="configs.tAddr.PortNo"></v-text-field></v-list-item-content>
+                    </v-list-item>
+                    <v-list-item>
+                      <v-list-item-content>System Remote:</v-list-item-content>
+                      <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" :rules="rules" v-model="configs.tRemoteAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 :rules="rules" v-model="configs.tRemoteAddr.PortNo"></v-text-field></v-list-item-content>
+                    </v-list-item>
+                    <v-list-item>
+                      <v-list-item-content>MinPktIntervalSec:</v-list-item-content>
+                      <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.PacketMinIntervalSec"></v-text-field></v-list-item-content>
+                    </v-list-item>
+                    <v-list-item>
+                      <v-list-item-content>ControlPeriodSec:</v-list-item-content>
+                      <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.ControlPeriodSec"></v-text-field></v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                </v-col>
+                <v-col>
+                  <v-list dense>
+                    <v-list-item>
+                      <v-list-item-content>DB Server:</v-list-item-content>
+                      <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" :rules="rules" v-model="configs.tDataBase.tAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 :rules="rules" v-model="configs.tDataBase.tAddr.PortNo"></v-text-field></v-list-item-content>
+                    </v-list-item>
+                    <v-list-item>
+                      <v-list-item-content>DB Name:</v-list-item-content>
+                      <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tDataBase.Name"></v-text-field></v-list-item-content>
+                    </v-list-item>
+                    <v-list-item>
+                      <v-list-item-content>ID:</v-list-item-content>
+                      <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tDataBase.ID"></v-text-field></v-list-item-content>
+                    </v-list-item>
+                    <v-list-item>
+                      <v-list-item-content>PassWd:</v-list-item-content>
+                      <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tDataBase.PassWd"></v-text-field></v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                </v-col>
+                <v-col>
+                  <v-list dense>
+                    <v-list-item>
+                      <v-list-item-content>SMS ID:</v-list-item-content>
+                      <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSMS.ID"></v-text-field></v-list-item-content>
+                    </v-list-item>
+                    <v-list-item>
+                      <v-list-item-content>SMS:</v-list-item-content>
+                      <v-list-item-content class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSMS.Key"></v-text-field></v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                </v-col>
+              </v-row>
               </v-card>
               <v-card flat v-if='i == 2'>
                 <v-list dense>
@@ -109,8 +141,20 @@
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.CheckInHour"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>Tsurf_res:</v-list-item-title>
+                                <v-list-item-title>RR_CheckInHour:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.RR_CheckInHour"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>Tsurf_init:</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.Tsurf_init"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>Tset_inc:</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.Tset_inc"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>TelNo_1:</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.TelNumber0"></v-text-field></v-list-item-title>
                               </v-list-item>
                             </v-list>
                           </v-card>
@@ -263,6 +307,10 @@
                                 <v-list-item>
                                   <v-list-item-title>CO2PeriodSec:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="configs.tSolBeachConf.CO2LoadPeriodSec"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>TelNo_1:</v-list-item-title>
+                                  <v-list-item-title><v-text-field height=13 v-model="configs.tSolBeachConf.TelNumber0"></v-text-field></v-list-item-title>
                                 </v-list-item>
                               </v-list>
                             </v-card>
