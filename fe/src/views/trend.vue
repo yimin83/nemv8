@@ -24,7 +24,6 @@
 import axios from 'axios'
 export default {
   mounted () {
-    this.getTrend(201)
     this.getRooms()
   },
   name: 'LineExample',
@@ -45,25 +44,43 @@ export default {
           var data0 = [];
           var data1 = [];
           var data2 = [];
+          var data3 = [];
+          var data4 = [];
+          var data5 = [];
           var date = [];
           for(var i = 0; i<this.datas.length; i++){
-            data0.push((this.datas[i].fTroom_cur*100).toFixed(2))
-            data1.push((this.datas[i].fTsurf_cur*100).toFixed(2))
-            data2.push(this.datas[i].fManTset.toFixed(2))
-            date.push(new Date(this.datas[i].nCheckInTime*1000).toISOString().replace(/T/, ' ').replace(/\..+/, ''))
+            data0.push((this.datas[i].ucRoomState*5).toFixed(2))
+            data1.push((this.datas[i].ucSetStatus*10).toFixed(2))
+            data2.push((this.datas[i].ucCurStatus*15).toFixed(2))
+            data3.push(this.datas[i].fTset.toFixed(2))
+            data4.push(this.datas[i].fTsurf_cur.toFixed(2))
+            data5.push(this.datas[i].fTroom_cur.toFixed(2))
+            date.push(new Date(this.datas[i].nSetLastTime*1000).toISOString().replace(/T/, ' ').replace(/\..+/, ''))
           }
           this.series = [
             {
-              name: 'fTroom_cur',
+              name: 'ucRoomState',
               data: data0
             },
             {
-              name: 'fTsurf_cur',
+              name: 'ucSetStatus',
               data: data1
             },
             {
-              name: 'fManTset',
+              name: 'ucCurStatus',
               data: data2
+            },
+            {
+              name: 'fTset',
+              data: data3
+            },
+            {
+              name: 'fTsurf_cur',
+              data: data4
+            },
+            {
+              name: 'fTroom_cur',
+              data: data5
             }
           ]
           this.chartOptions  = {
@@ -90,6 +107,7 @@ export default {
             roomsData.push(r.data[i].usRoomNo)
           }
           this.roomNos = roomsData
+          this.getTrend(201)
         })
         .catch((e) => {
           alert(e.message)

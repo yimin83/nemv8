@@ -7,6 +7,7 @@ import store from './store'
 import vuetify from './plugins/vuetify';
 import moment from 'moment'
 import VueMomentJS from 'vue-momentjs'
+import VScrollLock from 'v-scroll-lock'
 // import Chartkick from 'chartkick'
 // // import VueChartkick from 'vue-chartkick'
 import VueApexCharts from 'vue-apexcharts'
@@ -15,6 +16,7 @@ import VueApexCharts from 'vue-apexcharts'
 //  Vue.use(VueChartkick, { Chartkick })
 Vue.use(VueApexCharts)
 Vue.use(VueMomentJS, moment)
+Vue.use(VScrollLock)
 Vue.component('apexchart', VueApexCharts)
 
 Vue.config.productionTip = false

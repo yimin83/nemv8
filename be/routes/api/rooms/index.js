@@ -178,7 +178,6 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/roomPriority', (req, res, next) => { // 수정
-	console.log("############1234121312412431234")
 	console.log("############ get /roomPriority ")
 	dataLen = 0;
 	msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_priority, dataLen, null);
@@ -190,6 +189,59 @@ router.get('/roomPriority', (req, res, next) => { // 수정
 	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
 	net.writeData(client, fullBuffer, nSeq);
 	IntervalA = setInterval(checkMap, 1000, nSeq, res);
+});
+
+router.put('/roomStat', (req, res, next) => { // 수정
+	//console.log("############ put roomStat values : " + JSON.stringify(req.body))
+	var dataBuffer = new Buffer(net.getSizeFloorRadRoomState())
+	dataBuffer = net.makeFloorRadRoomState_t(
+		req.body.config.RoomNo, req.body.config.HeatingMode, req.body.config.RoomState,
+		req.body.config.ReservedRoomType, req.body.config.ReservedRoomHour, req.body.config.CheckInOutEnable,
+		req.body.config.CheckInTime, req.body.config.CheckOutTime, req.body.config.Tset, req.body.config.Tcr,
+		req.body.config.MH_SchedulerUsed, req.body.config.reserved, req.body.config.MH_HeatingTimeSec,
+		req.body.config.MH_HeatingStopTimeSec, req.body.config.MH_TotalHeatingTimeSec, req.body.config.MH_TodayStartTime,
+		req.body.config.MH_Tset, req.body.config.MH_Tcr, req.body.config.CheckInTime, req.body.config.CheckOutTime,
+		req.body.config.PreHeatingOption, req.body.config.OptimalNeedTime, req.body.config.PreHeatingStartTime,
+		req.body.config.MH_StartTime, req.body.config.TempInc, req.body.config.TempDec, req.body.config.Troom_cur, req.body.config.Tsurf_cur
+	);
+	dataLen = net.getSizeFloorRadRoomState();
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_floorRad_room_state, dataLen, null);
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
+	nSeq = counter.get();
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
+	fullBuffer = new Buffer(totalSize);
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
+	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
+	net.writeData(client, fullBuffer, nSeq);
+	res.send({ success: true })
+});
+
+router.put('/roomPrio', (req, res, next) => { // 수정
+	// console.log("############ put roomPrio values : " + JSON.stringify(req.body))
+	var prioArr = []
+	for (var key in req.body.config) {
+		var room_priority_t = {
+			RoomNo: req.body.config[key].RoomNo,
+			Priority: req.body.config[key].Priority,
+			Reserved: req.body.config[key].Reserved
+		}
+		prioArr.push(room_priority_t)
+	}
+	var dataBuffer = new Buffer(net.getSizeFloorRadRoomPrioritiy_t())
+	dataBuffer = net.makeFloorRadRoomPrioritiy_t(prioArr);
+	dataLen = net.getSizeFloorRadRoomPrioritiy_t();
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_floorRad_room_priority, dataLen, null);
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
+	nSeq = counter.get();
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
+	fullBuffer = new Buffer(totalSize);
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
+	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
+	// console.log("############ put roomPrio fullBuffer hex : " + fullBuffer.toString('hex'))
+	net.writeData(client, fullBuffer, nSeq);
+	res.send({ success: true })
 });
 
 router.get('/emsSysConfig', function(req, res, next) {
@@ -610,14 +662,14 @@ var processCmdCheckIn = function(datas) {
 
 router.get('/getRoomTrend/:usRoomNo', (req, res, next) => { // 수정
 	const usRoomNo = req.params.usRoomNo
-	console.log("############ get /getRoomConfig/:roomNo  roomNo : "+usRoomNo)
+	console.log("############ get /getRoomTrend/:roomNo  roomNo : "+usRoomNo)
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT fTroom_cur, fTsurf_cur, fManTset, nCheckInTime FROM floor_rad_room_record WHERE usRoomNo = ?;", [usRoomNo], function(err, result, fields){
+	mysqlDB.query("SELECT ucRoomState, ucSetStatus, ucCurStatus, fTset, fTsurf_cur, fTroom_cur, nSetLastTime FROM floor_rad_room_record WHERE usRoomNo = ? order by nIdx asc, nSetLastTime desc limit 50;", [usRoomNo], function(err, result, fields){
 		if(err){
 			console.log("getRoomTrend 쿼리문에 오류가 있습니다. err : " + err);
 		}
 		else{
-			console.log(JSON.stringify(result))
+			console.log("############ get /getRoomTrend :" + JSON.stringify(result))
 			res.json(result);
 		}
 	});
