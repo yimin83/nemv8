@@ -135,19 +135,19 @@
             </v-list-item>
             <v-list-item>
               <v-list-item-title>방 온도</v-list-item-title>
-              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="roomStat.Troom_cur"></v-text-field></v-list-item-title>
+              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="roomStat.Troom_cur.toFixed(2)"></v-text-field></v-list-item-title>
             </v-list-item>
             <v-list-item>
               <v-list-item-title>시간당 상승온도</v-list-item-title>
-              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="roomStat.TempInc"></v-text-field></v-list-item-title>
+              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="roomStat.TempInc.toFixed(2)"></v-text-field></v-list-item-title>
             </v-list-item>
             <v-list-item>
               <v-list-item-title>시간당 하강온도</v-list-item-title>
-              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="roomStat.TempDec"></v-text-field></v-list-item-title>
+              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="roomStat.TempDec.toFixed(2)"></v-text-field></v-list-item-title>
             </v-list-item>
             <v-list-item>
               <v-list-item-title>난방소요시간</v-list-item-title>
-              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="this.trnOptimalNeedTime"></v-text-field></v-list-item-title>
+              <v-list-item-title class="align-end"><v-text-field height=13 :rules="rules" v-model="this.trnOptimalNeedTime.toFixed(2)"></v-text-field></v-list-item-title>
             </v-list-item>
             <v-list-item>
               <v-list-item-title>사전난방 시작시간</v-list-item-title>
@@ -214,7 +214,7 @@ export default {
   },
   methods: {
     getRoomPriority () {
-      axios.get('http://localhost:3000/api/rooms/roomPriority')
+      axios.get(`${this.$apiRootPath}rooms/roomPriority`)
         .then((r) => {
           this.roomPris = JSON.parse(r.data)
           var prio
@@ -237,7 +237,7 @@ export default {
         })
     },
     getRoomStat (roomNo) {
-      axios.get(`http://localhost:3000/api/rooms/getRoomStat/${roomNo}`)
+      axios.get(`${this.$apiRootPath}rooms/getRoomStat/${roomNo}`)
         .then((r) => {
           this.roomStat = JSON.parse(r.data)
           this.curRoomNo = this.roomStat.RoomNo
@@ -268,7 +268,7 @@ export default {
       this.roomStat.MH_TodayStartTime = this.trnMH_TodayStartTime != 0 ? (this.roomStat.trnMH_TodayStartTime*60*60): this.roomStat.trnMH_TodayStartTime
       this.roomStat.OptimalNeedTime = this.trnOptimalNeedTime != 0 ? (this.roomStat.trnOptimalNeedTime*60*60): this.roomStat.trnOptimalNeedTime
 
-      axios.put('http://localhost:3000/api/rooms/roomStat', { config:this.roomStat })
+      axios.put(`${this.$apiRootPath}rooms/roomStat`, { config:this.roomStat })
         .then((r) => {
           // this.$data.settingRoomModal = false
           this.getRoomStat(this.roomStat.RoomNo)
@@ -280,7 +280,7 @@ export default {
     },
     saveRoomPrio: function () {
       alert("saveRoomPrio!!")
-      axios.put('http://localhost:3000/api/rooms/roomPrio', { config:this.items})
+      axios.put(`${this.$apiRootPath}rooms/roomPrio`, { config:this.items})
         .then((r) => {
           // this.$data.settingRoomModal = false
           this.getRoomPriority()
@@ -370,7 +370,7 @@ export default {
       }
     }
     // getRooms () {
-    //   axios.get('http://localhost:3000/api/rooms')
+    //   axios.get(`${this.$apiRootPath}rooms`)
     //     .then((r) => {
     //       this.roomConfig = r.data
     //     })
@@ -383,7 +383,7 @@ export default {
     // settingRoom: function (roomNo) {
     //   //this.initRoomStatInfo()
     //   // this.getRoomStatInfo(roomNo)
-    //   axios.get(`http://localhost:3000/api/rooms/getRoomConfig/${roomNo}`)
+    //   axios.get(`${this.$apiRootPath}rooms/getRoomConfig/${roomNo}`)
     //     .then((r) => {
     //       this.roomConfig = JSON.parse(r.data)
     //       this.settingTitle = this.roomConfig.RoomNo +"호"
@@ -395,7 +395,7 @@ export default {
     //
     // },
     // saveSettingRoom: function (roomNo) {
-    //   axios.put(`http://localhost:3000/api/rooms/${'roomStat'}`, {
+    //   axios.put(`${this.$apiRootPath}rooms/${'roomStat'}`, {
     //     RoomNo: this.roomConfigs.RoomNo, Area: this.roomConfigs.Area, Direction: this.roomConfigs.Direction, ExteriorWallCnt: this.roomConfigs.ExteriorWallCnt,
     //     Troom_set: this.roomConfigs.Troom_set, Tsurf_set: this.roomConfigs.Tsurf_set, Troom_cr: this.roomConfigs.Troom_cr, Tsurf_cr: this.roomConfigs.Tsurf_cr,
     //     szDesc:  this.roomConfigs.szDesc

@@ -219,9 +219,11 @@
 <script>
 import axios from 'axios'
 export default {
-  mounted () {
-    this.getAhus()
-    this.getZones()
+  created () {
+      this.getAhus()
+      this.getZones()
+      this.timer = setInterval(this.getAhus, 10000)
+      this.timer = setInterval(this.getZones, 10000)
   },
   data () {
     return {
@@ -330,7 +332,7 @@ export default {
   },
   methods: {
     getAhus () {
-      axios.get('http://localhost:3000/api/rooms/ahusConfig')
+      axios.get(`${this.$apiRootPath}rooms/ahusConfig`)
         .then((r) => {
           this.ahus = r.data
         })
@@ -340,7 +342,7 @@ export default {
         })
     },
     getZones () {
-      axios.get('http://localhost:3000/api/rooms/zones')
+      axios.get(`${this.$apiRootPath}rooms/zones`)
         .then((r) => {
           this.zones = r.data
           this.mergeZonesAhu()
@@ -351,12 +353,13 @@ export default {
         })
     },
     mergeZonesAhu () {
+      this.mergezones = []
       for(var i = 0; i < this.zones.length; i++){
         this.mergezones.push({ zone:this.zones[i], ahu:this.ahus[i]})
       }
     },
     settingAhu: function (ahuIndex) {
-      axios.get(`http://localhost:3000/api/rooms/ahusConfig/${ahuIndex}`)
+      axios.get(`${this.$apiRootPath}rooms/ahusConfig/${ahuIndex}`)
         .then((r) => {
           this.ahuConfig = JSON.parse(r.data)
           for(var i=0; i < this.ahus.length ; i++){
@@ -374,7 +377,7 @@ export default {
 
     },
     saveSettingAhu: function (ahuIndex) {
-      axios.put(`http://localhost:3000/api/rooms/ahusConfig`, { config:this.ahuConfig })
+      axios.put(`${this.$apiRootPath}rooms/ahusConfig`, { config:this.ahuConfig })
         .then((r) => {
           this.settingAhu(ahuIndex)
         })

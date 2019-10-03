@@ -3,6 +3,7 @@ var router = express.Router();
 var mysqlDB = require('./../../mysql-db');
 var net = require('./../socketOutput');
 const counter = require('./../makeSeq.js');
+const config = require('./../../../config.js')
 var EMS_ID = 'NB_ADMIN'
 var EMS_PASSWORD = 'FLOWERSTONE_81'
 var UserLevel = 1
@@ -177,6 +178,11 @@ router.get('/', function(req, res, next) {
   });
 });
 
+router.get('/getSiteInfo', function(req, res, next) {
+	console.log("############ getSiteInfo ############")
+  res.json({'siteInfo':config.siteInfo});
+});
+
 router.get('/roomPriority', (req, res, next) => { // 수정
 	console.log("############ get /roomPriority ")
 	dataLen = 0;
@@ -188,7 +194,7 @@ router.get('/roomPriority', (req, res, next) => { // 수정
 	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
 	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
 	net.writeData(client, fullBuffer, nSeq);
-	IntervalA = setInterval(checkMap, 1000, nSeq, res);
+	IntervalA = setInterval(checkMap, 100, nSeq, res);
 });
 
 router.put('/roomStat', (req, res, next) => { // 수정
@@ -244,6 +250,29 @@ router.put('/roomPrio', (req, res, next) => { // 수정
 	res.send({ success: true })
 });
 
+router.get('/solTrend', (req, res, next) => { // 수정
+	console.log("############ get /getSolTrend ")
+  // console.log("######################### getRoomConfig ######################### ")
+	mysqlDB.query("SELECT CurTime, FanOperationCnt, Tzone, Rdamp, PPMco2 FROM solbeach_stat order by CurTime desc limit 50;", function(err, result, fields){
+		if(err){
+			console.log("getSolTrend 쿼리문에 오류가 있습니다. err : " + err);
+		}
+		else{
+			console.log("############ get /getSolTrend :" + JSON.stringify(result))
+			res.json(result);
+		}
+	});
+});
+
+router.get('/getAlarm', (req, res, next) => { // 수정
+	console.log("############ get /getAlarm ")
+  // console.log("######################### getRoomConfig ######################### ")
+	res.json(net.getAlarm())
+	if(net.getAlarm() != null){
+		net.chkAlarm()
+	}
+});
+
 router.get('/emsSysConfig', function(req, res, next) {
 	console.log("############ get emsSysConfig ##########")
   dataLen = 0;
@@ -255,7 +284,7 @@ router.get('/emsSysConfig', function(req, res, next) {
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
   msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
   net.writeData(client, fullBuffer, nSeq);
-  IntervalA = setInterval(checkMap, 1000, nSeq, res);
+  IntervalA = setInterval(checkMap, 100, nSeq, res);
 });
 
 router.put('/emsSysConfig', (req, res, next) => { // 수정
@@ -389,7 +418,7 @@ router.get('/ahusConfig/:ahuIndex', function(req, res, next) {
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
   msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
   net.writeData(client, fullBuffer, nSeq);
-  IntervalA = setInterval(checkMap, 1000, nSeq, res);
+  IntervalA = setInterval(checkMap, 100, nSeq, res);
 });
 
 router.put('/ahusConfig', (req, res, next) => { // 수정
@@ -428,7 +457,7 @@ router.get('/damperConfig/:ahuIndex', function(req, res, next) {
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
   msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
   net.writeData(client, fullBuffer, nSeq);
-  IntervalA = setInterval(checkMap, 1000, nSeq, res);
+  IntervalA = setInterval(checkMap, 100, nSeq, res);
 });
 
 router.put('/damperConfig', (req, res, next) => { // 수정
@@ -498,7 +527,14 @@ var checkMap = function(seq, res) {
   var json = seqMap.get(seq)
   if(json != "" && json != null){
     clearInterval(IntervalA)
-    res.json(seqMap.get(nSeq))
+		try {
+    	res.json(seqMap.get(nSeq))
+			// throw new Error('오류 핸들링 테스트');
+		}
+		catch (exception) {
+			console.log(exception);
+			return true;
+		}
     // console.log("configSetting seqMap.get(nSeq) : " + seqMap.get(nSeq))
     seqMap.delete(nSeq)
   }
@@ -532,7 +568,7 @@ router.get('/getRoomConfig/:roomNo', (req, res, next) => { // 수정
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
   msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
   net.writeData(client, fullBuffer, nSeq);
-  IntervalA = setInterval(checkMap, 1000, nSeq, res);
+  IntervalA = setInterval(checkMap, 100, nSeq, res);
 });
 
 router.post('/', (req, res, next) => { // 생성
@@ -578,7 +614,7 @@ router.put('/:type', (req, res, next) => { // 수정
 		msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
 	  dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
 	  net.writeData(client, fullBuffer, nSeq);
-	  // IntervalA = setInterval(checkMap, 1000, nSeq, res);
+	  // IntervalA = setInterval(checkMap, 100, nSeq, res);
 		// makeRoomConfig_t = function(roomNo, area, direction, exteriorWallCnt, troom_set, tsurf_set, troom_cr, tsurf_cr, checkInOutEnable, checkInTime, checkOutTime, szDesc)
   } else {
   	console.log('############ roomschedule update body : '+ JSON.stringify(req.body))
@@ -669,7 +705,7 @@ router.get('/getRoomTrend/:usRoomNo', (req, res, next) => { // 수정
 			console.log("getRoomTrend 쿼리문에 오류가 있습니다. err : " + err);
 		}
 		else{
-			console.log("############ get /getRoomTrend :" + JSON.stringify(result))
+			//console.log("############ get /getRoomTrend :" + JSON.stringify(result))
 			res.json(result);
 		}
 	});
@@ -689,7 +725,7 @@ router.get('/getRoomStat/:roomNo', function(req, res, next) {
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
   msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
   net.writeData(client, fullBuffer, nSeq);
-  IntervalA = setInterval(checkMap, 1000, nSeq, res);
+  IntervalA = setInterval(checkMap, 100, nSeq, res);
 });
 
 

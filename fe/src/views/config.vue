@@ -567,7 +567,7 @@
     },
     methods: {
       getEmsSysConfig () {
-        axios.get('http://localhost:3000/api/rooms/emsSysConfig')
+        axios.get(`${this.$apiRootPath}rooms/emsSysConfig`)
           .then((r) => {
             this.configs = JSON.parse(r.data)
           })
@@ -576,7 +576,7 @@
           })
       },
       applyEmsSysConfig () {
-        axios.put('http://localhost:3000/api/rooms/emsSysConfig', { configs:this.configs })
+        axios.put(`${this.$apiRootPath}rooms/emsSysConfig`, { configs:this.configs })
           .then((r) => {
             this.getEmsSysConfig()
           })
@@ -586,7 +586,7 @@
           })
       },
       openDamperSch: function (ahuIndex) {
-        axios.get(`http://localhost:3000/api/rooms/damperConfig/${ahuIndex}`)
+        axios.get(`${this.$apiRootPath}rooms/damperConfig/${ahuIndex}`)
           .then((r) => {
             // alert("getDamperScheConfig r.data : " + r.data)
             this.damperSchsConfig = JSON.parse(r.data)
@@ -598,7 +598,7 @@
       },
       applyDamperSch: function (AhuIndex) {
         // alert(JSON.stringify(this.damperSchsConfig))
-        axios.put('http://localhost:3000/api/rooms/damperConfig', { damperConfig:this.damperSchsConfig })
+        axios.put(`${this.$apiRootPath}rooms/damperConfig`, { damperConfig:this.damperSchsConfig })
           .then((r) => {
             this.openDamperSch(AhuIndex)
           })

@@ -43,14 +43,15 @@
             md=12
             sm=3
             xs=3>
-            <v-card-title
+            <!-- <v-card-title
               style='cursor: pointer'
               @click='scheduleRoom(room.usRoomNo)'>
                 {{room.usRoomNo}}호
+            </v-card-title> -->
+            <v-card-title>
+                {{room.usRoomNo}}호
             </v-card-title>
-            <v-card-text
-              style='cursor: pointer'
-              @click='scheduleRoom(room.usRoomNo)'>
+            <v-card-text>
               <div class="text-center ma-0 pa-0">
                   <v-icon v-if='room.ucRoomState == 0 || room.ucRoomState == 1 || room.ucRoomState == 4' color="gray">delete_outline</v-icon>
                   <v-icon v-if='room.ucRoomState == 2 && room.nCheckInOutEnable == 1' color="green">date_range</v-icon>
@@ -78,13 +79,6 @@
                 </v-card>
               </div>
             </v-card-text>
-            <v-card-actions class="ma-0 pa-0">
-              <v-spacer></v-spacer>
-              <v-btn fab x-small color='grey darken-1' class=" ma-0 pa-0" @click='settingRoom(room.usRoomNo)'>
-                <v-icon dark>build</v-icon>
-              </v-btn>
-              <v-spacer></v-spacer>
-            </v-card-actions>
           </v-card>
         </v-item>
       </v-flex>
@@ -525,8 +519,9 @@
 <script>
 import axios from 'axios'
 export default {
-  mounted () {
-    this.getRooms()
+  created () {
+      this.getRooms()
+      this.timer = setInterval(this.getRooms, 10000)
   },
   data () {
     return {
@@ -842,7 +837,7 @@ export default {
     },
 
     getRooms () {
-      axios.get('http://localhost:3000/api/rooms')
+      axios.get(`${this.$apiRootPath}rooms`)
         .then((r) => {
           this.roomStat = r.data
           this.CurStatus = 0
@@ -872,7 +867,7 @@ export default {
       this.calType = 'month'
       this.roomNo = usRoomNo
       this.events = []
-      axios.get(`http://localhost:3000/api/rooms/${usRoomNo}`)
+      axios.get(`${this.$apiRootPath}rooms/${usRoomNo}`)
         .then((r) => {
           this.roomsSchedule = r.data
           //alert(JSON.stringify(this.roomsSchedule))
@@ -902,7 +897,7 @@ export default {
       this.$data.roomScheduleModal = true
     },
     getRoomConfig: function (roomNo) {
-      axios.get(`http://localhost:3000/api/rooms/getRoomConfig/${roomNo}`)
+      axios.get(`${this.$apiRootPath}rooms/getRoomConfig/${roomNo}`)
         .then((r) => {
           this.roomConfigs = JSON.parse(r.data)
         })
@@ -914,7 +909,7 @@ export default {
     settingRoom: function (roomNo) {
       //this.initRoomStatInfo()
       // this.getRoomStatInfo(roomNo)
-      axios.get(`http://localhost:3000/api/rooms/getRoomConfig/${roomNo}`)
+      axios.get(`${this.$apiRootPath}rooms/getRoomConfig/${roomNo}`)
         .then((r) => {
           this.roomConfigs = JSON.parse(r.data)
           if(this.roomConfigs.CheckInTime != '0') {
@@ -983,7 +978,7 @@ export default {
       var nCheckInTime = Math.round((new Date(this.roomScheInfo.strCheckInTime).getTime()+(9 * 3600 * 1000)) / 1000)
       var nCheckOutTime = Math.round((new Date(this.roomScheInfo.strCheckOutTime).getTime()+(9 * 3600 * 1000)) / 1000)
 
-      axios.post('http://localhost:3000/api/rooms/', {
+      axios.post(`${this.$apiRootPath}rooms/`, {
         usRoomNo: this.roomScheInfo.usRoomNo, nCheckInOutEnable: 1, nCheckInTime: nCheckInTime,
         nCheckOutTime: nCheckOutTime, szSubsName: this.roomScheInfo.szSubsName,
         szSubsTel: this.roomScheInfo.szSubsTel, tReserveDate: null, ucPeopleCnt: this.roomScheInfo.ucPeopleCnt,
@@ -1009,7 +1004,7 @@ export default {
       this.roomScheInfo.strCheckOutTime = this.endDate + ' ' + this.strCheckOutTime
       var nCheckInTime = Math.round((new Date(this.roomScheInfo.strCheckInTime).getTime()+(9 * 3600 * 1000)) / 1000)
       var nCheckOutTime = Math.round((new Date(this.roomScheInfo.strCheckOutTime).getTime()+(9 * 3600* 1000)) / 1000)
-      axios.put(`http://localhost:3000/api/rooms/${this.type}`, {
+      axios.put(`${this.$apiRootPath}rooms/${this.type}`, {
         nIdx: idx, usRoomNo: this.roomScheInfo.usRoomNo, nCheckInOutEnable: 1, nCheckInTime: nCheckInTime,
         nCheckOutTime: nCheckOutTime, szSubsName: this.roomScheInfo.szSubsName, szSubsTel: this.roomScheInfo.szSubsTel,
         tReserveDate: null, ucPeopleCnt: this.roomScheInfo.ucPeopleCnt, szDesc: this.roomScheInfo.szDesc,
@@ -1030,7 +1025,7 @@ export default {
     },
     cancelReserveRoom: function (nIdx) {
       this.events.pop()
-      axios.delete(`http://localhost:3000/api/rooms/`, { data: { nIdx: nIdx, usRoomNo : this.roomScheInfo.usRoomNo } } )
+      axios.delete(`${this.$apiRootPath}rooms/`, { data: { nIdx: nIdx, usRoomNo : this.roomScheInfo.usRoomNo } } )
         .then((r) => {
           this.$data.rsvRoomModal = false
           this.scheduleRoom(this.roomScheInfo.usRoomNo)
@@ -1046,7 +1041,7 @@ export default {
     saveSettingRoom: function (roomNo) {
       var nCheckInTime = (this.trnCheckInTime != '0' ) ? Math.round((new Date(this.trnCheckInTime).getTime()+(9*3600)) / 1000) : this.trnCheckInTime
       var nCheckOutTime =(this.trnCheckOutTime != '0' ) ?  Math.round((new Date(this.trnCheckOutTime).getTime()+(9*3600)) / 1000): this.trnCheckInTime
-      axios.put(`http://localhost:3000/api/rooms/${'roomStat'}`, {
+      axios.put(`${this.$apiRootPath}rooms/${'roomStat'}`, {
         RoomNo: this.roomConfigs.RoomNo, Area: this.roomConfigs.Area, Direction: this.roomConfigs.Direction, ExteriorWallCnt: this.roomConfigs.ExteriorWallCnt,
         Troom_set: this.roomConfigs.Troom_set, Tsurf_set: this.roomConfigs.Tsurf_set, Troom_cr: this.roomConfigs.Troom_cr, Tsurf_cr: this.roomConfigs.Tsurf_cr,
         CheckInOutEnable: this.roomConfigs.CheckInOutEnable, CheckInTime: nCheckInTime, CheckOutTime:nCheckOutTime, szDesc:  this.roomConfigs.szDesc,
@@ -1064,7 +1059,7 @@ export default {
     },
     cmdManualHeating: function (roomNo) {
       //alert('cmdManualHeating usManHeatingMode : ' + this.roomStatInfo.usManHeatingMode + ', '+((this.roomStatInfo.usManHeatingMode == 1) ? 2 : 1))
-      axios.put('http://localhost:3000/api/rooms/cmdManualHeating', {
+      axios.put(`${this.$apiRootPath}rooms/cmdManualHeating`, {
         RoomNo: roomNo, HeatingMode: (this.roomStatInfo.ucCurStatus == 1) ? 2 : 1,
         HeatingTimeSec: this.roomStatInfo.ulManHeatingTimeSec,
         Tset: this.roomStatInfo.fManTset, Tset_cr: this.roomStatInfo.fManTset_cr
@@ -1079,7 +1074,7 @@ export default {
         })
     },
     cmdRoomState: function (roomNo) {
-      axios.put(`http://localhost:3000/api/rooms/cmdRoomState/${roomNo}`)
+      axios.put(`${this.$apiRootPath}rooms/cmdRoomState/${roomNo}`)
         .then((r) => {
           // this.$data.settingRoomModal = false
           this.getRooms()

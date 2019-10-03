@@ -39,6 +39,11 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/trend.vue')
     },
     {
+      path: '/solTrend',
+      name: 'solTrend',
+      component: () => import(/* webpackChunkName: "about" */ './views/solTrend.vue')
+    },
+    {
       path: '*',
       name: 'e404',
       component: () => import(/* webpackChunkName: "about" */ './views/e404.vue')

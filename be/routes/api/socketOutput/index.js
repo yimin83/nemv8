@@ -1,7 +1,7 @@
-
 var net_client = require('net');
 var router = require('./../rooms')
 var struct = require("cpp-struct-js");
+const config = require('./../../../config.js')
 var net = {};
 const ems_msg_type_e = {
 	Msg_Type_Auth : 0x10,
@@ -13,7 +13,6 @@ const ems_msg_type_e = {
 	Msg_Type_IPC_Config : 0xf0,
 	Msg_Type_MAX : 0xff
 };
-
 
 const oam_msg_type_e = {
 	oam_set_sys_config : 1,		// if you change this, you should change _ems_msg_type_stat_e [_set_sys_config] too
@@ -48,8 +47,8 @@ net.getConnection = function (){
     var recvData = [];
     var local_port = "";
 
-    client = net_client.connect({port: 15000, host:'localhost'}, function() {
-        console.log("================================= net_client.connect start =====================================");
+    client = net_client.connect({port: config.port, host: config.host}, function() {
+        console.log("================================= net_client.connect start  ===================================== : ");
         console.log('connect success');
         console.log('local = ' + this.localAddress + ':' + this.localPort);
         console.log('remote = ' + this.remoteAddress + ':' +this.remotePort);
@@ -89,7 +88,7 @@ net.getConnection = function (){
 
     client.on('error', function(err) {
         console.log('socketOutput client Socket Error: '+ JSON.stringify(err));
-				client.connect(15000, 'localhost');
+				client.connect(config.port, config.host);
     });
 
 		client.on('disconnect', function(){
@@ -122,15 +121,7 @@ net.writeData = function (socket, data, seq){
     }
 }
 
-
-net.getSeq = function(){
-	return
-}
-var emsSysConfig
-var manualHeating
-var roomConfig
-var ahuZoneConfigMsg
-var damperSchedulerConfig
+var alarm = null
 var processOAMmsg = function (data, seq){
   var ret = 0;
 	let res
@@ -139,8 +130,14 @@ var processOAMmsg = function (data, seq){
   if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_sys_config )
    && oamMsgDat.DataLen == ems_sys_config_t.size()){
      var emsSysConfigDat = ems_sys_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"LE"});
-		 if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config)
-		 	  router.setSeqMap(seq, JSON.stringify(emsSysConfigDat))
+		 if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config) {
+			 router.setSeqMap(seq, JSON.stringify(emsSysConfigDat))
+			 processAlarm(
+				 {'Time':Date.now(),'Seq':seq,
+				 'SiteInfo':1,'Module':1,
+				 'Level':1,'ModuleIndex':1,
+				 'szContent':'testAlarm'}, setAlarm)
+		 }
   }
   else if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_cmd_floorRad_manual_heating && oamMsgDat.DataLen == manual_heating_msg_t.size()){
       console.log("oamMsgDat.OAMMsgType = " + oamMsgDa.OAMMsgType)
@@ -174,16 +171,64 @@ var processOAMmsg = function (data, seq){
 			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_priority)
       	router.setSeqMap(seq, JSON.stringify(floorRadRoomPriorityDat))
   }
-  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_event_alarm || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_event_alarm)){
-      var damperScheConfigDat = damper_scheduler_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"BE"});
-			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_solBeach_damper_scheduler)
-      	router.setSeqMap(seq, JSON.stringify(damperScheConfigDat))
+  else if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_event_alarm){
+      var emsAlarmDat = ems_alarm_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"BE"});
+			processAlarm(emsAlarmDat, setAlarm)
   }
   else {
       console.log("else!!!! oamMsgDat.OAMMsgType = " + oamMsgDat.OAMMsgType)
 			ret = -1;
   }
   return ret;
+}
+// var ems_alarm_t = new struct("ems_alarm_t", [
+// 	"Time", struct.uint32(),
+// 	"Seq", struct.uint16(),
+// 	"SiteInfo", struct.uint16(),
+// 	"Module", struct.uint16(),
+// 	"Level", struct.uint16(),
+// 	"ModuleIndex", struct.uint16(),
+// 	"szContent", struct.char(256)
+// ]);
+var setAlarm = function(data) {
+	console.log("################ setAlarm!!! ################")
+	this.alarm = {
+		'Time':data.Time,'Seq':data.Seq,
+		'SiteInfo':data.SiteInfo,'Module':data.Module,
+		'Level':data.Level,'ModuleIndex':data.ModuleIndex,
+		'szContent':data.szContent, 'beChecked':false
+	}
+	console.log("setAlarm : " +JSON.stringify(this.alarm))
+}
+net.getAlarm = function(){
+	console.log("################ getAlarm!!! ################")
+	return processGetAlarm(returnAlarm)
+}
+net.chkAlarm = function(){
+	console.log("################ chkAlarm!!! ################")
+	processClearAlarm(clearAlarm)
+}
+
+function processGetAlarm(callback){
+	console.log("################ processGetAlarm!!! ################")
+	return callback(this.alarm)
+}
+function returnAlarm(data){
+	console.log("################ returnAlarm!!! ################")
+	return data
+}
+
+function processClearAlarm(callback){
+	console.log("################ processClearAlarm!!! ################")
+	callback()
+}
+function clearAlarm(){
+	console.log("################ clearAlarm!!! ################")
+	this.alarm.beChecked = true
+}
+function processAlarm (data, callback){
+  console.log("################ processAlarm start!!! ################")
+	callback(data)
 }
 var ems_msg_header_t = new struct("ems_msg_header_t", [
     "Preamble", struct.uint16(),
@@ -195,6 +240,7 @@ var ems_msg_header_t = new struct("ems_msg_header_t", [
     "MsgStatus", struct.uint16(),
     "Reserved", struct.uint8(6)
 ]);
+
 net.makeEmsMsgHeader_t = function(preamble, version, length, sessionId, seqNo, msgType, msgStatus, reserved){
   var buffer = new Buffer(ems_msg_header_t.size());
   ems_msg_header_t.encode(buffer,0, {
