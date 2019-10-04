@@ -18,7 +18,7 @@ Vue.use(VueApexCharts)
 Vue.use(VueMomentJS, moment)
 Vue.use(VScrollLock)
 Vue.component('apexchart', VueApexCharts)
-console.log("############ process.env.NODE_ENV : " + process.env.NODE_ENV)
+// console.log("############ process.env.NODE_ENV : " + process.env.NODE_ENV)
 Vue.prototype.$apiRootPath = process.env.NODE_ENV !== 'production' ? 'http://localhost/api/' : '/api/'
 Vue.config.productionTip = false
 
@@ -29,4 +29,4 @@ new Vue({
   render: h => h(App)
 }).$mount('#app')
 
-console.log(process.env.NODE_ENV)
+// console.log(process.env.NODE_ENV)

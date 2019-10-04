@@ -157,22 +157,23 @@ export default {
     this.getSiteInfo()
   },
   created () {
-      // this.getAlarm()
-      // this.timer = setInterval(this.getAlarm, 5000)
+      this.getAlarm()
+      this.timer = setInterval(this.getAlarm, 5000)
   },
   methods: {
     getStart(){
       this.myVar = setInterval(getAlarm, 1000);
     },
     getSiteInfo() {
+      // axios.get(`http://localhost:3000/api/rooms/getSiteInfo`)
       axios.get(`${this.$apiRootPath}rooms/getSiteInfo`)
         .then((r) => {
           if(r.data.siteInfo == 1) {
             this.items = [
               {
-                icon: 'bubble_chart',
-                title: '메인',
-                to: { path: '/' }
+                icon: 'favorite',
+                title: '설정',
+                to: { path: '/emsSysConfig' }
               },
               {
                 icon: 'favorite',
@@ -199,7 +200,7 @@ export default {
                 },
                 {
                   icon: 'favorite',
-                  title: '공조기설정',
+                  title: '공조기상태',
                   to: { path: '/ahusConfig' }
                 },
                 {
@@ -211,21 +212,22 @@ export default {
           }
         })
         .catch((e) => {
-          alert(e.message)
+          //alert(e.message)
           console.error(e.message)
         })
     },
     getAlarm() {
+      // axios.get(`http://localhost:3000/api/rooms/getAlarm`)
       axios.get(`${this.$apiRootPath}rooms/getAlarm`)
         .then((r) => {
           if(r.data != "" && r.data != null && !r.data.beChecked){
             this.alram = r.data
-            this.alram.Time = this.$moment(new Date(this.alram.Time).toISOString()).format('YYYY/MM/DD/ HH/MM/SS')
+            this.alram.Time = this.$moment(new Date(this.alram.Time*1000).toISOString()).format('YYYY/MM/DD/ HH/MM/SS')
             this.alarmModal= true
           }
         })
         .catch((e) => {
-          alert(e.message)
+          //alert(e.message)
           clearInterval(this.myVar);
           console.error(e.message)
         })

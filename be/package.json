@@ -3,9 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
-    "dev": "node ./bin/www NODE_ENV=development ",
-    "pr": "node ./bin/www NODE_ENV=production PORT=80"
+    "start": "node ./bin/www"
   },
   "dependencies": {
     "connect-history-api-fallback": "^1.6.0",

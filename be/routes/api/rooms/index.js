@@ -50,6 +50,7 @@ var nSeq = counter.get()
 var totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeEmsAuthReq_t()
 var msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_Auth, Msg_Status_OK);
 var msgBuffer = net.makeEmsAuthReq_t(EMS_ID, EMS_PASSWORD, UserLevel, web_interface);
+console.log("############msgBuffer hex : " + msgBuffer.toString('hex'))
 var fullBuffer = new Buffer(totalSize);
 msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
 msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
@@ -163,7 +164,7 @@ var checkRsvRoomsArr = function (){
 }
 
 makeRsvRoomsArr();
-setInterval(checkRsvRoomsArr, 5000);
+//setInterval(checkRsvRoomsArr, 5000);
 const seqMap = new Map()
 router.get('/', function(req, res, next) {
 	console.log("############ get floor_rad_room ############")
@@ -273,6 +274,36 @@ router.get('/getAlarm', (req, res, next) => { // 수정
 	}
 });
 
+
+router.get('/roomStatTrend', (req, res, next) => { // 수정
+	console.log("############ get /roomStatTrend ")
+  // console.log("######################### getRoomConfig ######################### ")
+	mysqlDB.query("SELECT CurTime, HeatingCnt, HeatingRoomCnt, Tsurf_avg, Troom_avg, Tout FROM floor_rad_stat order by CurTime desc limit 50;", function(err, result, fields){
+		if(err){
+			console.log("roomStatTrend 쿼리문에 오류가 있습니다. err : " + err);
+		}
+		else{
+			//console.log("############ get /roomStatTrend :" + JSON.stringify(result))
+			res.json(result);
+		}
+	});
+});
+
+router.get('/solAhuTrend/:ahuNo', (req, res, next) => { // 수정
+	const ahuNo = req.params.ahuNo
+	console.log("############ get /solAhuTrend/:ahuNo  ahuNo : "+ahuNo)
+  // console.log("######################### getRoomConfig ######################### ")
+	mysqlDB.query("SELECT fData_damper_manual_set, fData_temp_supply, nPPMco2_cur, nLastUpdateTime FROM solbeach_zone_record WHERE nZoneIdx = ? order by nLastUpdateTime desc, nIdx asc limit 50;", [ahuNo], function(err, result, fields){
+		if(err){
+			console.log("solAhuTrend 쿼리문에 오류가 있습니다. err : " + err);
+		}
+		else{
+			console.log("############ get /solAhuTrend :" + JSON.stringify(result))
+			res.json(result);
+		}
+	});
+});
+
 router.get('/emsSysConfig', function(req, res, next) {
 	console.log("############ get emsSysConfig ##########")
   dataLen = 0;
@@ -289,7 +320,7 @@ router.get('/emsSysConfig', function(req, res, next) {
 
 router.put('/emsSysConfig', (req, res, next) => { // 수정
 	console.log("############ put emsSysConfig values : " + JSON.stringify(req.body))
-	//console.log("emsSysConfig req.body.configs : " + JSON.stringify(req.body.configs) + ", PacketMinIntervalSec : " + req.body.configs.PacketMinIntervalSec)
+	console.log("emsSysConfig req.body.configs : " + JSON.stringify(req.body.configs) + ", PacketMinIntervalSec : " + req.body.configs.PacketMinIntervalSec)
 	var dataBuffer = new Buffer(net.getSizeEmsSysConf_t())
 	dataBuffer = net.makeEmsSysConf_t(
 		req.body.configs.PacketMinIntervalSec, req.body.configs.ControlPeriodSec,
@@ -300,12 +331,15 @@ router.put('/emsSysConfig', (req, res, next) => { // 수정
 		{tAddr:{IpAddress:req.body.configs.tDataBase.tAddr.IpAddress, PortNo:req.body.configs.tDataBase.tAddr.PortNo},
 		  Name:req.body.configs.tDataBase.Name, ID:req.body.configs.tDataBase.ID, PassWd:req.body.configs.tDataBase.PassWd},
 		{ID:req.body.configs.tSMS.ID, Key:req.body.configs.tSMS.Key},
+		req.body.configs.ReservedOption1, req.body.configs.ReservedOption2,
 		{IpAddress:req.body.configs.tRemoteAddr.IpAddress, PortNo:req.body.configs.tRemoteAddr.PortNo},
 		{ControlOption:req.body.configs.tFloorRadConf.ControlOption, RoomCount:req.body.configs.tFloorRadConf.RoomCount,
 			UseTsurf:req.body.configs.tFloorRadConf.UseTsurf, Troom_set:req.body.configs.tFloorRadConf.Troom_set,
 			Tsurf_set:req.body.configs.tFloorRadConf.Tsurf_set, Troom_cr:req.body.configs.tFloorRadConf.Troom_cr,
 			Tsurf_cr:req.body.configs.tFloorRadConf.Tsurf_cr, Tctrl_res:req.body.configs.tFloorRadConf.Tctrl_res,
-			Tsurf_cr:req.body.configs.tFloorRadConf.Tsurf_init, Tctrl_res:req.body.configs.tFloorRadConf.Tset_inc,
+			Tsurf_init:req.body.configs.tFloorRadConf.Tsurf_init, Tset_init_inc:req.body.configs.tFloorRadConf.Tset_init_inc,
+			Tset_init_inc_max:req.body.configs.tFloorRadConf.Tset_init_inc_max, CheckInHour:req.body.configs.tFloorRadConf.CheckInHour,
+			Tset_init_inc_max:req.body.configs.tFloorRadConf.RR_CheckInHour, CheckInHour:req.body.configs.tFloorRadConf.RR_StayHour,
 			TelNumber0:req.body.configs.tFloorRadConf.TelNumber0, TelNumber1:req.body.configs.tFloorRadConf.TelNumber1,
 			TelNumber2:req.body.configs.tFloorRadConf.TelNumber2, TelNumber3:req.body.configs.tFloorRadConf.TelNumber3,
 			TelNumber4:req.body.configs.tFloorRadConf.TelNumber4,
@@ -324,17 +358,21 @@ router.put('/emsSysConfig', (req, res, next) => { // 수정
 				DRTimeHour:req.body.configs.tFloorRadConf.tDemandResponse.DRTimeHour},
 			tPreHeating:{
 				Option:req.body.configs.tFloorRadConf.tPreHeating.Option,
+				RerservedRoomOption:req.body.configs.tFloorRadConf.tPreHeating.RerservedRoomOption,
 				Tout_avg:req.body.configs.tFloorRadConf.tPreHeating.Tout_avg,
 				WF_Toutdoor:req.body.configs.tFloorRadConf.tPreHeating.WF_Toutdoor,
 				WF_Tdiff:req.body.configs.tFloorRadConf.tPreHeating.WF_Tdiff,
 				IncTempRate:req.body.configs.tFloorRadConf.tPreHeating.IncTempRate,
-				DecTempRate:req.body.configs.tFloorRadConf.tPreHeating.DecTempRate}
+				DecTempRate:req.body.configs.tFloorRadConf.tPreHeating.DecTempRate,
+				PH_StartTimeErrRange:req.body.configs.tFloorRadConf.tPreHeating.PH_StartTimeErrRange,
+				PH_LowLoadStartTimeErrRange:req.body.configs.tFloorRadConf.tPreHeating.PH_LowLoadStartTimeErrRange}
 			},
 			{ ControlOption:req.body.configs.tSolBeachConf.ControlOption, ZoneCnt:req.body.configs.tSolBeachConf.ZoneCnt,
 				HCMode:req.body.configs.tSolBeachConf.HCMode, Tzone_set:req.body.configs.tSolBeachConf.Tzone_set,
 				Tctrl_res:req.body.configs.tSolBeachConf.Tctrl_res, TelNumber0:req.body.configs.tSolBeachConf.TelNumber0,
 				TelNumber1:req.body.configs.tSolBeachConf.TelNumber1, TelNumber2:req.body.configs.tSolBeachConf.TelNumber2,
 				TelNumber3:req.body.configs.tSolBeachConf.TelNumber3, TelNumber4:req.body.configs.tSolBeachConf.TelNumber4,
+				CO2LoadPeriodSec:req.body.configs.tSolBeachConf.CO2LoadPeriodSec,
 				tRdamp:{
 					DamperCtrlMode:req.body.configs.tSolBeachConf.tRdamp.DamperCtrlMode,
 					Rdamp_set:req.body.configs.tSolBeachConf.tRdamp.Rdamp_set,
@@ -363,7 +401,7 @@ router.put('/emsSysConfig', (req, res, next) => { // 수정
 					PPMco2_dec_time:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_dec_time}
 				}
 	);
-	//console.log(dataBuffer.toString('hex'))
+	console.log(dataBuffer.toString('hex'))
 	dataLen = net.getSizeEmsSysConf_t();
   msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_sys_config, dataLen, null);
   totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
@@ -700,7 +738,7 @@ router.get('/getRoomTrend/:usRoomNo', (req, res, next) => { // 수정
 	const usRoomNo = req.params.usRoomNo
 	console.log("############ get /getRoomTrend/:roomNo  roomNo : "+usRoomNo)
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT ucRoomState, ucSetStatus, ucCurStatus, fTset, fTsurf_cur, fTroom_cur, nSetLastTime FROM floor_rad_room_record WHERE usRoomNo = ? order by nIdx asc, nSetLastTime desc limit 50;", [usRoomNo], function(err, result, fields){
+	mysqlDB.query("SELECT ucRoomState, ucSetStatus, ucCurStatus, fTset, fTsurf_cur, fTroom_cur, nSetLastTime FROM floor_rad_room_record WHERE usRoomNo = ? order by nSetLastTime desc, nIdx asc limit 50;", [usRoomNo], function(err, result, fields){
 		if(err){
 			console.log("getRoomTrend 쿼리문에 오류가 있습니다. err : " + err);
 		}

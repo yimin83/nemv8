@@ -126,17 +126,12 @@ var processOAMmsg = function (data, seq){
   var ret = 0;
 	let res
   var oamMsgDat = oam_msg_t.decode(data, ems_msg_header_t.size(), {endian:"BE"});
-  console.log("seq : " + seq + ", oamMsgDat : " + oamMsgDat.OAMMsgType +", oamMsgDat.DataLen : " + oamMsgDat.DataLen +", oamMsgDat.Data : "  + oamMsgDat.Data + ", floor_rad_room_state_t.size() : " + floor_rad_room_state_t.size());
+  console.log("seq : " + seq + ", oamMsgDat : " + oamMsgDat.OAMMsgType +", oamMsgDat.DataLen : " + oamMsgDat.DataLen +", oamMsgDat.Data : "  + oamMsgDat.Data + ", ems_sys_config_t.size() : " + ems_sys_config_t.size());
   if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_sys_config )
    && oamMsgDat.DataLen == ems_sys_config_t.size()){
      var emsSysConfigDat = ems_sys_config_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"LE"});
 		 if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config) {
 			 router.setSeqMap(seq, JSON.stringify(emsSysConfigDat))
-			 processAlarm(
-				 {'Time':Date.now(),'Seq':seq,
-				 'SiteInfo':1,'Module':1,
-				 'Level':1,'ModuleIndex':1,
-				 'szContent':'testAlarm'}, setAlarm)
 		 }
   }
   else if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_cmd_floorRad_manual_heating && oamMsgDat.DataLen == manual_heating_msg_t.size()){
@@ -172,8 +167,9 @@ var processOAMmsg = function (data, seq){
       	router.setSeqMap(seq, JSON.stringify(floorRadRoomPriorityDat))
   }
   else if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_event_alarm){
-      var emsAlarmDat = ems_alarm_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"BE"});
-			processAlarm(emsAlarmDat, setAlarm)
+		console.log("$$$$$$$$$$$$$$$$$$$$$$ recieve Alarm!!!$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+    var emsAlarmDat = ems_alarm_t.decode(data, ems_msg_header_t.size()+oam_msg_t.size(), {endian:"BE"});
+		processAlarm(emsAlarmDat, setAlarm)
   }
   else {
       console.log("else!!!! oamMsgDat.OAMMsgType = " + oamMsgDat.OAMMsgType)
@@ -271,7 +267,7 @@ net.makeEmsAuthReq_t = function(szAuthId, szAuthPassword, userLevel, siteInfo){
     szAuthId: szAuthId,
     szAuthPassword: szAuthPassword,
     UserLevel: userLevel,
-    SiteInfo: siteInfo
+    SiteInfo: (siteInfo|config.siteInfo)
   },{endian:"BE"})
   return buffer;
 }
@@ -465,9 +461,11 @@ var floor_rad_conf_t = new struct("floor_rad_conf_t", [
     "Tsurf_cr", struct.float32(),
     "Tctrl_res", struct.float32(),
     "Tsurf_init", struct.float32(),
-    "Tset_inc", struct.float32(),
+    "Tset_init_inc", struct.float32(),
+		"Tset_init_inc_max", struct.float32(),
     "CheckInHour", struct.int32(),
     "RR_CheckInHour", struct.int32(),
+		"RR_StayHour", struct.int32(),
     "TelNumber0", struct.char(12),
     "TelNumber1", struct.char(12),
     "TelNumber2", struct.char(12),
@@ -479,7 +477,7 @@ var floor_rad_conf_t = new struct("floor_rad_conf_t", [
     "tDemandResponse", demand_response_conf_t,
     "tPreHeating", pre_heating_conf_t // reserved.
 ]);
-net.makeFloorRadConf_t = function(controlOption, roomCount, useTsurf, troom_set, tsurf_set, troom_cr, tsurf_cr, tctrl_res, tsurf_init, tset_inc, checkInHour, rr_CheckInHour, telNumber0, telNumber1, telNumber2, telNumber3, telNumber4, tVariableTemp, tPeak, tOptimalStop, tDemandResponse, tPreHeating){
+net.makeFloorRadConf_t = function(controlOption, roomCount, useTsurf, troom_set, tsurf_set, troom_cr, tsurf_cr, tctrl_res, tsurf_init, tset_init_inc, tset_init_inc_max, checkInHour, rr_CheckInHour, rr_StayHour, telNumber0, telNumber1, telNumber2, telNumber3, telNumber4, tVariableTemp, tPeak, tOptimalStop, tDemandResponse, tPreHeating){
   var buffer = new Buffer(floor_rad_conf_t.size());
   floor_rad_conf_t.encode(buffer,0, {
     ControlOption: controlOption,
@@ -491,9 +489,11 @@ net.makeFloorRadConf_t = function(controlOption, roomCount, useTsurf, troom_set,
     Tsurf_cr: tsurf_cr,
     Tctrl_res: tctrl_res,
     Tsurf_init: tsurf_init,
-    Tset_inc: tset_inc,
+    Tset_init_inc: tset_init_inc,
+		Tset_init_inc_max: tset_init_inc_max,
     CheckInHour: checkInHour,
     RR_CheckInHour: rr_CheckInHour,
+    RR_StayHour: rr_StayHour,
 		TelNumber0: telNumber0,
 		TelNumber1: telNumber1,
 		TelNumber2: telNumber2,
@@ -642,12 +642,14 @@ var ems_sys_config_t = new struct("ems_sys_config_t", [
     "tLog", log_conf_t,
 		"tDataBase", db_confg_t,
 		"tSMS", sms_confg_t,
+	  "ReservedOption1", struct.uint32(),
+		"ReservedOption2", struct.uint32(),
     "tRemoteAddr", address_conf_t,
     "tFloorRadConf", floor_rad_conf_t,
     "tSolBeachConf", solbeach_conf_t
 ]);
 
-net.makeEmsSysConf_t = function(packetMinIntervalSec, controlPeriodSec, tAddr, tLog, tDataBase, tSMS, tRemoteAddr, tFloorRadConf, tSolBeachConf){
+net.makeEmsSysConf_t = function(packetMinIntervalSec, controlPeriodSec, tAddr, tLog, tDataBase, tSMS, reservedOption1, reservedOption2, tRemoteAddr, tFloorRadConf, tSolBeachConf){
   var buffer = new Buffer(ems_sys_config_t.size());
   ems_sys_config_t.encode(buffer,0, {
     PacketMinIntervalSec: packetMinIntervalSec,
@@ -656,6 +658,8 @@ net.makeEmsSysConf_t = function(packetMinIntervalSec, controlPeriodSec, tAddr, t
     tLog: tLog,
     tDataBase: tDataBase,
     tSMS: tSMS,
+		ReservedOption1:reservedOption1,
+		ReservedOption2:reservedOption2,
     tRemoteAddr: tRemoteAddr,
     tFloorRadConf: tFloorRadConf,
     tSolBeachConf: tSolBeachConf

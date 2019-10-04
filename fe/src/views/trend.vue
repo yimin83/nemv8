@@ -1,8 +1,22 @@
 <template>
   <v-container grid-list-md>
     <v-layout row wrap >
+      <v-bottom-navigation
+        :value="activeBtn"
+        grow
+        color="teal"
+        @change="changGraph()"
+      >
+        <v-btn @click="activeBtn = 0">
+          <span>객실 상태 그래프</span>
+        </v-btn>
+        <v-btn @click="activeBtn = 1">
+          <span>평균 그래프</span>
+        </v-btn>
+      </v-bottom-navigation>
       <div>
-        <v-col class="d-flex" cols="12" sm="2">
+        <br>
+        <v-col class="d-flex" cols="12" sm="2" v-if="this.activeBtn == 0">
           <v-select
             :items='roomNos'
             v-model='roomNo'
@@ -25,10 +39,12 @@ import axios from 'axios'
 export default {
   mounted () {
     this.getRooms()
+    //this.changGraph()
   },
   name: 'LineExample',
   data: function() {
     return {
+      activeBtn:0,
       datas:[],
       series:[],
       chartOptions: [],
@@ -37,7 +53,73 @@ export default {
     }
   },
   methods: {
+    changGraph() {
+      if(this.activeBtn == 0){
+        this.getTrend(201)
+      }
+      else {
+        this.getStatTrend()
+      }
+    },
+    getStatTrend() {
+      // axios.get(`http://localhost:3000/api/rooms/roomStatTrend`)
+      axios.get(`${this.$apiRootPath}rooms/roomStatTrend`)
+        .then((r) => {
+          this.datas = r.data
+          var data0 = []
+          var data1 = []
+          var data2 = []
+          var data3 = []
+          var data4 = []
+          var date = []
+          for(var i = 0; i<this.datas.length; i++){
+            data0.push(this.datas[i].HeatingCnt.toFixed(2))
+            data1.push(this.datas[i].HeatingRoomCnt.toFixed(2))
+            data2.push(this.datas[i].Tsurf_avg.toFixed(2))
+            data3.push(this.datas[i].Troom_avg.toFixed(2))
+            data4.push(this.datas[i].Tout.toFixed(2))
+            date.push(new Date(this.datas[i].CurTime*1000+(9*60*60*1000)).toISOString().replace(/T/, ' ').replace(/\..+/, ''))
+          }
+          this.series = [
+            {
+              name: 'HeatingCnt',
+              data: data0
+            },
+            {
+              name: 'HeatingRoomCnt',
+              data: data1
+            },
+            {
+              name: 'Tsurf_avg',
+              data: data2
+            },
+            {
+              name: 'Troom_avg',
+              data: data3
+            },
+            {
+              name: 'Tout',
+              data: data4
+            }
+          ]
+          this.chartOptions = {
+            xaxis: {
+                categories: date,
+            },
+            tooltip: {
+              x: {
+                format: 'dd MMM yyyy'
+              }
+            },
+          }
+        })
+        .catch((e) => {
+          alert(e.message)
+          console.error(e.message)
+        })
+    },
     getTrend(usRoomNo) {
+      // axios.get(`http://localhost:3000/api/rooms/getRoomTrend/${usRoomNo}`)
       axios.get(`${this.$apiRootPath}rooms/getRoomTrend/${usRoomNo}`)
         .then((r) => {
           this.datas = r.data
@@ -55,7 +137,7 @@ export default {
             data3.push(this.datas[i].fTset.toFixed(2))
             data4.push(this.datas[i].fTsurf_cur.toFixed(2))
             data5.push(this.datas[i].fTroom_cur.toFixed(2))
-            date.push(new Date(this.datas[i].nSetLastTime*1000).toISOString().replace(/T/, ' ').replace(/\..+/, ''))
+            date.push(new Date(this.datas[i].nSetLastTime*1000+(9*60*60*1000)).toISOString().replace(/T/, ' ').replace(/\..+/, ''))
           }
           this.series = [
             {
@@ -83,7 +165,7 @@ export default {
               data: data5
             }
           ]
-          this.chartOptions  = {
+          this.chartOptions = {
             xaxis: {
                 categories: date,
             },
@@ -100,6 +182,7 @@ export default {
         })
     },
     getRooms() {
+      // axios.get(`http://localhost:3000/api/rooms`)
       axios.get(`${this.$apiRootPath}rooms`)
         .then((r) => {
           var roomsData = [];

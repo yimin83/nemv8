@@ -214,6 +214,7 @@ export default {
   },
   methods: {
     getRoomPriority () {
+      // axios.get(`http://localhost:3000/api/rooms/roomPriority`)
       axios.get(`${this.$apiRootPath}rooms/roomPriority`)
         .then((r) => {
           this.roomPris = JSON.parse(r.data)
@@ -237,6 +238,7 @@ export default {
         })
     },
     getRoomStat (roomNo) {
+      // axios.get(`http://localhost:3000/api/rooms/getRoomStat/${roomNo}`)
       axios.get(`${this.$apiRootPath}rooms/getRoomStat/${roomNo}`)
         .then((r) => {
           this.roomStat = JSON.parse(r.data)
@@ -268,6 +270,7 @@ export default {
       this.roomStat.MH_TodayStartTime = this.trnMH_TodayStartTime != 0 ? (this.roomStat.trnMH_TodayStartTime*60*60): this.roomStat.trnMH_TodayStartTime
       this.roomStat.OptimalNeedTime = this.trnOptimalNeedTime != 0 ? (this.roomStat.trnOptimalNeedTime*60*60): this.roomStat.trnOptimalNeedTime
 
+      // axios.put(`http://localhost:3000/api/rooms/roomStat`, { config:this.roomStat })
       axios.put(`${this.$apiRootPath}rooms/roomStat`, { config:this.roomStat })
         .then((r) => {
           // this.$data.settingRoomModal = false
@@ -279,7 +282,7 @@ export default {
         })
     },
     saveRoomPrio: function () {
-      alert("saveRoomPrio!!")
+      // axios.put(`http://localhost:3000/api/rooms/roomPrio`, { config:this.items})
       axios.put(`${this.$apiRootPath}rooms/roomPrio`, { config:this.items})
         .then((r) => {
           // this.$data.settingRoomModal = false
