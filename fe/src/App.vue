@@ -38,7 +38,7 @@
       <router-view/>
     </v-content>
     <v-footer :fixed="fixed" app>
-      <span>&copy;2017</span>
+      <span></span>
     </v-footer>
     <v-dialog v-model="alarmModal" persistent max-width="400px">
       <v-card>
@@ -47,39 +47,68 @@
         </v-card-title>
         <v-card-text>
           <v-simple-table>
-            <thead>
-              <tr>
-                <th class="text-left" width="120px">Step</th>
-                <th class="text-left">Hour</th>
-              </tr>
-            </thead>
             <tbody>
               <tr>
-                <td>Time</td>
+                <td width="120px">알람발생시간</td>
                 <td>{{alram.Time}}</td>
               </tr>
               <tr>
-                <td>Seq</td>
-                <td>{{alram.Seq}}</td>
-              </tr>
-              <tr>
-                <td>SiteInfo</td>
+                <td>사이트정보</td>
                 <td>{{alram.SiteInfo}}</td>
               </tr>
               <tr>
-                <td>Module</td>
+                <td>발생구역</td>
                 <td>{{alram.Module}}</td>
               </tr>
               <tr>
-                <td>Level</td>
-                <td>{{alram.Level}}</td>
+                <td>알람등급</td>
+                <td>
+                  <v-card
+                    v-if="this.alram.Level === 1"
+                    class="d-inline-flex ma-1 pa-1"
+                    color="red lighten-1"
+                    outlined
+                  >
+                    <div>Critica</div>
+                  </v-card>
+                  <v-card
+                    v-if="this.alram.Level === 2"
+                    class="d-inline-flex ma-1 pa-1"
+                    color="orange accent-2"
+                    outlined
+                  >
+                    <div>Major</div>
+                  </v-card>
+                  <v-card
+                    v-if="this.alram.Level === 3"
+                    class="d-inline-flex ma-1 pa-1"
+                    color="yellow lighten-3"
+                    outlined
+                  >
+                    <div>Minor</div>
+                  </v-card>
+                  <v-card
+                    v-if="this.alram.Level === 4"
+                    class="d-inline-flex ma-1 pa-1"
+                    outlined
+                  >
+                    <div>Information</div>
+                  </v-card>
+                  <v-card
+                    v-if="this.alram.Level === 0"
+                    class="d-inline-flex  ma-0 pa-0"
+                    outlined
+                  >
+                    <div> - </div>
+                  </v-card>
+                </td>
               </tr>
-              <tr>
+              <!-- <tr>
                 <td>ModuleIndex</td>
                 <td>{{alram.ModuleIndex}}</td>
-              </tr>
+              </tr> -->
               <tr>
-                <td>szContent</td>
+                <td>알람내역</td>
                 <td>{{alram.szContent}}</td>
               </tr>
             </tbody>
@@ -104,7 +133,7 @@ export default {
       drawer: true,
       fixed: false,
       timer: '',
-      alram:{},
+      alram: {},
       items: [
         {
           icon: 'bubble_chart',
@@ -157,18 +186,18 @@ export default {
     this.getSiteInfo()
   },
   created () {
-      this.getAlarm()
-      this.timer = setInterval(this.getAlarm, 5000)
+    this.getAlarm()
+    this.timer = setInterval(this.getAlarm, 5000)
   },
   methods: {
-    getStart(){
-      this.myVar = setInterval(getAlarm, 1000);
+    getStart () {
+      this.myVar = setInterval(this.getAlarm, 1000)
     },
-    getSiteInfo() {
+    getSiteInfo () {
       // axios.get(`http://localhost:3000/api/rooms/getSiteInfo`)
       axios.get(`${this.$apiRootPath}rooms/getSiteInfo`)
         .then((r) => {
-          if(r.data.siteInfo == 1) {
+          if (r.data.siteInfo === 1) {
             this.items = [
               {
                 icon: 'favorite',
@@ -192,46 +221,46 @@ export default {
               }
             ]
           } else {
-              this.items = [
-                {
-                  icon: 'favorite',
-                  title: '설정',
-                  to: { path: '/emsSysConfig' }
-                },
-                {
-                  icon: 'favorite',
-                  title: '공조기상태',
-                  to: { path: '/ahusConfig' }
-                },
-                {
-                  icon: 'help',
-                  title: '쏠트랜드',
-                  to: { path: '/solTrend' }
-                }
-              ]
+            this.items = [
+              {
+                icon: 'favorite',
+                title: '설정',
+                to: { path: '/emsSysConfig' }
+              },
+              {
+                icon: 'favorite',
+                title: '공조기상태',
+                to: { path: '/ahusConfig' }
+              },
+              {
+                icon: 'help',
+                title: '쏠트랜드',
+                to: { path: '/solTrend' }
+              }
+            ]
           }
         })
         .catch((e) => {
-          //alert(e.message)
+          // alert(e.message)
           console.error(e.message)
         })
     },
-    getAlarm() {
+    getAlarm () {
       // axios.get(`http://localhost:3000/api/rooms/getAlarm`)
       axios.get(`${this.$apiRootPath}rooms/getAlarm`)
         .then((r) => {
-          if(r.data != "" && r.data != null && !r.data.beChecked){
+          if (r.data !== '' && r.data !== null && !r.data.beChecked) {
             this.alram = r.data
-            this.alram.Time = this.$moment(new Date(this.alram.Time*1000).toISOString()).format('YYYY/MM/DD/ HH/MM/SS')
-            this.alarmModal= true
+            this.alram.Time = this.$moment(new Date(this.alram.Time * 1000).toISOString()).format('YYYY/MM/DD/ kk:mm:ss')
+            this.alarmModal = true
           }
         })
         .catch((e) => {
-          //alert(e.message)
-          clearInterval(this.myVar);
+          // alert(e.message)
+          clearInterval(this.myVar)
           console.error(e.message)
         })
-    },
+    }
   }
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
   <v-container grid-list-md>
     <v-simple-table dense>
-      <template v-slot:default>
+      <template>
         <thead>
           <tr>
             <th class="text-center" rowspan="2">구분</th>
@@ -11,27 +11,27 @@
             <th class="text-center" colspan="2">CO2센서</th>
           </tr>
           <tr>
-            <th class="text-center">냉난방설정모드</th>
-            <th class="text-center">냉난방설정온도</th>
+            <th class="text-center">냉난방<br>설정모드</th>
+            <th class="text-center">냉난방<br>설정온도</th>
             <th class="text-center">실내온도</th>
-            <th class="text-center">FAN동작설정</th>
-            <th class="text-center">공급FAN상태</th>
-            <th class="text-center">Damper 설정모드</th>
-            <th class="text-center">Damper 설정값</th>
-            <th class="text-center">Damper현재값</th>
-            <th class="text-center">CO2설정값</th>
-            <th class="text-center">CO2현재값</th>
+            <th class="text-center">FAN<br>동작설정</th>
+            <th class="text-center">공급FAN<br>상태</th>
+            <th class="text-center">Damper<br>설정모드</th>
+            <th class="text-center">Damper<br>설정값</th>
+            <th class="text-center">Damper<br>현재값</th>
+            <th class="text-center">CO2<br>설정값</th>
+            <th class="text-center">CO2<br>현재값</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="zone in mergezones">
             <td class="text-center">{{zone.ahu.ahu_desc}}({{zone.ahu.ahu_name}})</td>
-            <td class="text-center">{{zone.zone.cMode_hc_mode}}</td>
+            <td class="text-center">{{zone.hc_mode}}</td>
             <td class="text-center">{{zone.zone.fData_hc_set_temp}}</td>
             <td class="text-center">{{zone.zone.fData_temp_return}}</td>
-            <td class="text-center">{{zone.zone.cMode_manual_mode}}</td>
+            <td class="text-center">{{zone.manual_mode}}</td>
             <td class="text-center">{{zone.zone.cState_supplay_fan}}</td>
-            <td class="text-center">{{zone.zone.cMode_damper_auto_manual}}</td>
+            <td class="text-center">{{zone.damper_auto_manual}}</td>
             <td class="text-center">{{zone.zone.nRdamp_set}}</td>
             <td class="text-center">{{zone.zone.fData_damper_manual_set}}</td>
             <td class="text-center">{{zone.zone.nPPMco2_set}}</td>
@@ -57,10 +57,9 @@ export default {
       mergezones : [],
       ahus : [],
       zones : [],
-      ahuConfig : [],
-      rsvRoomModal: false,
-      roomScheduleModal: false,
-      settingAhuModal: false,
+      hcModes : ['난방', '냉방'],
+      manualModes : ['중지', '가동'],
+      damperAutoManual : ['자동', '수동']
     }
   },
   methods: {
@@ -88,40 +87,16 @@ export default {
         })
     },
     mergeZonesAhu () {
+      var trncMode_hc_mode = ''
+      var trncMode_manual_mode = ''
+      var trncMode_damper_auto_manual = ''
       this.mergezones = []
-      for(var i = 0; i < this.zones.length; i++){
-        this.mergezones.push({ zone:this.zones[i], ahu:this.ahus[i]})
+      for ( var i = 0; i < this.zones.length; i++) {
+        trncMode_hc_mode = (this.zones[i].cMode_hc_mode !== -1 ) ? this.hcModes[this.zones[i].cMode_hc_mode] : '중지'
+        trncMode_manual_mode = (this.zones[i].cMode_manual_mode !== -1 ) ? this.manualModes[this.zones[i].cMode_manual_mode] : '미설정'
+        trncMode_damper_auto_manual = (this.zones[i].cMode_damper_auto_manual !== -1 ) ? this.damperAutoManual[this.zones[i].cMode_damper_auto_manual] : '미설정'
+        this.mergezones.push({ zone: this.zones[i], ahu: this.ahus[i], hc_mode: trncMode_hc_mode, manual_mode: trncMode_manual_mode, damper_auto_manual: trncMode_damper_auto_manual  })
       }
-    },
-    settingAhu: function (ahuIndex) {
-      // axios.get(`http://localhost:3000/api/rooms/ahusConfig/${ahuIndex}`)
-      axios.get(`${this.$apiRootPath}rooms/ahusConfig/${ahuIndex}`)
-        .then((r) => {
-          this.ahuConfig = JSON.parse(r.data)
-          for(var i=0; i < this.ahus.length ; i++){
-            if(this.ahus[i].ahu_id == ahuIndex){
-             this.settingTitle = this.ahus[i].ahu_desc + '('+this.ahus[i].ahu_id+'호 공조기)'
-             break;
-            }
-          }
-          this.$data.settingAhuModal = true
-        })
-        .catch((e) => {
-          alert(e.message)
-          console.error(e.message)
-        })
-
-    },
-    saveSettingAhu: function (ahuIndex) {
-      // axios.put(`http://localhost:3000/api/rooms/ahusConfig`, { config:this.ahuConfig })
-      axios.put(`${this.$apiRootPath}rooms/ahusConfig`, { config:this.ahuConfig })
-        .then((r) => {
-          this.settingAhu(ahuIndex)
-        })
-        .catch((e) => {
-          alert(e.message)
-          console.error(e.message)
-        })
     }
   }
 }

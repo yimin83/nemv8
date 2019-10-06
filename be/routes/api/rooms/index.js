@@ -1,8 +1,8 @@
-var express = require('express');
-var router = express.Router();
-var mysqlDB = require('./../../mysql-db');
-var net = require('./../socketOutput');
-const counter = require('./../makeSeq.js');
+var express = require('express')
+var router = express.Router()
+var mysqlDB = require('./../../mysql-db')
+var net = require('./../socketOutput')
+const counter = require('./../makeSeq.js')
 const config = require('./../../../config.js')
 var EMS_ID = 'NB_ADMIN'
 var EMS_PASSWORD = 'FLOWERSTONE_81'
@@ -40,86 +40,104 @@ const oam_msg_type_e = {
 	oam_get_floorRad_room_priority : 16,
 
 	oam_event_alarm : 17
-};
+}
 
-mysqlDB.connect();
-var client = net.getConnection();
+mysqlDB.connect()
+var client = net.getConnection()
 /* GET home page. */
 
 var nSeq = counter.get()
 var totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeEmsAuthReq_t()
-var msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_Auth, Msg_Status_OK);
-var msgBuffer = net.makeEmsAuthReq_t(EMS_ID, EMS_PASSWORD, UserLevel, web_interface);
+var msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_Auth, Msg_Status_OK)
+var msgBuffer = net.makeEmsAuthReq_t(EMS_ID, EMS_PASSWORD, UserLevel, web_interface)
 console.log("############msgBuffer hex : " + msgBuffer.toString('hex'))
-var fullBuffer = new Buffer(totalSize);
-msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t());
-net.writeData(client, fullBuffer, null);
+var fullBuffer = new Buffer(totalSize)
+msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t())
+net.writeData(client, fullBuffer, null)
 
+var nSeq
+var totalSize
+var msgHeaderBuffer
+var fullBuffer
+
+var requestAuth = function () {
+	console.log("################ requestAuth start!!! ################")
+	nSeq = counter.get()
+	totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeEmsAuthReq_t()
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_Auth, Msg_Status_OK)
+	msgBuffer = net.makeEmsAuthReq_t(EMS_ID, EMS_PASSWORD, UserLevel, web_interface)
+	console.log("############msgBuffer hex : " + msgBuffer.toString('hex'))
+	var fullBuffer = new Buffer(totalSize)
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t())
+	net.writeData(client, fullBuffer, null)
+}
+requestAuth()
 var dataLen = 0
-var IntervalA;
-// const startCallback = Date.now();
+var IntervalA
+// const startCallback = Date.now()
 // while (Date.now() - startCallback < 10000) {
 // }
-var roomsArr = [];
+var roomsArr = []
 var makeRsvRoomsArr = function () {
-	mysqlDB.query("SELECT * FROM floor_rad_room;", function(err, result, fields){
-    if(err){
-      console.log("############ makeRsvRoomsArr 쿼리문에 오류가 있습니다.");
+	mysqlDB.query("SELECT * FROM floor_rad_room", function(err, result, fields) {
+    if(err) {
+      console.log("############ makeRsvRoomsArr 쿼리문에 오류가 있습니다.")
     }
     else{
-			if(result!=null){
-				for(var i=0;i<result.length;i++){
+			if(result!=null) {
+				for ( var i = 0; i < result.length; i++ ) {
 					roomsArr.push({usRoomNo:result[i].usRoomNo,nCheckInOutEnable:result[i].nCheckInOutEnable,nCheckInTime:result[i].nCheckInTime,nCheckOutTime:result[i].nCheckOutTime})
 				}
 			}
 		}
-  });
+  })
 	console.log(roomsArr.length)
 	// console.log(roomsArr)
 }
-var clearRsvRoomsArr = function (usRoomNo){
+var clearRsvRoomsArr = function (usRoomNo) {
 	// console.log("################ clearRsvRooms start!!! ################")
-	for(var i=0;i<roomsArr.length;i++){
-		if(usRoomNo == roomsArr[i].usRoomNo){
+	for ( var i = 0; i < roomsArr.length; i++ ) {
+		if(usRoomNo == roomsArr[i].usRoomNo) {
 			roomsArr[i].nCheckInOutEnable = 0
 			roomsArr[i].nCheckInTime = 0
 			roomsArr[i].nCheckOutTime = 0
-			break;
+			break
 		}
 	}
 }
 
-function refreshRsvRoomsArr (result, option, callback){
+function refreshRsvRoomsArr (result, option, callback) {
 	// console.log("################ refreshRsvRoomsArr start!!! ################ result : " + JSON.stringify(result))
-	for(var i=0;i<roomsArr.length;i++){
-		if(result.usRoomNo == roomsArr[i].usRoomNo){
+	for ( var i = 0; i < roomsArr.length; i++) {
+		if(result.usRoomNo == roomsArr[i].usRoomNo) {
 			roomsArr[i].nCheckInOutEnable = result.nCheckInOutEnable
 			roomsArr[i].nCheckInTime = result.nCheckInTime
 			roomsArr[i].nCheckOutTime = result.nCheckOutTime
-			break;
+			break
 		}
 	}
-	callback(option);
+	callback(option)
 }
 
 function refreshRsvRooms (option, callback) {
 	// console.log("################ refreshRsvRooms start!!! ################")
-	for(var i=0;i<roomsArr.length;i++){
-		mysqlDB.query("SELECT * FROM roomsschedule where usRoomNo = ? ORDER BY nCheckInTime asc limit 1;", [roomsArr[i].usRoomNo], function(err, result, fields){
-	    if(err){
-	      console.log("############ refreshRsvRooms 쿼리문에 오류가 있습니다. err : " + err);
+	for ( var i = 0; i < roomsArr.length; i++) {
+		mysqlDB.query("SELECT * FROM roomsschedule where usRoomNo = ? ORDER BY nCheckInTime asc limit 1", [roomsArr[i].usRoomNo], function(err, result, fields) {
+	    if(err) {
+	      console.log("############ refreshRsvRooms 쿼리문에 오류가 있습니다. err : " + err)
 	    }
 	    else{
-				if(result.length != 0  ){
+				if(result.length != 0  ) {
 					refreshRsvRoomsArr(result[0], option, callback)
 				}
 			}
-	  });
+	  })
 	}
 }
-var processRsvRoom = function(result){
-	for(var i=0;i<roomsArr.length;i++){
+var processRsvRoom = function(result) {
+	for ( var i = 0; i < roomsArr.length; i++) {
 		//console.log("################ processRsvRoom start!!! ################ : "+roomsArr[i].usRoomNo+", roomsArr[i].nCheckInTime : " + roomsArr[i].nCheckInTime +", result.nCheckInTime : " + result.nCheckInTime )
 		if(roomsArr[i].usRoomNo == result.usRoomNo && ((roomsArr[i].nCheckInTime == 0) || (roomsArr[i].nCheckInTime > result.nCheckInTime))) {
 			console.log("############ cycle processRsvRoom : " + JSON.stringify(result))
@@ -127,30 +145,30 @@ var processRsvRoom = function(result){
 			roomsArr[i].nCheckInTime = result.nCheckInTime
 			roomsArr[i].nCheckOutTime = result.nCheckOutTime
 			var dataBuffer = new Buffer(net.getSizeCheckIn_t())
-			dataBuffer = net.makeCheckInCmd_t(result.usRoomNo, result.nCheckInOutEnable, result.nCheckInTime, result.nCheckOutTime);
-			dataLen = net.getSizeCheckIn_t();
-			msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_cmd_checkIn, dataLen, null);
-			totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-			nSeq = counter.get();
-			msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-			fullBuffer = new Buffer(totalSize);
-			msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-			msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-			dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
-			net.writeData(client, fullBuffer, nSeq);
-			break;
+			dataBuffer = net.makeCheckInCmd_t(result.usRoomNo, result.nCheckInOutEnable, result.nCheckInTime, result.nCheckOutTime)
+			dataLen = net.getSizeCheckIn_t()
+			msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_cmd_checkIn, dataLen, null)
+			totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+			nSeq = counter.get()
+			msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+			fullBuffer = new Buffer(totalSize)
+			msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+			msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+			dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
+			net.writeData(client, fullBuffer, nSeq)
+			break
 		}
 	}
 }
-var checkRsvRoomsArr = function (){
+var checkRsvRoomsArr = function () {
 	// console.log("################ checkRsvRoomsArr start!!! ################")
-	for(var i=0;i<roomsArr.length;i++){
-		mysqlDB.query("SELECT * FROM roomsschedule where usRoomNo = ? ORDER BY nCheckInTime asc limit 1;", [roomsArr[i].usRoomNo], function(err, result, fields){
-	    if(err){
-	      console.log("############ checkRsvRoomsArr 쿼리문에 오류가 있습니다. err : " + err);
+	for ( var i = 0; i < roomsArr.length; i++) {
+		mysqlDB.query("SELECT * FROM roomsschedule where usRoomNo = ? ORDER BY nCheckInTime asc limit 1", [roomsArr[i].usRoomNo], function(err, result, fields) {
+	    if(err) {
+	      console.log("############ checkRsvRoomsArr 쿼리문에 오류가 있습니다. err : " + err)
 	    }
 	    else{
-				if(result.length != 0  ){
+				if(result.length != 0  ) {
 					// console.log("################ checkRsvRoomsArr result not zero ################ : " + JSON.stringify(result[0]))
 					processRsvRoom(result[0])
 				}
@@ -159,70 +177,73 @@ var checkRsvRoomsArr = function (){
 					return null
 				}
 			}
-	  });
+	  })
 	}
 }
 
-makeRsvRoomsArr();
-//setInterval(checkRsvRoomsArr, 5000);
+makeRsvRoomsArr()
+//setInterval(checkRsvRoomsArr, 5000)
 const seqMap = new Map()
 router.get('/', function(req, res, next) {
 	console.log("############ get floor_rad_room ############")
-  mysqlDB.query("SELECT * FROM floor_rad_room;", function(err, result, fields){
-    if(err){
-      console.log("############ get floor_rad_room 쿼리문에 오류가 있습니다.");
+  mysqlDB.query("SELECT * FROM floor_rad_room", function(err, result, fields) {
+    if(err) {
+      console.log("############ get floor_rad_room 쿼리문에 오류가 있습니다.")
     }
     else{
-      res.json(result);
+      res.json(result)
       //console.log(result)
     }
-  });
-});
+  })
+})
 
 router.get('/getSiteInfo', function(req, res, next) {
 	console.log("############ getSiteInfo ############")
-  res.json({'siteInfo':config.siteInfo});
-});
+  res.json({'siteInfo':config.siteInfo})
+})
 
 router.get('/roomPriority', (req, res, next) => { // 수정
 	console.log("############ get /roomPriority ")
-	dataLen = 0;
-	msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_priority, dataLen, null);
-	totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-	nSeq = counter.get();
-	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-	fullBuffer = new Buffer(totalSize);
-	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-	net.writeData(client, fullBuffer, nSeq);
-	IntervalA = setInterval(checkMap, 100, nSeq, res);
-});
+	dataLen = 0
+	msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_priority, dataLen, null)
+	totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+	nSeq = counter.get()
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+	fullBuffer = new Buffer(totalSize)
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+	net.writeData(client, fullBuffer, nSeq)
+	IntervalA = setInterval(checkMap, 100, nSeq, res)
+})
 
 router.put('/roomStat', (req, res, next) => { // 수정
 	//console.log("############ put roomStat values : " + JSON.stringify(req.body))
 	var dataBuffer = new Buffer(net.getSizeFloorRadRoomState())
-	dataBuffer = net.makeFloorRadRoomState_t(
-		req.body.config.RoomNo, req.body.config.HeatingMode, req.body.config.RoomState,
-		req.body.config.ReservedRoomType, req.body.config.ReservedRoomHour, req.body.config.CheckInOutEnable,
-		req.body.config.CheckInTime, req.body.config.CheckOutTime, req.body.config.Tset, req.body.config.Tcr,
-		req.body.config.MH_SchedulerUsed, req.body.config.reserved, req.body.config.MH_HeatingTimeSec,
-		req.body.config.MH_HeatingStopTimeSec, req.body.config.MH_TotalHeatingTimeSec, req.body.config.MH_TodayStartTime,
-		req.body.config.MH_Tset, req.body.config.MH_Tcr, req.body.config.CheckInTime, req.body.config.CheckOutTime,
-		req.body.config.PreHeatingOption, req.body.config.OptimalNeedTime, req.body.config.PreHeatingStartTime,
-		req.body.config.MH_StartTime, req.body.config.TempInc, req.body.config.TempDec, req.body.config.Troom_cur, req.body.config.Tsurf_cur
-	);
-	dataLen = net.getSizeFloorRadRoomState();
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_floorRad_room_state, dataLen, null);
-  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-	nSeq = counter.get();
-	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-	fullBuffer = new Buffer(totalSize);
-	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
-	net.writeData(client, fullBuffer, nSeq);
+	for (var key in req.body.roomNos) {
+		dataBuffer = net.makeFloorRadRoomState_t(
+			req.body.roomNos[key], req.body.config.HeatingMode, req.body.config.RoomState,
+			req.body.config.ReservedRoomType, req.body.config.ReservedRoomHour, req.body.config.CheckInOutEnable,
+			req.body.config.CheckInTime, req.body.config.CheckOutTime, req.body.config.Tset, req.body.config.Tcr,
+			req.body.config.MH_SchedulerUsed, req.body.config.reserved, req.body.config.MH_HeatingTimeSec,
+			req.body.config.MH_HeatingStopTimeSec, req.body.config.MH_TotalHeatingTimeSec, req.body.config.MH_TodayStartTime,
+			req.body.config.MH_Tset, req.body.config.MH_Tcr, req.body.config.CheckInTime, req.body.config.CheckOutTime,
+			req.body.config.PreHeatingOption, req.body.config.OptimalNeedTime, req.body.config.PreHeatingStartTime,
+			req.body.config.MH_StartTime, req.body.config.TempInc, req.body.config.TempDec, req.body.config.Troom_cur, req.body.config.Tsurf_cur
+		)
+		dataLen = net.getSizeFloorRadRoomState()
+	  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_floorRad_room_state, dataLen, null)
+	  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+		nSeq = counter.get()
+		msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+		fullBuffer = new Buffer(totalSize)
+		msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+		msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+		dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
+		net.writeData(client, fullBuffer, nSeq)
+		// console.log("############ put roomStat (" + req.body.roomNos[key] + ") fullBuffer hex : " + fullBuffer.toString('hex'))
+	}
 	res.send({ success: true })
-});
+})
 
 router.put('/roomPrio', (req, res, next) => { // 수정
 	// console.log("############ put roomPrio values : " + JSON.stringify(req.body))
@@ -236,87 +257,87 @@ router.put('/roomPrio', (req, res, next) => { // 수정
 		prioArr.push(room_priority_t)
 	}
 	var dataBuffer = new Buffer(net.getSizeFloorRadRoomPrioritiy_t())
-	dataBuffer = net.makeFloorRadRoomPrioritiy_t(prioArr);
-	dataLen = net.getSizeFloorRadRoomPrioritiy_t();
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_floorRad_room_priority, dataLen, null);
-  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-	nSeq = counter.get();
-	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-	fullBuffer = new Buffer(totalSize);
-	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
+	dataBuffer = net.makeFloorRadRoomPrioritiy_t(prioArr)
+	dataLen = net.getSizeFloorRadRoomPrioritiy_t()
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_floorRad_room_priority, dataLen, null)
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+	nSeq = counter.get()
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+	fullBuffer = new Buffer(totalSize)
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
 	// console.log("############ put roomPrio fullBuffer hex : " + fullBuffer.toString('hex'))
-	net.writeData(client, fullBuffer, nSeq);
+	net.writeData(client, fullBuffer, nSeq)
 	res.send({ success: true })
-});
+})
 
 router.get('/solTrend', (req, res, next) => { // 수정
 	console.log("############ get /getSolTrend ")
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT CurTime, FanOperationCnt, Tzone, Rdamp, PPMco2 FROM solbeach_stat order by CurTime desc limit 50;", function(err, result, fields){
-		if(err){
-			console.log("getSolTrend 쿼리문에 오류가 있습니다. err : " + err);
+	mysqlDB.query("SELECT CurTime, FanOperationCnt, Tzone, Rdamp, PPMco2 FROM ( SELECT * FROM solbeach_stat ORDER BY CurTime DESC limit 50) A ORDER BY CurTime ASC", function(err, result, fields) {
+		if(err) {
+			console.log("getSolTrend 쿼리문에 오류가 있습니다. err : " + err)
 		}
 		else{
 			console.log("############ get /getSolTrend :" + JSON.stringify(result))
-			res.json(result);
+			res.json(result)
 		}
-	});
-});
+	})
+})
 
 router.get('/getAlarm', (req, res, next) => { // 수정
 	console.log("############ get /getAlarm ")
   // console.log("######################### getRoomConfig ######################### ")
 	res.json(net.getAlarm())
-	if(net.getAlarm() != null){
+	if(net.getAlarm() != null) {
 		net.chkAlarm()
 	}
-});
+})
 
 
 router.get('/roomStatTrend', (req, res, next) => { // 수정
 	console.log("############ get /roomStatTrend ")
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT CurTime, HeatingCnt, HeatingRoomCnt, Tsurf_avg, Troom_avg, Tout FROM floor_rad_stat order by CurTime desc limit 50;", function(err, result, fields){
-		if(err){
-			console.log("roomStatTrend 쿼리문에 오류가 있습니다. err : " + err);
+	mysqlDB.query("SELECT CurTime, HeatingCnt, HeatingRoomCnt, Tsurf_avg, Troom_avg, Tout FROM ( SELECT * FROM floor_rad_stat ORDER BY CurTime desc limit 50) A ORDER BY CurTime ASC", function(err, result, fields) {
+		if(err) {
+			console.log("roomStatTrend 쿼리문에 오류가 있습니다. err : " + err)
 		}
 		else{
 			//console.log("############ get /roomStatTrend :" + JSON.stringify(result))
-			res.json(result);
+			res.json(result)
 		}
-	});
-});
+	})
+})
 
 router.get('/solAhuTrend/:ahuNo', (req, res, next) => { // 수정
 	const ahuNo = req.params.ahuNo
 	console.log("############ get /solAhuTrend/:ahuNo  ahuNo : "+ahuNo)
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT fData_damper_manual_set, fData_temp_supply, nPPMco2_cur, nLastUpdateTime FROM solbeach_zone_record WHERE nZoneIdx = ? order by nLastUpdateTime desc, nIdx asc limit 50;", [ahuNo], function(err, result, fields){
-		if(err){
-			console.log("solAhuTrend 쿼리문에 오류가 있습니다. err : " + err);
+	mysqlDB.query("SELECT fData_damper_manual_set, fData_temp_supply, nPPMco2_cur, nLastUpdateTime FROM (SELECT * FROM solbeach_zone_record WHERE nZoneIdx = ? ORDER BY nLastUpdateTime DESC limit 50) A ORDER BY nLastUpdateTime ASC", [ahuNo], function(err, result, fields) {
+		if(err) {
+			console.log("solAhuTrend 쿼리문에 오류가 있습니다. err : " + err)
 		}
 		else{
-			console.log("############ get /solAhuTrend :" + JSON.stringify(result))
-			res.json(result);
+			// console.log("############ get /solAhuTrend :" + JSON.stringify(result))
+			res.json(result)
 		}
-	});
-});
+	})
+})
 
 router.get('/emsSysConfig', function(req, res, next) {
 	console.log("############ get emsSysConfig ##########")
-  dataLen = 0;
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_sys_config, dataLen, null);
-  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-  nSeq = counter.get();
-  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-  fullBuffer = new Buffer(totalSize);
-  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-  net.writeData(client, fullBuffer, nSeq);
-  IntervalA = setInterval(checkMap, 100, nSeq, res);
-});
+  dataLen = 0
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_sys_config, dataLen, null)
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+  nSeq = counter.get()
+  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+  fullBuffer = new Buffer(totalSize)
+  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+  net.writeData(client, fullBuffer, nSeq)
+  IntervalA = setInterval(checkMap, 100, nSeq, res)
+})
 
 router.put('/emsSysConfig', (req, res, next) => { // 수정
 	console.log("############ put emsSysConfig values : " + JSON.stringify(req.body))
@@ -400,64 +421,64 @@ router.put('/emsSysConfig', (req, res, next) => { // 수정
 					PPMco2_inc_time:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_inc_time,
 					PPMco2_dec_time:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_dec_time}
 				}
-	);
+	)
 	console.log(dataBuffer.toString('hex'))
-	dataLen = net.getSizeEmsSysConf_t();
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_sys_config, dataLen, null);
-  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-	nSeq = counter.get();
-	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-	fullBuffer = new Buffer(totalSize);
-	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
-	net.writeData(client, fullBuffer, nSeq);
+	dataLen = net.getSizeEmsSysConf_t()
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_sys_config, dataLen, null)
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+	nSeq = counter.get()
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+	fullBuffer = new Buffer(totalSize)
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
+	net.writeData(client, fullBuffer, nSeq)
 	res.send({ success: true })
-});
+})
 
 
 router.get('/ahusConfig', function(req, res, next) {
 	console.log("############ get ahusConfig ")
-  mysqlDB.query("SELECT * FROM ahu_info;", function(err, result, fields){
-    if(err){
-      console.log("############ get ahusConfig 쿼리문에 오류가 있습니다.");
+  mysqlDB.query("SELECT * FROM ahu_info", function(err, result, fields) {
+    if(err) {
+      console.log("############ get ahusConfig 쿼리문에 오류가 있습니다.")
     }
     else{
-      res.json(result);
+      res.json(result)
       //console.log(result)
     }
-  });
-});
+  })
+})
 router.get('/zones', function(req, res, next) {
 	console.log("############ get zones ")
-  mysqlDB.query("SELECT * FROM solbeach_zone;", function(err, result, fields){
-    if(err){
-      console.log("############ get zones 쿼리문에 오류가 있습니다.");
+  mysqlDB.query("SELECT * FROM solbeach_zone", function(err, result, fields) {
+    if(err) {
+      console.log("############ get zones 쿼리문에 오류가 있습니다.")
     }
     else{
 			// console.log(JSON.stringify(result))
-      res.json(result);
+      res.json(result)
       //console.log(result)
     }
-  });
-});
+  })
+})
 
 router.get('/ahusConfig/:ahuIndex', function(req, res, next) {
   const ahuIndex = req.params.ahuIndex
   var dataBuffer = new Buffer(4)
-  dataBuffer.writeUInt32LE(ahuIndex);
+  dataBuffer.writeUInt32LE(ahuIndex)
 	console.log("############ get /ahusConfig/:ahuIndex : " + ahuIndex)
-  dataLen = 0;
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_solBeach_zone_config, dataLen, dataBuffer);
-  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-  nSeq = counter.get();
-  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-  fullBuffer = new Buffer(totalSize);
-  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-  net.writeData(client, fullBuffer, nSeq);
-  IntervalA = setInterval(checkMap, 100, nSeq, res);
-});
+  dataLen = 0
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_solBeach_zone_config, dataLen, dataBuffer)
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+  nSeq = counter.get()
+  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+  fullBuffer = new Buffer(totalSize)
+  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+  net.writeData(client, fullBuffer, nSeq)
+  IntervalA = setInterval(checkMap, 100, nSeq, res)
+})
 
 router.put('/ahusConfig', (req, res, next) => { // 수정
 	console.log("############ put ahusConfig values : " + JSON.stringify(req.body))
@@ -467,36 +488,36 @@ router.put('/ahusConfig', (req, res, next) => { // 수정
 		req.body.config.HCMode, req.body.config.FanAutoManual,
 		req.body.config.DamperAutoManual, req.body.config.Tzone_set,
 		req.body.config.Rdamp_set, req.body.config.PPMco2_set, req.body.config.Desc
-	);
-	dataLen = net.getSizeAhuZoneConfig_t();
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_solBeach_zone_config, dataLen, null);
-  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-	nSeq = counter.get();
-	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-	fullBuffer = new Buffer(totalSize);
-	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
-	net.writeData(client, fullBuffer, nSeq);
+	)
+	dataLen = net.getSizeAhuZoneConfig_t()
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_solBeach_zone_config, dataLen, null)
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+	nSeq = counter.get()
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+	fullBuffer = new Buffer(totalSize)
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
+	net.writeData(client, fullBuffer, nSeq)
 	res.send({ success: true })
-});
+})
 
 router.get('/damperConfig/:ahuIndex', function(req, res, next) {
 	console.log("############ get /damperConfig/:ahuIndex values : " + JSON.stringify(req.body))
   const ahuIndex = req.params.ahuIndex
   var dataBuffer = new Buffer(4)
-  dataBuffer.writeUInt32LE(ahuIndex);
-  dataLen = 0;
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_solBeach_damper_scheduler, dataLen, dataBuffer);
-  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-  nSeq = counter.get();
-  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-  fullBuffer = new Buffer(totalSize);
-  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-  net.writeData(client, fullBuffer, nSeq);
-  IntervalA = setInterval(checkMap, 100, nSeq, res);
-});
+  dataBuffer.writeUInt32LE(ahuIndex)
+  dataLen = 0
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_solBeach_damper_scheduler, dataLen, dataBuffer)
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+  nSeq = counter.get()
+  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+  fullBuffer = new Buffer(totalSize)
+  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+  net.writeData(client, fullBuffer, nSeq)
+  IntervalA = setInterval(checkMap, 100, nSeq, res)
+})
 
 router.put('/damperConfig', (req, res, next) => { // 수정
 	console.log("############ put damperConfig values : " + JSON.stringify(req.body))
@@ -504,20 +525,20 @@ router.put('/damperConfig', (req, res, next) => { // 수정
 	// "Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},
 	dataBuffer = net.makeDamperSchedulerConfig_t(
 		req.body.damperConfig.AhuIndex, req.body.damperConfig.Reserved, req.body.damperConfig.tSch
-	);
+	)
 	// console.log("damperConfig : " + dataBuffer.toString('hex'))
-	dataLen = net.getSizeDamperSchedulerConfig_t();
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_solBeach_damper_scheduler, dataLen, null);
-  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-	nSeq = counter.get();
-	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-	fullBuffer = new Buffer(totalSize);
-	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
-	net.writeData(client, fullBuffer, nSeq);
+	dataLen = net.getSizeDamperSchedulerConfig_t()
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_solBeach_damper_scheduler, dataLen, null)
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+	nSeq = counter.get()
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+	fullBuffer = new Buffer(totalSize)
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
+	net.writeData(client, fullBuffer, nSeq)
 	res.send({ success: true })
-});
+})
 
 
 router.put('/cmdManualHeating', (req, res, next) => { // 수정
@@ -526,52 +547,52 @@ router.put('/cmdManualHeating', (req, res, next) => { // 수정
 	// "Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},
 	dataBuffer = net.makeManualHeating_t(
 		req.body.RoomNo, req.body.HeatingMode, req.body.HeatingTimeSec, req.body.Tset, req.body.Tset_cr
-	);
+	)
 	// console.log("cmdManualHeating : " + dataBuffer.toString('hex'))
-	dataLen = net.getSizeManualHeating_t();
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_cmd_floorRad_manual_heating, dataLen, null);
-  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-	nSeq = counter.get();
-	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-	fullBuffer = new Buffer(totalSize);
-	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
-	net.writeData(client, fullBuffer, nSeq);
+	dataLen = net.getSizeManualHeating_t()
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_cmd_floorRad_manual_heating, dataLen, null)
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+	nSeq = counter.get()
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+	fullBuffer = new Buffer(totalSize)
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
+	net.writeData(client, fullBuffer, nSeq)
 	res.send({ success: true })
-});
+})
 
 router.put('/cmdRoomState', (req, res, next) => { // 수정
 	console.log("############ put cmdRoomState values : " + JSON.stringify(req.body))
-  var data = new Uint32Array(2);
-	data[0] = req.body.RoomNo;
-	data[1] = req.body.RoomState;
-	dataLen = 0;
+  var data = new Uint32Array(2)
+	data[0] = req.body.RoomNo
+	data[1] = req.body.RoomState
+	dataLen = 0
 	// console.log("/cmdRoomState/:roomNo hex : " +data.toString('hex'))
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_cmd_floorRad_room_state, dataLen, data);
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_cmd_floorRad_room_state, dataLen, data)
 	// console.log("/cmdRoomState/:roomNo msgBuffer : " +msgBuffer.toString('hex'))
-  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-	nSeq = counter.get();
-	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-	fullBuffer = new Buffer(totalSize);
-	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-	net.writeData(client, fullBuffer, nSeq);
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+	nSeq = counter.get()
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+	fullBuffer = new Buffer(totalSize)
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+	net.writeData(client, fullBuffer, nSeq)
 	res.send({ success: true })
-});
+})
 
 var checkMap = function(seq, res) {
   // console.log("######################### checkMap ######################### ")
   var json = seqMap.get(seq)
-  if(json != "" && json != null){
+  if(json != '' && json != null) {
     clearInterval(IntervalA)
 		try {
     	res.json(seqMap.get(nSeq))
-			// throw new Error('오류 핸들링 테스트');
+			// throw new Error('오류 핸들링 테스트')
 		}
 		catch (exception) {
-			console.log(exception);
-			return true;
+			console.log(exception)
+			return true
 		}
     // console.log("configSetting seqMap.get(nSeq) : " + seqMap.get(nSeq))
     seqMap.delete(nSeq)
@@ -580,34 +601,34 @@ var checkMap = function(seq, res) {
 router.get('/:usRoomNo', (req, res, next) => { // 수정
   const usRoomNo = req.params.usRoomNo
 	// console.log("get room schedule : " + usRoomNo)
-    mysqlDB.query("SELECT * FROM RoomsSchedule where usRoomNo = ?;", [usRoomNo], function(err, result, fields){
-      if(err){
-        console.log("###### /:usRoomNo 쿼리문에 오류가 있습니다.");
+    mysqlDB.query("SELECT * FROM RoomsSchedule where usRoomNo = ?", [usRoomNo], function(err, result, fields) {
+      if(err) {
+        console.log("###### /:usRoomNo 쿼리문에 오류가 있습니다.")
       }
       else{
-        res.json(result);
+        res.json(result)
         //console.log(result)
       }
-    });
-});
+    })
+})
 router.get('/getRoomConfig/:roomNo', (req, res, next) => { // 수정
 	const roomNo = req.params.roomNo
 	console.log("############ get /getRoomConfig/:roomNo  roomNo : "+roomNo+", body : " + JSON.stringify(req.body))
   // console.log("######################### getRoomConfig ######################### ")
   var dataBuffer = new Buffer(2)
-  dataBuffer.writeUInt16LE(roomNo);
+  dataBuffer.writeUInt16LE(roomNo)
   // console.log("###### getRoomConfig ###### roomNo : "+roomNo+", dataBuffer : " + dataBuffer.toString('hex') )
-  dataLen = 0;
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_config, dataLen, dataBuffer);
-  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-  nSeq = counter.get();
-  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-  fullBuffer = new Buffer(totalSize);
-  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-  net.writeData(client, fullBuffer, nSeq);
-  IntervalA = setInterval(checkMap, 100, nSeq, res);
-});
+  dataLen = 0
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_config, dataLen, dataBuffer)
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+  nSeq = counter.get()
+  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+  fullBuffer = new Buffer(totalSize)
+  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+  net.writeData(client, fullBuffer, nSeq)
+  IntervalA = setInterval(checkMap, 100, nSeq, res)
+})
 
 router.post('/', (req, res, next) => { // 생성
   console.log('###### post ###### body : '+ JSON.stringify(req.body))
@@ -615,11 +636,11 @@ router.post('/', (req, res, next) => { // 생성
   mysqlDB.query("INSERT INTO RoomsSchedule (nIdx, usRoomNo, nCheckInOutEnable, nCheckInTime, nCheckOutTime, szSubsName, szSubsTel, tReserveDate, ucPeopleCnt, szDesc) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
   [ null, usRoomNo, nCheckInOutEnable, nCheckInTime, nCheckOutTime, szSubsName, szSubsTel, tReserveDate, ucPeopleCnt, szDesc], function (err, rows, fields) {
     if (err) {
-        res.send('###### post error : ' + err);
+        res.send('###### post error : ' + err)
         console.log(err)
     }
-  });
-	for(var i=0; i<roomsArr.length; i++) {
+  })
+	for ( var i = 0; i < roomsArr.length; i++ ) {
 		if(roomsArr[i].usRoomNo == usRoomNo) {
 			refreshRsvRooms(
 				{
@@ -628,31 +649,31 @@ router.post('/', (req, res, next) => { // 생성
 					Tsurf_cr:Tsurf_cr, szDesc:szDesc, data:roomsArr[i]
 				},
 				processCmdCheckIn )
-			break;
+			break
 		}
 	}
 	res.send({ success: true })
-});
+})
 router.put('/:type', (req, res, next) => { // 수정
   const type = req.params.type
   console.log('############ roomConfig update type : ' + type + 'body : '+ JSON.stringify(req.body))
-  if(type == "roomStat"){
+  if(type == "roomStat") {
     const { RoomNo, Area, Direction, ExteriorWallCnt, Troom_set, Tsurf_set, Troom_cr, Tsurf_cr, CheckInOutEnable,
 			CheckInTime, CheckOutTime, szDesc, HeatingMode, HeatingTimeSec, Tset, Tset_cr} = req.body
 		// console.log(RoomNo + " , " +Area + " , " +Direction + " , " +ExteriorWallCnt + " , " +Troom_set + " , " +Tsurf_set + " , " +Troom_cr + " , " +Tsurf_cr + " , " +CheckInOutEnable + " , " +CheckInTime + " , " +CheckOutTime + " , " +szDesc)
 		var dataBuffer = new Buffer(net.getSizeRoomConfig_t())
-	  dataBuffer = net.makeRoomConfig_t(RoomNo, Area, Direction, ExteriorWallCnt, Troom_set, Tsurf_set, Troom_cr, Tsurf_cr, CheckInOutEnable, CheckInTime, CheckOutTime, szDesc);
-	  dataLen = net.getSizeRoomConfig_t();
-	  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_floorRad_room_config, dataLen, dataBuffer);
-	  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-	  nSeq = counter.get();
-	  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-	  fullBuffer = new Buffer(totalSize);
-	  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-		msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-	  dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
-	  net.writeData(client, fullBuffer, nSeq);
-	  // IntervalA = setInterval(checkMap, 100, nSeq, res);
+	  dataBuffer = net.makeRoomConfig_t(RoomNo, Area, Direction, ExteriorWallCnt, Troom_set, Tsurf_set, Troom_cr, Tsurf_cr, CheckInOutEnable, CheckInTime, CheckOutTime, szDesc)
+	  dataLen = net.getSizeRoomConfig_t()
+	  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_floorRad_room_config, dataLen, dataBuffer)
+	  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+	  nSeq = counter.get()
+	  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+	  fullBuffer = new Buffer(totalSize)
+	  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+		msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+	  dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
+	  net.writeData(client, fullBuffer, nSeq)
+	  // IntervalA = setInterval(checkMap, 100, nSeq, res)
 		// makeRoomConfig_t = function(roomNo, area, direction, exteriorWallCnt, troom_set, tsurf_set, troom_cr, tsurf_cr, checkInOutEnable, checkInTime, checkOutTime, szDesc)
   } else {
   	console.log('############ roomschedule update body : '+ JSON.stringify(req.body))
@@ -660,11 +681,11 @@ router.put('/:type', (req, res, next) => { // 수정
     mysqlDB.query("UPDATE RoomsSchedule SET usRoomNo = ?, nCheckInOutEnable = ?, nCheckInTime = ?, nCheckOutTime = ?, szSubsName = ?, szSubsTel = ?, ucPeopleCnt = ?, szDesc = ? WHERE nIdx = ?",
 		[ usRoomNo, nCheckInOutEnable, nCheckInTime, nCheckOutTime, szSubsName, szSubsTel, ucPeopleCnt, szDesc, nIdx], function (err, rows, fields) {
 			if (err) {
-	        res.send('############ roomschedule update error : ' + err);
+	        res.send('############ roomschedule update error : ' + err)
 	        console.log(err)
 	    }
-    });
-		for(var i=0; i<roomsArr.length; i++) {
+    })
+		for ( var i = 0; i < roomsArr.length; i++ ) {
 			if(roomsArr[i].usRoomNo == usRoomNo) {
 				refreshRsvRooms(
 					{
@@ -673,12 +694,12 @@ router.put('/:type', (req, res, next) => { // 수정
 						Tsurf_cr:Tsurf_cr, szDesc:szDesc, data:roomsArr[i]
 					},
 					processCmdCheckIn )
-				break;
+				break
 			}
 		}
   }
 	res.send({ success: true })
-});
+})
 
 router.delete('/', (req, res, next) => { // 삭제
   // const nIdx = req.body.nIdx
@@ -689,14 +710,14 @@ router.delete('/', (req, res, next) => { // 삭제
       if (!err) {
 				res.send({ success: true })
       } else {
-				res.send('############ delete roomschedule error : ' + err);
+				res.send('############ delete roomschedule error : ' + err)
       }
-  });
+  })
 	clearRsvRoomsArr(usRoomNo)
-	for(var i=0; i<roomsArr.length; i++) {
+	for ( var i = 0; i < roomsArr.length; i++ ) {
 		if(roomsArr[i].usRoomNo == usRoomNo) {
 			refreshRsvRooms({type:'delete', data:roomsArr[i]}, processCmdCheckIn)
-			break;
+			break
 		}
 	}
 
@@ -705,31 +726,31 @@ router.delete('/', (req, res, next) => { // 삭제
 var processCmdCheckIn = function(datas) {
 	if(datas.type == 'delete') {
 		var dataBuffer = new Buffer(net.getSizeCheckIn_t())
-		dataBuffer = net.makeCheckInCmd_t(datas.data.usRoomNo, datas.data.tmpnCheckInOutEnable, datas.data.nCheckInTime, datas.data.nCheckOutTime);
-		dataLen = net.getSizeCheckIn_t();
-		msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_cmd_checkIn, dataLen, dataBuffer);
-		totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-		nSeq = counter.get();
-		msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-		fullBuffer = new Buffer(totalSize);
-		msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-		msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-		dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
-		net.writeData(client, fullBuffer, nSeq);
+		dataBuffer = net.makeCheckInCmd_t(datas.data.usRoomNo, datas.data.tmpnCheckInOutEnable, datas.data.nCheckInTime, datas.data.nCheckOutTime)
+		dataLen = net.getSizeCheckIn_t()
+		msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_cmd_checkIn, dataLen, dataBuffer)
+		totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+		nSeq = counter.get()
+		msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+		fullBuffer = new Buffer(totalSize)
+		msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+		msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+		dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
+		net.writeData(client, fullBuffer, nSeq)
 	}
 	else {
 		var dataBuffer = new Buffer(net.getSizeRoomConfig_t())
-		dataBuffer = net.makeRoomConfig_t(datas.data.usRoomNo, datas.Area, datas.Direction, datas.ExteriorWallCnt, datas.Troom_set, datas.Tsurf_set, datas.Troom_cr, datas.Tsurf_cr, datas.data.nCheckInOutEnable, datas.data.nCheckInTime, datas.data.nCheckOutTime, datas.szDesc);
-		dataLen = net.getSizeRoomConfig_t();
-		msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_floorRad_room_config, dataLen, dataBuffer);
-		totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-		nSeq = counter.get();
-		msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-		fullBuffer = new Buffer(totalSize);
-		msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-		msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-		dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t()+net.getSizeOamMsg_t()), 0, dataLen);
-		net.writeData(client, fullBuffer, nSeq);
+		dataBuffer = net.makeRoomConfig_t(datas.data.usRoomNo, datas.Area, datas.Direction, datas.ExteriorWallCnt, datas.Troom_set, datas.Tsurf_set, datas.Troom_cr, datas.Tsurf_cr, datas.data.nCheckInOutEnable, datas.data.nCheckInTime, datas.data.nCheckOutTime, datas.szDesc)
+		dataLen = net.getSizeRoomConfig_t()
+		msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_floorRad_room_config, dataLen, dataBuffer)
+		totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+		nSeq = counter.get()
+		msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+		fullBuffer = new Buffer(totalSize)
+		msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+		msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+		dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
+		net.writeData(client, fullBuffer, nSeq)
 	}
 }
 
@@ -738,53 +759,56 @@ router.get('/getRoomTrend/:usRoomNo', (req, res, next) => { // 수정
 	const usRoomNo = req.params.usRoomNo
 	console.log("############ get /getRoomTrend/:roomNo  roomNo : "+usRoomNo)
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT ucRoomState, ucSetStatus, ucCurStatus, fTset, fTsurf_cur, fTroom_cur, nSetLastTime FROM floor_rad_room_record WHERE usRoomNo = ? order by nSetLastTime desc, nIdx asc limit 50;", [usRoomNo], function(err, result, fields){
-		if(err){
-			console.log("getRoomTrend 쿼리문에 오류가 있습니다. err : " + err);
+	mysqlDB.query("SELECT ucRoomState, ucSetStatus, ucCurStatus, fTset, fTsurf_cur, fTroom_cur, nSetLastTime FROM (SELECT * FROM floor_rad_room_record WHERE usRoomNo = ? ORDER BY nSetLastTime DESC LIMIT 50) A ORDER BY nSetLastTime ASC", [usRoomNo], function(err, result, fields) {
+		if(err) {
+			console.log("getRoomTrend 쿼리문에 오류가 있습니다. err : " + err)
 		}
 		else{
-			//console.log("############ get /getRoomTrend :" + JSON.stringify(result))
-			res.json(result);
+			console.log("############ get /getRoomTrend :" + JSON.stringify(result))
+			res.json(result)
 		}
-	});
-});
+	})
+})
 
 router.get('/getRoomStat/:roomNo', function(req, res, next) {
   const roomNo = req.params.roomNo
   var dataBuffer = new Buffer(4)
-  dataBuffer.writeUInt32LE(roomNo);
+  dataBuffer.writeUInt32LE(roomNo)
 	console.log("############ get /getRoomStat/:roomNo : " + roomNo)
-  dataLen = 0;
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_state, dataLen, dataBuffer);
-  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen;
-  nSeq = counter.get();
-  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK);
-  fullBuffer = new Buffer(totalSize);
-  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t());
-  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t());
-  net.writeData(client, fullBuffer, nSeq);
-  IntervalA = setInterval(checkMap, 100, nSeq, res);
-});
+  dataLen = 0
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_state, dataLen, dataBuffer)
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+  nSeq = counter.get()
+  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+  fullBuffer = new Buffer(totalSize)
+  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+  net.writeData(client, fullBuffer, nSeq)
+  IntervalA = setInterval(checkMap, 100, nSeq, res)
+})
 
 
 exports.getMysqlDB = function () {
-    console.log('getMysqlDB!!!!!!!!!!!!!!!!!!' );
-    //return mysqlDB;
-};
+    console.log('getMysqlDB!!!!!!!!!!!!!!!!!!' )
+    //return mysqlDB
+}
 exports.getNet = function () {
-    console.log('getNet!!!!!!!!!!!!!!!!!!' );
-    //return client;
-};
+    console.log('getNet!!!!!!!!!!!!!!!!!!' )
+    //return client
+}
 exports.testFunc = function (res) {
-    console.log('testFunc!!!!!!!!!!!!!!!!!! ' + res );
-    //res.redirect("/");
-};
+    console.log('testFunc!!!!!!!!!!!!!!!!!! ' + res )
+    //res.redirect("/")
+}
 
 exports.setSeqMap = function (seq, jsonData) {
-    //res.redirect("/");
+    //res.redirect("/")
     seqMap.set(seq, jsonData)
-    console.log('setSeqMap seq : '+seq+' seqMap.get(seq) : ' + seqMap.get(seq));
+    // console.log('setSeqMap seq : '+seq+' seqMap.get(seq) : ' + seqMap.get(seq))
+}
 
-
-};
-module.exports = router;
+exports.reconnectAuth = function () {
+    console.log('reconnectAuth!!! ')
+    requestAuth()
+}
+module.exports = router

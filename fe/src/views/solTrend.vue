@@ -16,7 +16,7 @@
       </v-bottom-navigation>
       <div>
         <br>
-        <v-col class="d-flex" cols="12" sm="3" v-if="this.activeBtn == 0">
+        <v-col class="d-flex" cols="12" sm="3" v-if="this.activeBtn === 0">
           <v-select
             v-model="ahuNo.value"
             :items="this.ahuNos"
@@ -43,27 +43,25 @@ export default {
     this.getAhus()
   },
   name: 'LineExample',
-  data: function() {
+  data: function () {
     return {
-      ahuNo: {'name':'그라시아스(AHU1)','value':1},
-      ahuNos:[],
-      activeBtn:0,
-      datas:[],
-      series:[],
-      chartOptions: [],
+      ahuNo: { 'name': '그라시아스(AHU1)', 'value': 1 },
+      ahuNos: [],
+      activeBtn: 0,
+      datas: [],
+      series: [],
+      chartOptions: []
     }
   },
   methods: {
-    changGraph() {
-      if(this.activeBtn == 0){
+    changGraph () {
+      if (this.activeBtn === 0) {
         this.getAhuTrend(1)
-      }
-      else {
+      } else {
         this.getTrend()
       }
     },
-    getAhuTrend(ahuNo) {
-      //
+    getAhuTrend (ahuNo) {
       // axios.get(`http://localhost:3000/api/rooms/solAhuTrend/${ahuNo}`)
       axios.get(`${this.$apiRootPath}rooms/solAhuTrend/${ahuNo}`)
         .then((r) => {
@@ -72,11 +70,11 @@ export default {
           var data1 = []
           var data2 = []
           var date = []
-          for(var i = 0; i<this.datas.length; i++){
+          for (var i = 0; i < this.datas.length; i++) {
             data0.push(this.datas[i].fData_damper_manual_set.toFixed(2))
             data1.push(this.datas[i].fData_temp_supply.toFixed(2))
             data2.push(this.datas[i].nPPMco2_cur.toFixed(2))
-            date.push(new Date(this.datas[i].nLastUpdateTime*1000+(9*60*60*1000)).toISOString().replace(/T/, ' ').replace(/\..+/, ''))
+            date.push(this.$moment(new Date(this.datas[i].nLastUpdateTime * 1000 + (9 * 60 * 60 * 1000)).toISOString()).format('YYYY/MM/DD kk:mm:ss'))
           }
           this.series = [
             {
@@ -92,15 +90,15 @@ export default {
               data: data2
             }
           ]
-          this.chartOptions  = {
+          this.chartOptions = {
             xaxis: {
-                categories: date,
+              categories: date
             },
             tooltip: {
               x: {
                 format: 'dd MMM yyyy'
               }
-            },
+            }
           }
         })
         .catch((e) => {
@@ -108,7 +106,7 @@ export default {
           console.error(e.message)
         })
     },
-    getTrend() {
+    getTrend () {
       // axios.get(`http://localhost:3000/api/rooms/solTrend`)
       axios.get(`${this.$apiRootPath}rooms/solTrend`)
         .then((r) => {
@@ -118,12 +116,12 @@ export default {
           var data2 = []
           var data3 = []
           var date = []
-          for(var i = 0; i<this.datas.length; i++){
+          for (var i = 0; i < this.datas.length; i++) {
             data0.push(this.datas[i].FanOperationCnt.toFixed(2))
             data1.push(this.datas[i].Tzone.toFixed(2))
             data2.push(this.datas[i].Rdamp.toFixed(2))
             data3.push(this.datas[i].PPMco2.toFixed(2))
-            date.push(new Date(this.datas[i].CurTime*1000+(9*60*60*1000)).toISOString().replace(/T/, ' ').replace(/\..+/, ''))
+            date.push(this.$moment(new Date(this.datas[i].CurTime * 1000 + (9 * 60 * 60 * 1000)).toISOString()).format('YYYY/MM/DD kk:mm:ss'))
           }
           this.series = [
             {
@@ -143,15 +141,15 @@ export default {
               data: data3
             }
           ]
-          this.chartOptions  = {
+          this.chartOptions = {
             xaxis: {
-                categories: date,
+              categories: date
             },
             tooltip: {
               x: {
                 format: 'dd MMM yyyy'
               }
-            },
+            }
           }
         })
         .catch((e) => {
@@ -159,16 +157,16 @@ export default {
           console.error(e.message)
         })
     },
-    getAhus() {
-      //axios.get(`http://localhost:3000/api/rooms/ahusConfig`)
+    getAhus () {
+      // axios.get(`http://localhost:3000/api/rooms/ahusConfig`)
       axios.get(`${this.$apiRootPath}rooms/ahusConfig`)
         .then((r) => {
-          var ahuData = [];
-          for(var i = 0; i < r.data.length; i++){
-            if(i == 0){
-              this.ahuNo = {'name':r.data[i].ahu_desc+'('+r.data[i].ahu_name+')','value':r.data[i].ahu_id}
+          var ahuData = []
+          for (var i = 0; i < r.data.length; i++) {
+            if (i === 0) {
+              this.ahuNo = { 'name': r.data[i].ahu_desc + '(' + r.data[i].ahu_name + ')', 'value': r.data[i].ahu_id }
             }
-            ahuData.push({'name':r.data[i].ahu_desc+'('+r.data[i].ahu_name+')', 'value':r.data[i].ahu_id})
+            ahuData.push({ 'name': r.data[i].ahu_desc + '(' + r.data[i].ahu_name + ')', 'value': r.data[i].ahu_id })
           }
           this.ahuNos = ahuData
           this.getAhuTrend(1)
@@ -181,21 +179,21 @@ export default {
     toggleAhuNos: function () {
       this.getAhuTrend(this.ahuNo.value)
     },
-    generateDayWiseTimeSeries(baseval, count, yrange) {
-      var i = 0;
-      var series = [];
+    generateDayWiseTimeSeries (baseval, count, yrange) {
+      var i = 0
+      var series = []
       while (i < count) {
-        var x = baseval;
-        var y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
-        series.push([x, y]);
-        baseval += 86400000;
-        i++;
+        var x = baseval
+        var y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min
+        series.push([x, y])
+        baseval += 86400000
+        i++
       }
-      return series;
+      return series
     },
-    updateChart() {
+    updateChart () {
       let series = [
-          {
+        {
           name: 'South',
           data: this.generateDayWiseTimeSeries(new Date('11 Feb 2017').getTime(), 20, {
             min: 10,

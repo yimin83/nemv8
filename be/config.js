@@ -3,10 +3,9 @@ module.exports = {
   'siteInfo' : 2,
   'host' : 'localhost',
   'port' : 15000,
-  'dbHost': '112.216.18.149',
+  'dbHost': 'localhost',
   'dbPort': 3306,
   'dbUser': 'root',
   'dbPassword': 'tlavmf',
   'dbDatabase': 'ocean'
-
 }

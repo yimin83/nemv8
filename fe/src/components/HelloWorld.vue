@@ -138,5 +138,5 @@ export default {
       },
     ],
   }),
-};
+}
 </script>

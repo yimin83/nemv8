@@ -25,7 +25,7 @@
               :key="i"
               :value="'tab-' + i"
             >
-              <v-card flat v-if='i == 1' max-width="1000" class="mx-auto">
+              <v-card flat v-if='i === 1' max-width="1000" class="mx-auto">
                 <v-row>
                   <v-col>
                     <v-list dense>
@@ -81,7 +81,7 @@
                 </v-col>
               </v-row>
               </v-card>
-              <v-card flat v-if='i == 2'>
+              <v-card flat v-if='i === 2'>
                 <v-list dense>
                   <v-list-item>
                       <template>
@@ -99,8 +99,8 @@
                                   filled
                                   auto-grow
                                   readonly
-                                  height=130
-                                  class='ma-0 pa-0'
+                                  class="overflow-y-auto ma-0 pa-0"
+                                  max-height="130"
                                   value="ManualHeating:1 (기본 설정), Scheduler:2 (기본 설정), PeakDemand:4 (최대 난방 수 조절), VariableTemp:8(가변온도), PreHeating:16 (사전난방), DemandResp:64 (부하시간대 온도조절)"
                                 ></v-textarea>
                               </v-list-item>
@@ -284,7 +284,7 @@
                   </v-list-item>
                 </v-list>
               </v-card>
-                <v-card flat v-if='i == 3'>
+                <v-card flat v-if='i === 3'>
                   <v-list dense>
                     <v-list-item>
                         <template>
@@ -391,7 +391,7 @@
                               </v-list>
                             </v-card>
                             <br>
-                            <center><v-btn color="primary" @click="openDamperSch(1);">DamperSch</v-btn></center>
+                            <center><v-btn color="primary" @click="openDamperSch(1)">DamperSch</v-btn></center>
                             <v-dialog v-model="damperSchModal" persistent max-width="550px">
                               <v-card>
                                 <v-card-title>
@@ -404,7 +404,7 @@
                                     </v-col>
                                     <v-col cols="2">
                                       <v-select
-                                        v-model="damperSchsConfig.AhuIndex"
+                                        v-model="select"
                                         :items="AhuIndexs"
                                         item-text="AhuIndex"
                                         item-value="AhuIndex"
@@ -413,6 +413,7 @@
                                         return-object
                                         single-line
                                         width:10px
+                                        @change="openDamperSch(select.AhuIndex)"
                                       ></v-select>
                                     </v-col>
                                   </v-row>
@@ -574,105 +575,104 @@
   </v-container>
 </template>
 <script>
-  import axios from 'axios'
-  export default {
-    mounted () {
-      this.getEmsSysConfig()
+import axios from 'axios'
+export default {
+  mounted () {
+    this.getEmsSysConfig()
+  },
+  data () {
+    return {
+      tab: null,
+      select: { AhuIndex: 1 },
+      AhuIndexs: [
+        { AhuIndex: 1 },
+        { AhuIndex: 2 },
+        { AhuIndex: 3 },
+        { AhuIndex: 4 },
+        { AhuIndex: 5 },
+        { AhuIndex: 6 },
+        { AhuIndex: 7 },
+        { AhuIndex: 8 },
+        { AhuIndex: 9 },
+        { AhuIndex: 10 },
+        { AhuIndex: 11 },
+        { AhuIndex: 12 },
+        { AhuIndex: 13 },
+        { AhuIndex: 14 },
+        { AhuIndex: 15 },
+        { AhuIndex: 16 },
+        { AhuIndex: 17 },
+        { AhuIndex: 18 },
+        { AhuIndex: 19 },
+        { AhuIndex: 20 }
+      ],
+      itemsPerPage: 3,
+      damperSchModal: false,
+      configs: [],
+      damperSchsConfig: [],
+      rules: [
+        value => !!value || '',
+        value => (value || '').length <= 20 || 'Max 20 characters'
+        // value => {
+        //   const pattern = /^(([^<>()[\]\\.,:\s@"]+(\.[^<>()[\]\\.,:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.) +[a-zA-Z]{2,}))$/
+        //   return pattern.test(value) || 'Invalid e-mail.'
+        // },
+      ]
+    }
+  },
+  methods: {
+    getEmsSysConfig () {
+      // axios.get(`http://localhost:3000/api/rooms/emsSysConfig`)
+      axios.get(`${this.$apiRootPath}rooms/emsSysConfig`)
+        .then((r) => {
+          // alert("emsSysConfig r.data : " + JSON.parse(r.data))
+          this.configs = JSON.parse(r.data)
+        })
+        .catch((e) => {
+          alert(e.message)
+          // console.error(e.message)
+        })
     },
-    data () {
-      return {
-        tab: null,
-        select: { AhuIndex: 2},
-        AhuIndexs: [
-          { AhuIndex: 1 },
-          { AhuIndex: 2 },
-          { AhuIndex: 3 },
-          { AhuIndex: 4 },
-          { AhuIndex: 5 },
-          { AhuIndex: 6 },
-          { AhuIndex: 7 },
-          { AhuIndex: 8 },
-          { AhuIndex: 9 },
-          { AhuIndex: 10 },
-          { AhuIndex: 11 },
-          { AhuIndex: 12 },
-          { AhuIndex: 13 },
-          { AhuIndex: 14 },
-          { AhuIndex: 15 },
-          { AhuIndex: 16 },
-          { AhuIndex: 17 },
-          { AhuIndex: 18 },
-          { AhuIndex: 19 },
-          { AhuIndex: 20 },
-        ],
-        itemsPerPage: 3,
-        damperSchModal: false,
-        configs:[],
-        damperSchsConfig:[],
-        rules: [
-          value => !!value || '',
-          value => (value || '').length <= 20 || 'Max 20 characters',
-          // value => {
-          //   const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          //   return pattern.test(value) || 'Invalid e-mail.'
-          // },
-        ],
-      }
+    applyEmsSysConfig () {
+      // axios.put(`http://localhost:3000/api/rooms/emsSysConfig`, { configs: this.configs })
+      axios.put(`${this.$apiRootPath}rooms/emsSysConfig`, { configs: this.configs })
+        .then((r) => {
+          this.getEmsSysConfig()
+        })
+        .catch((e) => {
+          alert(e.message)
+          // console.error(e.message)
+        })
     },
-    methods: {
-      getEmsSysConfig () {
-        // axios.get(`http://localhost:3000/api/rooms/emsSysConfig`)
-        axios.get(`${this.$apiRootPath}rooms/emsSysConfig`)
-          .then((r) => {
-             // alert("emsSysConfig r.data : " + JSON.parse(r.data))
-            this.configs = JSON.parse(r.data)
-          })
-          .catch((e) => {
-            alert(e.message)
-            console.error(e.message)
-          })
-      },
-      applyEmsSysConfig () {
-        // axios.put(`http://localhost:3000/api/rooms/emsSysConfig`, { configs:this.configs })
-        axios.put(`${this.$apiRootPath}rooms/emsSysConfig`, { configs:this.configs })
-          .then((r) => {
-            this.getEmsSysConfig()
-          })
-          .catch((e) => {
-            alert(e.message)
-            console.error(e.message)
-          })
-      },
-      openDamperSch: function (ahuIndex) {
-        // axios.get(`http://localhost:3000/api/rooms/damperConfig/${ahuIndex}`)
-        axios.get(`${this.$apiRootPath}rooms/damperConfig/${ahuIndex}`)
-          .then((r) => {
-            // alert("getDamperScheConfig r.data : " + r.data)
-            this.damperSchsConfig = JSON.parse(r.data)
-          })
-          .catch((e) => {
-            alert(e.message)
-            console.error(e.message)
-          })
-        this.$data.damperSchModal = true
-      },
-      applyDamperSch: function (AhuIndex) {
-        // alert(JSON.stringify(this.damperSchsConfig))
-        // axios.put(`http://localhost:3000/api/rooms/damperConfig`, { damperConfig:this.damperSchsConfig })
-        axios.put(`${this.$apiRootPath}rooms/damperConfig`, { damperConfig:this.damperSchsConfig })
-          .then((r) => {
-            this.openDamperSch(AhuIndex)
-          })
-          .catch((e) => {
-            alert(e.message)
-            console.error(e.message)
-          })
-        // this.$data.damperSchModal = false
-      },
-      closeDamperSch: function () {
-        // alert("closeDamperSch")
-        this.$data.damperSchModal = false
-      },
+    openDamperSch: function (ahuIndex) {
+      // axios.get(`http://localhost:3000/api/rooms/damperConfig/${ahuIndex}`)
+      axios.get(`${this.$apiRootPath}rooms/damperConfig/${ahuIndex}`)
+        .then((r) => {
+          this.damperSchsConfig = JSON.parse(r.data)
+          this.select = { AhuIndex : this.damperSchsConfig.AhuIndex }
+        })
+        .catch((e) => {
+          alert(e.message)
+          // console.error(e.message)
+        })
+      this.$data.damperSchModal = true
+    },
+    applyDamperSch: function (AhuIndex) {
+      // alert(JSON.stringify(this.damperSchsConfig))
+      // axios.put(`http://localhost:3000/api/rooms/damperConfig`, { damperConfig: this.damperSchsConfig })
+      axios.put(`${this.$apiRootPath}rooms/damperConfig`, { damperConfig: this.damperSchsConfig })
+        .then((r) => {
+          this.openDamperSch(AhuIndex)
+        })
+        .catch((e) => {
+          alert(e.message)
+          // console.error(e.message)
+        })
+    },
+    closeDamperSch: function () {
+      // alert("closeDamperSch")
+      this.$data.damperSchModal = false
     }
   }
+}
 </script>

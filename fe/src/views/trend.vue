@@ -16,7 +16,7 @@
       </v-bottom-navigation>
       <div>
         <br>
-        <v-col class="d-flex" cols="12" sm="2" v-if="this.activeBtn == 0">
+        <v-col class="d-flex" cols="12" sm="2" v-if="this.activeBtn === 0">
           <v-select
             :items='roomNos'
             v-model='roomNo'
@@ -39,29 +39,28 @@ import axios from 'axios'
 export default {
   mounted () {
     this.getRooms()
-    //this.changGraph()
+    // this.changGraph()
   },
   name: 'LineExample',
-  data: function() {
+  data: function () {
     return {
-      activeBtn:0,
-      datas:[],
-      series:[],
+      activeBtn: 0,
+      datas: [],
+      series: [],
       chartOptions: [],
-      roomNos:[],
-      roomNo:201
+      roomNos: [],
+      roomNo: 201
     }
   },
   methods: {
-    changGraph() {
-      if(this.activeBtn == 0){
+    changGraph () {
+      if (this.activeBtn === 0) {
         this.getTrend(201)
-      }
-      else {
+      } else {
         this.getStatTrend()
       }
     },
-    getStatTrend() {
+    getStatTrend () {
       // axios.get(`http://localhost:3000/api/rooms/roomStatTrend`)
       axios.get(`${this.$apiRootPath}rooms/roomStatTrend`)
         .then((r) => {
@@ -72,13 +71,13 @@ export default {
           var data3 = []
           var data4 = []
           var date = []
-          for(var i = 0; i<this.datas.length; i++){
+          for (var i = 0; i < this.datas.length; i++) {
             data0.push(this.datas[i].HeatingCnt.toFixed(2))
             data1.push(this.datas[i].HeatingRoomCnt.toFixed(2))
             data2.push(this.datas[i].Tsurf_avg.toFixed(2))
             data3.push(this.datas[i].Troom_avg.toFixed(2))
             data4.push(this.datas[i].Tout.toFixed(2))
-            date.push(new Date(this.datas[i].CurTime*1000+(9*60*60*1000)).toISOString().replace(/T/, ' ').replace(/\..+/, ''))
+            date.push(this.$moment(new Date((this.datas[i].CurTime * 1000) + (9 * 60 * 60 * 1000)).toISOString()).format('YYYY/MM/DD kk:mm:ss'))
           }
           this.series = [
             {
@@ -104,13 +103,13 @@ export default {
           ]
           this.chartOptions = {
             xaxis: {
-                categories: date,
+              categories: date
             },
             tooltip: {
               x: {
                 format: 'dd MMM yyyy'
               }
-            },
+            }
           }
         })
         .catch((e) => {
@@ -118,26 +117,26 @@ export default {
           console.error(e.message)
         })
     },
-    getTrend(usRoomNo) {
+    getTrend (usRoomNo) {
       // axios.get(`http://localhost:3000/api/rooms/getRoomTrend/${usRoomNo}`)
       axios.get(`${this.$apiRootPath}rooms/getRoomTrend/${usRoomNo}`)
         .then((r) => {
           this.datas = r.data
-          var data0 = [];
-          var data1 = [];
-          var data2 = [];
-          var data3 = [];
-          var data4 = [];
-          var data5 = [];
-          var date = [];
-          for(var i = 0; i<this.datas.length; i++){
-            data0.push((this.datas[i].ucRoomState*5).toFixed(2))
-            data1.push((this.datas[i].ucSetStatus*10).toFixed(2))
-            data2.push((this.datas[i].ucCurStatus*15).toFixed(2))
+          var data0 = []
+          var data1 = []
+          var data2 = []
+          var data3 = []
+          var data4 = []
+          var data5 = []
+          var date = []
+          for (var i = 0; i < this.datas.length; i++) {
+            data0.push((this.datas[i].ucRoomState * 5).toFixed(2))
+            data1.push((this.datas[i].ucSetStatus * 10).toFixed(2))
+            data2.push((this.datas[i].ucCurStatus * 15).toFixed(2))
             data3.push(this.datas[i].fTset.toFixed(2))
             data4.push(this.datas[i].fTsurf_cur.toFixed(2))
             data5.push(this.datas[i].fTroom_cur.toFixed(2))
-            date.push(new Date(this.datas[i].nSetLastTime*1000+(9*60*60*1000)).toISOString().replace(/T/, ' ').replace(/\..+/, ''))
+            date.push(this.$moment(new Date(this.datas[i].nSetLastTime * 1000 + (9 * 60 * 60 * 1000)).toISOString()).format('YYYY/MM/DD kk:mm:ss'))
           }
           this.series = [
             {
@@ -167,13 +166,13 @@ export default {
           ]
           this.chartOptions = {
             xaxis: {
-                categories: date,
+              categories: date
             },
             tooltip: {
               x: {
                 format: 'dd MMM yyyy'
               }
-            },
+            }
           }
         })
         .catch((e) => {
@@ -181,12 +180,12 @@ export default {
           console.error(e.message)
         })
     },
-    getRooms() {
+    getRooms () {
       // axios.get(`http://localhost:3000/api/rooms`)
       axios.get(`${this.$apiRootPath}rooms`)
         .then((r) => {
-          var roomsData = [];
-          for(var i = 0; i < r.data.length; i++){
+          var roomsData = []
+          for (var i = 0; i < r.data.length; i++) {
             roomsData.push(r.data[i].usRoomNo)
           }
           this.roomNos = roomsData
@@ -200,21 +199,21 @@ export default {
     toggleRoomNos: function () {
       this.getTrend(this.roomNo)
     },
-    generateDayWiseTimeSeries(baseval, count, yrange) {
-      var i = 0;
-      var series = [];
+    generateDayWiseTimeSeries (baseval, count, yrange) {
+      var i = 0
+      var series = []
       while (i < count) {
-        var x = baseval;
-        var y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
-        series.push([x, y]);
-        baseval += 86400000;
-        i++;
+        var x = baseval
+        var y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min
+        series.push([x, y])
+        baseval += 86400000
+        i++
       }
-      return series;
+      return series
     },
-    updateChart() {
+    updateChart () {
       let series = [
-          {
+        {
           name: 'South',
           data: this.generateDayWiseTimeSeries(new Date('11 Feb 2017').getTime(), 20, {
             min: 10,
