@@ -622,8 +622,8 @@ export default {
   },
   methods: {
     getEmsSysConfig () {
-      // axios.get(`http://localhost:3000/api/rooms/emsSysConfig`)
-      axios.get(`${this.$apiRootPath}rooms/emsSysConfig`)
+      axios.get(`http://localhost:3000/api/rooms/emsSysConfig`)
+      // axios.get(`${this.$apiRootPath}rooms/emsSysConfig`)
         .then((r) => {
           // alert("emsSysConfig r.data : " + JSON.parse(r.data))
           this.configs = JSON.parse(r.data)
@@ -634,8 +634,8 @@ export default {
         })
     },
     applyEmsSysConfig () {
-      // axios.put(`http://localhost:3000/api/rooms/emsSysConfig`, { configs: this.configs })
-      axios.put(`${this.$apiRootPath}rooms/emsSysConfig`, { configs: this.configs })
+      axios.put(`http://localhost:3000/api/rooms/emsSysConfig`, { configs: this.configs })
+      // axios.put(`${this.$apiRootPath}rooms/emsSysConfig`, { configs: this.configs })
         .then((r) => {
           this.getEmsSysConfig()
         })
@@ -645,8 +645,8 @@ export default {
         })
     },
     openDamperSch: function (ahuIndex) {
-      // axios.get(`http://localhost:3000/api/rooms/damperConfig/${ahuIndex}`)
-      axios.get(`${this.$apiRootPath}rooms/damperConfig/${ahuIndex}`)
+      axios.get(`http://localhost:3000/api/rooms/damperConfig/${ahuIndex}`)
+      // axios.get(`${this.$apiRootPath}rooms/damperConfig/${ahuIndex}`)
         .then((r) => {
           this.damperSchsConfig = JSON.parse(r.data)
           this.select = { AhuIndex : this.damperSchsConfig.AhuIndex }
@@ -659,8 +659,8 @@ export default {
     },
     applyDamperSch: function (AhuIndex) {
       // alert(JSON.stringify(this.damperSchsConfig))
-      // axios.put(`http://localhost:3000/api/rooms/damperConfig`, { damperConfig: this.damperSchsConfig })
-      axios.put(`${this.$apiRootPath}rooms/damperConfig`, { damperConfig: this.damperSchsConfig })
+      axios.put(`http://localhost:3000/api/rooms/damperConfig`, { damperConfig: this.damperSchsConfig })
+      // axios.put(`${this.$apiRootPath}rooms/damperConfig`, { damperConfig: this.damperSchsConfig })
         .then((r) => {
           this.openDamperSch(AhuIndex)
         })

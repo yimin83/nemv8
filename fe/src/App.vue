@@ -187,15 +187,12 @@ export default {
   },
   created () {
     this.getAlarm()
-    this.timer = setInterval(this.getAlarm, 5000)
+    //this.timer = setInterval(this.getAlarm, 5000)
   },
   methods: {
-    getStart () {
-      this.myVar = setInterval(this.getAlarm, 1000)
-    },
     getSiteInfo () {
-      // axios.get(`http://localhost:3000/api/rooms/getSiteInfo`)
-      axios.get(`${this.$apiRootPath}rooms/getSiteInfo`)
+      axios.get(`http://localhost:3000/api/rooms/getSiteInfo`)
+      // axios.get(`${this.$apiRootPath}rooms/getSiteInfo`)
         .then((r) => {
           if (r.data.siteInfo === 1) {
             this.items = [
@@ -230,6 +227,11 @@ export default {
               {
                 icon: 'favorite',
                 title: '공조기상태',
+                to: { path: '/ahusStat' }
+              },
+              {
+                icon: 'favorite',
+                title: '공조기설정',
                 to: { path: '/ahusConfig' }
               },
               {
@@ -246,8 +248,8 @@ export default {
         })
     },
     getAlarm () {
-      // axios.get(`http://localhost:3000/api/rooms/getAlarm`)
-      axios.get(`${this.$apiRootPath}rooms/getAlarm`)
+      axios.get(`http://localhost:3000/api/rooms/getAlarm`)
+      // axios.get(`${this.$apiRootPath}rooms/getAlarm`)
         .then((r) => {
           if (r.data !== '' && r.data !== null && !r.data.beChecked) {
             this.alram = r.data

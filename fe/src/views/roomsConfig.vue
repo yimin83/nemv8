@@ -276,7 +276,7 @@ export default {
   },
   data () {
     return {
-      bePriShow: false,
+      bePriShow: true,
       beAll: false,
       settingTitle: '',
       curRoomNo: 201,
@@ -312,15 +312,15 @@ export default {
       heatingModes: [ { name: '자동', value: 0 }, { name: '수동', value: 1 }, { name: '정지', value: 2 } ],
       roomHeatings: [ { name: '자동', value: 0 }, { name: '수동', value: 1 }, { name: '정지', value: 2 } ],
       heatings: [ { name: '자동', value: 0 }, { name: '수동', value: 1 }, { name: '정지', value: 2 } ],
-      roomResevedType: [ { name: '상시난방', value: 0 }, { name: '상시스케줄링', value: 1 }, { name: '오늘만스케줄링', value: 2 }, { name: '내일만스케줄링', value: 3 }, { name: '모레만스케줄링', value: 4 }
+      roomResevedType: [ { name: '상시', value: 0 }, { name: '매일', value: 1 }, { name: '오늘', value: 2 }, { name: '내일', value: 3 }, { name: '모레', value: 4 }
       ],
       model: [{ RoomNo: 201 }]
     }
   },
   methods: {
     startGets () {
-      // axios.get(`http://localhost:3000/api/rooms/roomPriority`)
-      axios.get(`${this.$apiRootPath}rooms/roomPriority`)
+      axios.get(`http://localhost:3000/api/rooms/roomPriority`)
+      // axios.get(`${this.$apiRootPath}rooms/roomPriority`)
         .then((r) => {
           this.roomPris = JSON.parse(r.data)
           var prio
@@ -344,8 +344,8 @@ export default {
         })
     },
     getRoomPriority () {
-      // axios.get(`http://localhost:3000/api/rooms/roomPriority`)
-      axios.get(`${this.$apiRootPath}rooms/roomPriority`)
+      axios.get(`http://localhost:3000/api/rooms/roomPriority`)
+      // axios.get(`${this.$apiRootPath}rooms/roomPriority`)
         .then((r) => {
           this.roomPris = JSON.parse(r.data)
           var prio
@@ -368,8 +368,8 @@ export default {
         })
     },
     getRoomStat (roomNo) {
-      // axios.get(`http://localhost:3000/api/rooms/getRoomStat/${roomNo}`)
-      axios.get(`${this.$apiRootPath}rooms/getRoomStat/${roomNo}`)
+      axios.get(`http://localhost:3000/api/rooms/getRoomStat/${roomNo}`)
+      // axios.get(`${this.$apiRootPath}rooms/getRoomStat/${roomNo}`)
         .then((r) => {
           this.roomStat = JSON.parse(r.data)
           this.curRoomNo = this.roomStat.RoomNo
@@ -416,8 +416,8 @@ export default {
           roomNos.push(this.items[key].RoomNo)
         }
       }
-      // axios.put(`http://localhost:3000/api/rooms/roomStat`, { config: this.roomStat, roomNos: roomNos })
-      axios.put(`${this.$apiRootPath}rooms/roomStat`, { config: this.roomStat })
+      axios.put(`http://localhost:3000/api/rooms/roomStat`, { config: this.roomStat, roomNos: roomNos })
+      // axios.put(`${this.$apiRootPath}rooms/roomStat`, { config: this.roomStat })
         .then((r) => {
           // this.$data.settingRoomModal = false
           this.getRoomStat(this.roomStat.RoomNo)
@@ -428,8 +428,8 @@ export default {
         })
     },
     cmdManualHeating: function (roomNo, HeatingMode) {
-      // axios.put(`http://localhost:3000/api/rooms/cmdManualHeating`, {
-      axios.put(`${this.$apiRootPath}rooms/cmdManualHeating`, {
+      axios.put(`http://localhost:3000/api/rooms/cmdManualHeating`, {
+      // axios.put(`${this.$apiRootPath}rooms/cmdManualHeating`, {
         RoomNo: roomNo,
         HeatingMode: HeatingMode,
         HeatingTimeSec: this.roomStat.MH_TotalHeatingTimeSec,
@@ -446,8 +446,8 @@ export default {
         })
     },
     saveRoomPrio: function () {
-      // axios.put(`http://localhost:3000/api/rooms/roomPrio`, { config: this.items })
-      axios.put(`${this.$apiRootPath}rooms/roomPrio`, { config: this.items })
+      axios.put(`http://localhost:3000/api/rooms/roomPrio`, { config: this.items })
+      // axios.put(`${this.$apiRootPath}rooms/roomPrio`, { config: this.items })
         .then((r) => {
           this.getRoomPriority()
         })

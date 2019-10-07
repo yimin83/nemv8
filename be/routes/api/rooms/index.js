@@ -140,7 +140,7 @@ var processRsvRoom = function(result) {
 	for ( var i = 0; i < roomsArr.length; i++) {
 		//console.log("################ processRsvRoom start!!! ################ : "+roomsArr[i].usRoomNo+", roomsArr[i].nCheckInTime : " + roomsArr[i].nCheckInTime +", result.nCheckInTime : " + result.nCheckInTime )
 		if(roomsArr[i].usRoomNo == result.usRoomNo && ((roomsArr[i].nCheckInTime == 0) || (roomsArr[i].nCheckInTime > result.nCheckInTime))) {
-			console.log("############ cycle processRsvRoom : " + JSON.stringify(result))
+			// console.log("############ cycle processRsvRoom : " + JSON.stringify(result))
 			roomsArr[i].nCheckInOutEnable = result.nCheckInOutEnable
 			roomsArr[i].nCheckInTime = result.nCheckInTime
 			roomsArr[i].nCheckOutTime = result.nCheckOutTime
@@ -245,6 +245,31 @@ router.put('/roomStat', (req, res, next) => { // 수정
 	res.send({ success: true })
 })
 
+
+router.put('/ahusConfig', (req, res, next) => { // 수정
+	console.log("############ put ahusConfig values : " + JSON.stringify(req.body))
+	var dataBuffer = new Buffer(net.getSizeAhuZoneConfig_t())
+	for (var key in req.body.ahuIdxs) {
+		dataBuffer = net.makeAhuZoneConfigMsg_t(
+			req.body.ahuIdxs[key], req.body.config.NotifyOccupantsState,
+			req.body.config.HCMode, req.body.config.FanAutoManual,
+			req.body.config.DamperAutoManual, req.body.config.Tzone_set,
+			req.body.config.Rdamp_set, req.body.config.PPMco2_set, req.body.config.Desc
+		)
+		dataLen = net.getSizeAhuZoneConfig_t()
+	  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_solBeach_zone_config, dataLen, null)
+	  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+		nSeq = counter.get()
+		msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+		fullBuffer = new Buffer(totalSize)
+		msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+		msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+		dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
+		net.writeData(client, fullBuffer, nSeq)
+	}
+	res.send({ success: true })
+})
+
 router.put('/roomPrio', (req, res, next) => { // 수정
 	// console.log("############ put roomPrio values : " + JSON.stringify(req.body))
 	var prioArr = []
@@ -280,7 +305,7 @@ router.get('/solTrend', (req, res, next) => { // 수정
 			console.log("getSolTrend 쿼리문에 오류가 있습니다. err : " + err)
 		}
 		else{
-			console.log("############ get /getSolTrend :" + JSON.stringify(result))
+			// console.log("############ get /getSolTrend :" + JSON.stringify(result))
 			res.json(result)
 		}
 	})
@@ -478,28 +503,6 @@ router.get('/ahusConfig/:ahuIndex', function(req, res, next) {
   msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
   net.writeData(client, fullBuffer, nSeq)
   IntervalA = setInterval(checkMap, 100, nSeq, res)
-})
-
-router.put('/ahusConfig', (req, res, next) => { // 수정
-	console.log("############ put ahusConfig values : " + JSON.stringify(req.body))
-	var dataBuffer = new Buffer(net.getSizeAhuZoneConfig_t())
-	dataBuffer = net.makeAhuZoneConfigMsg_t(
-		req.body.config.AhuIndex, req.body.config.NotifyOccupantsState,
-		req.body.config.HCMode, req.body.config.FanAutoManual,
-		req.body.config.DamperAutoManual, req.body.config.Tzone_set,
-		req.body.config.Rdamp_set, req.body.config.PPMco2_set, req.body.config.Desc
-	)
-	dataLen = net.getSizeAhuZoneConfig_t()
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_solBeach_zone_config, dataLen, null)
-  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
-	nSeq = counter.get()
-	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
-	fullBuffer = new Buffer(totalSize)
-	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
-	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
-	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
-	net.writeData(client, fullBuffer, nSeq)
-	res.send({ success: true })
 })
 
 router.get('/damperConfig/:ahuIndex', function(req, res, next) {
@@ -764,7 +767,7 @@ router.get('/getRoomTrend/:usRoomNo', (req, res, next) => { // 수정
 			console.log("getRoomTrend 쿼리문에 오류가 있습니다. err : " + err)
 		}
 		else{
-			console.log("############ get /getRoomTrend :" + JSON.stringify(result))
+			// console.log("############ get /getRoomTrend :" + JSON.stringify(result))
 			res.json(result)
 		}
 	})

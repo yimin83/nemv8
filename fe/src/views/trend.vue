@@ -61,8 +61,8 @@ export default {
       }
     },
     getStatTrend () {
-      // axios.get(`http://localhost:3000/api/rooms/roomStatTrend`)
-      axios.get(`${this.$apiRootPath}rooms/roomStatTrend`)
+      axios.get(`http://localhost:3000/api/rooms/roomStatTrend`)
+      // axios.get(`${this.$apiRootPath}rooms/roomStatTrend`)
         .then((r) => {
           this.datas = r.data
           var data0 = []
@@ -118,8 +118,8 @@ export default {
         })
     },
     getTrend (usRoomNo) {
-      // axios.get(`http://localhost:3000/api/rooms/getRoomTrend/${usRoomNo}`)
-      axios.get(`${this.$apiRootPath}rooms/getRoomTrend/${usRoomNo}`)
+      axios.get(`http://localhost:3000/api/rooms/getRoomTrend/${usRoomNo}`)
+      // axios.get(`${this.$apiRootPath}rooms/getRoomTrend/${usRoomNo}`)
         .then((r) => {
           this.datas = r.data
           var data0 = []
@@ -181,8 +181,8 @@ export default {
         })
     },
     getRooms () {
-      // axios.get(`http://localhost:3000/api/rooms`)
-      axios.get(`${this.$apiRootPath}rooms`)
+      axios.get(`http://localhost:3000/api/rooms`)
+      // axios.get(`${this.$apiRootPath}rooms`)
         .then((r) => {
           var roomsData = []
           for (var i = 0; i < r.data.length; i++) {
