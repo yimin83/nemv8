@@ -191,8 +191,8 @@ export default {
   },
   methods: {
     getSiteInfo () {
-      axios.get(`http://localhost:3000/api/rooms/getSiteInfo`)
-      // axios.get(`${this.$apiRootPath}rooms/getSiteInfo`)
+      // axios.get(`http://localhost:3000/api/rooms/getSiteInfo`)
+      axios.get(`${this.$apiRootPath}rooms/getSiteInfo`)
         .then((r) => {
           if (r.data.siteInfo === 1) {
             this.items = [
@@ -248,8 +248,8 @@ export default {
         })
     },
     getAlarm () {
-      axios.get(`http://localhost:3000/api/rooms/getAlarm`)
-      // axios.get(`${this.$apiRootPath}rooms/getAlarm`)
+      // axios.get(`http://localhost:3000/api/rooms/getAlarm`)
+      axios.get(`${this.$apiRootPath}rooms/getAlarm`)
         .then((r) => {
           if (r.data !== '' && r.data !== null && !r.data.beChecked) {
             this.alram = r.data

@@ -118,8 +118,8 @@ export default {
   },
   methods: {
     getAhus () {
-      axios.get(`http://localhost:3000/api/rooms/ahusConfig`)
-      // axios.get(`${this.$apiRootPath}rooms/ahusConfig`)
+      // axios.get(`http://localhost:3000/api/rooms/ahusConfig`)
+      axios.get(`${this.$apiRootPath}rooms/ahusConfig`)
         .then((r) => {
           this.ahuNos = []
           for (var key in r.data) {
@@ -135,8 +135,8 @@ export default {
         })
     },
     getAhuConfig (ahuNo) {
-      axios.get(`http://localhost:3000/api/rooms/ahusConfig/${ahuNo}`)
-      // axios.get(`${this.$apiRootPath}rooms/ahusConfig/${ahuNo}`)
+      // axios.get(`http://localhost:3000/api/rooms/ahusConfig/${ahuNo}`)
+      axios.get(`${this.$apiRootPath}rooms/ahusConfig/${ahuNo}`)
         .then((r) => {
           this.datas = JSON.parse(r.data)
           // alert("getAhuConfig : " + JSON.stringify(this.datas))
@@ -153,8 +153,8 @@ export default {
           ahuIdxs.push(this.ahuNos[key].value)
         }
       }
-      axios.put(`http://localhost:3000/api/rooms/ahusConfig`, { config: this.datas, ahuIdxs: ahuIdxs })
-      // axios.put(`${this.$apiRootPath}rooms/ahusConfig`, { config: this.data, ahuIdxs: ahuIdxs })
+      // axios.put(`http://localhost:3000/api/rooms/ahusConfig`, { config: this.datas, ahuIdxs: ahuIdxs })
+      axios.put(`${this.$apiRootPath}rooms/ahusConfig`, { config: this.data, ahuIdxs: ahuIdxs })
         .then((r) => {
           // this.$data.settingRoomModal = false
           this.getAhuConfig(this.curAhuId)

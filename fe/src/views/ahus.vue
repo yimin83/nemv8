@@ -64,8 +64,8 @@ export default {
   },
   methods: {
     getAhus () {
-     axios.get(`http://localhost:3000/api/rooms/ahusConfig`)
-     // axios.get(`${this.$apiRootPath}rooms/ahusConfig`)
+     // axios.get(`http://localhost:3000/api/rooms/ahusConfig`)
+     axios.get(`${this.$apiRootPath}rooms/ahusConfig`)
         .then((r) => {
           this.ahus = r.data
         })
@@ -75,8 +75,8 @@ export default {
         })
     },
     getZones () {
-      axios.get(`http://localhost:3000/api/rooms/zones`)
-      // axios.get(`${this.$apiRootPath}rooms/zones`)
+      // axios.get(`http://localhost:3000/api/rooms/zones`)
+      axios.get(`${this.$apiRootPath}rooms/zones`)
         .then((r) => {
           this.zones = r.data
           this.mergeZonesAhu()

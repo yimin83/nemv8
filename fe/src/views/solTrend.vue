@@ -62,8 +62,8 @@ export default {
       }
     },
     getAhuTrend (ahuNo) {
-      axios.get(`http://localhost:3000/api/rooms/solAhuTrend/${ahuNo}`)
-      // axios.get(`${this.$apiRootPath}rooms/solAhuTrend/${ahuNo}`)
+      // axios.get(`http://localhost:3000/api/rooms/solAhuTrend/${ahuNo}`)
+      axios.get(`${this.$apiRootPath}rooms/solAhuTrend/${ahuNo}`)
         .then((r) => {
           this.datas = r.data
           var data0 = []
@@ -107,8 +107,8 @@ export default {
         })
     },
     getTrend () {
-      axios.get(`http://localhost:3000/api/rooms/solTrend`)
-      // axios.get(`${this.$apiRootPath}rooms/solTrend`)
+      // axios.get(`http://localhost:3000/api/rooms/solTrend`)
+      axios.get(`${this.$apiRootPath}rooms/solTrend`)
         .then((r) => {
           this.datas = r.data
           var data0 = []
@@ -158,8 +158,8 @@ export default {
         })
     },
     getAhus () {
-      axios.get(`http://localhost:3000/api/rooms/ahusConfig`)
-      // axios.get(`${this.$apiRootPath}rooms/ahusConfig`)
+      // axios.get(`http://localhost:3000/api/rooms/ahusConfig`)
+      axios.get(`${this.$apiRootPath}rooms/ahusConfig`)
         .then((r) => {
           var ahuData = []
           for (var i = 0; i < r.data.length; i++) {
