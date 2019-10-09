@@ -91,7 +91,7 @@ export default {
     },
     getAhuTrend (ahuNo) {
       // axios.put(`http://localhost:3000/api/rooms/solAhuTrend`, { ahuNo: ahuNo, startTime: this.startTime, endTime: this.endTime, time: this.time.value })
-      axios.get(`${this.$apiRootPath}rooms/solAhuTrend/${ahuNo}`)
+      axios.put(`${this.$apiRootPath}rooms/solAhuTrend`, { ahuNo: ahuNo, startTime: this.startTime, endTime: this.endTime, time: this.time.value })
         .then((r) => {
           this.datas = r.data
           var data0 = []
@@ -142,7 +142,7 @@ export default {
     },
     getTrend () {
       // axios.put(`http://localhost:3000/api/rooms/solTrend`, { startTime: this.startTime, endTime: this.endTime, time: this.time.value })
-      axios.put(`${this.$apiRootPath}rooms/solTrend`, { ahuNo: ahuNo, startTime: this.startTime, endTime: this.endTime, time: this.time.value })
+      axios.put(`${this.$apiRootPath}rooms/solTrend`, { startTime: this.startTime, endTime: this.endTime, time: this.time.value })
         .then((r) => {
           this.datas = r.data
           var data0 = []

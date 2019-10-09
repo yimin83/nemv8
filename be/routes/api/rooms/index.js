@@ -297,6 +297,51 @@ router.put('/roomPrio', (req, res, next) => { // 수정
 	res.send({ success: true })
 })
 
+router.get('/getAlarm', (req, res, next) => { // 수정
+	console.log("############ get /getAlarm ")
+  // console.log("######################### getRoomConfig ######################### ")
+	res.json(net.getAlarm())
+	if(net.getAlarm() != null) {
+		net.chkAlarm()
+	}
+})
+
+router.put('/roomStatTrend', (req, res, next) => { // 수정
+	console.log("############ put /roomStatTrend : " + JSON.stringify(req.body))
+	const startTime = req.body.startTime
+	const endTime = req.body.endTime
+	const time = req.body.time
+  // console.log("######################### getRoomConfig ######################### ")
+	mysqlDB.query("SELECT * FROM ( SELECT CurTime DIV ? AS m, AVG(HeatingCnt) AS HeatingCnt, AVG(HeatingRoomCnt) AS HeatingRoomCnt, AVG(Tsurf_avg) AS Tsurf_avg, AVG(Troom_avg) AS Troom_avg, AVG(Tout) AS Tout FROM floor_rad_stat WHERE CurTime >= UNIX_TIMESTAMP(?) AND CurTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, startTime, endTime], function(err, result, fields) {
+		if(err) {
+			console.log("roomStatTrend 쿼리문에 오류가 있습니다. err : " + err)
+		}
+		else{
+			//console.log("############ get /roomStatTrend :" + JSON.stringify(result))
+			res.json(result)
+		}
+	})
+})
+
+router.put('/getRoomTrend', (req, res, next) => { // 수정
+	console.log("############ put /getRoomTrend : "+JSON.stringify(req.body))
+	const startTime = req.body.startTime
+	const endTime = req.body.endTime
+	const time = req.body.time
+	const usRoomNo = req.body.usRoomNo
+  // console.log("######################### getRoomConfig ######################### ")
+	mysqlDB.query(
+		"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m, AVG(ucRoomState) AS ucRoomState, AVG(ucSetStatus) AS ucSetStatus, AVG(ucCurStatus) AS ucCurStatus, AVG(fTset) AS fTset, AVG(fTsurf_cur) AS fTsurf_cur, AVG(fTroom_cur) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
+		if(err) {
+			console.log("getRoomTrend 쿼리문에 오류가 있습니다. err : " + err)
+		}
+		else{
+			console.log("############ put /getRoomTrend :" + JSON.stringify(result))
+			res.json(result)
+		}
+	})
+})
+
 router.put('/solTrend', (req, res, next) => { // 수정
 	console.log("############ put /getSolTrend ")
 	const startTime = req.body.startTime
@@ -313,31 +358,6 @@ router.put('/solTrend', (req, res, next) => { // 수정
 		}
 	})
 })
-
-router.get('/getAlarm', (req, res, next) => { // 수정
-	console.log("############ get /getAlarm ")
-  // console.log("######################### getRoomConfig ######################### ")
-	res.json(net.getAlarm())
-	if(net.getAlarm() != null) {
-		net.chkAlarm()
-	}
-})
-
-
-router.get('/roomStatTrend', (req, res, next) => { // 수정
-	console.log("############ get /roomStatTrend ")
-  // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT CurTime, HeatingCnt, HeatingRoomCnt, Tsurf_avg, Troom_avg, Tout FROM ( SELECT * FROM floor_rad_stat ORDER BY CurTime desc limit 50) A ORDER BY CurTime ASC", function(err, result, fields) {
-		if(err) {
-			console.log("roomStatTrend 쿼리문에 오류가 있습니다. err : " + err)
-		}
-		else{
-			//console.log("############ get /roomStatTrend :" + JSON.stringify(result))
-			res.json(result)
-		}
-	})
-})
-
 
 router.put('/solAhuTrend', (req, res, next) => { // 수정
 console.log("############ put /solAhuTrend req.body : " + JSON.stringify(req.body))
@@ -764,22 +784,6 @@ var processCmdCheckIn = function(datas) {
 	}
 }
 
-
-router.get('/getRoomTrend/:usRoomNo', (req, res, next) => { // 수정
-	const usRoomNo = req.params.usRoomNo
-	console.log("############ get /getRoomTrend/:roomNo  roomNo : "+usRoomNo)
-  // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query(
-		"SELECT ucRoomState, ucSetStatus, ucCurStatus,  AVG(fTset) AS fTset, AVG(fTsurf_cur) AS fTsurf_cur, AVG(fTroom_cur) AS fTroom_cur, nSetLastTime FROM floor_rad_room_record WHERE usRoomNo = ? GROUP BY SUBSTR(DATE_FORMAT(FROM_UNIXTIME(nSetLastTime),'%Y%m%H%i%S'), 1, 8), FLOOR(SUBSTR(DATE_FORMAT(FROM_UNIXTIME(nSetLastTime),'%Y%m%H%i%S'), 9, 2) / 5) ORDER BY nIdx DESC limit 720", [usRoomNo], function(err, result, fields) {
-		if(err) {
-			console.log("getRoomTrend 쿼리문에 오류가 있습니다. err : " + err)
-		}
-		else{
-			console.log("############ get /getRoomTrend :" + JSON.stringify(result))
-			res.json(result)
-		}
-	})
-})
 
 router.get('/getRoomStat/:roomNo', function(req, res, next) {
   const roomNo = req.params.roomNo

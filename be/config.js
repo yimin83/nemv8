@@ -1,6 +1,6 @@
 module.exports = {
   'mode' : 0,
-  'siteInfo' : 2,
+  'siteInfo' : 1,
   'host' : 'localhost',
   'port' : 15000,
   'dbHost': '112.216.18.149',
