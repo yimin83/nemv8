@@ -30,7 +30,7 @@
             <td class="text-center">{{zone.zone.fData_hc_set_temp}}</td>
             <td class="text-center">{{zone.zone.fData_temp_return}}</td>
             <td class="text-center">{{zone.manual_mode}}</td>
-            <td class="text-center">{{zone.zone.cState_supplay_fan}}</td>
+            <td class="text-center">{{zone.supplay_fan}}</td>
             <td class="text-center">{{zone.damper_auto_manual}}</td>
             <td class="text-center">{{zone.zone.nRdamp_set}}</td>
             <td class="text-center">{{zone.zone.fData_damper_manual_set}}</td>
@@ -90,12 +90,14 @@ export default {
       var trncMode_hc_mode = ''
       var trncMode_manual_mode = ''
       var trncMode_damper_auto_manual = ''
+      var trncState_supplay_fan = ''
       this.mergezones = []
       for ( var i = 0; i < this.zones.length; i++) {
         trncMode_hc_mode = (this.zones[i].cMode_hc_mode !== -1 ) ? this.hcModes[this.zones[i].cMode_hc_mode] : '중지'
         trncMode_manual_mode = (this.zones[i].cMode_manual_mode !== -1 ) ? this.manualModes[this.zones[i].cMode_manual_mode] : '미설정'
+        trncState_supplay_fan = (this.zones[i].cState_supplay_fan !== -1 ) ? this.manualModes[this.zones[i].cState_supplay_fan] : '미설정'
         trncMode_damper_auto_manual = (this.zones[i].cMode_damper_auto_manual !== -1 ) ? this.damperAutoManual[this.zones[i].cMode_damper_auto_manual] : '미설정'
-        this.mergezones.push({ zone: this.zones[i], ahu: this.ahus[i], hc_mode: trncMode_hc_mode, manual_mode: trncMode_manual_mode, damper_auto_manual: trncMode_damper_auto_manual  })
+        this.mergezones.push({ zone: this.zones[i], ahu: this.ahus[i], hc_mode: trncMode_hc_mode, manual_mode: trncMode_manual_mode, supplay_fan: trncState_supplay_fan, damper_auto_manual: trncMode_damper_auto_manual  })
       }
     }
   }

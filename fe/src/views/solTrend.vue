@@ -15,22 +15,46 @@
         </v-btn>
       </v-bottom-navigation>
       <div>
-        <br>
-        <v-col class="d-flex" cols="12" sm="3" v-if="this.activeBtn === 0">
-          <v-select
-            v-model="ahuNo.value"
-            :items="this.ahuNos"
-            item-value="value"
-            item-text="name"
-            auto
-            label='공조기 선택'
-            hide-details
-            height=13
-            max-width=100
-            class='pa-0'
-            @change='toggleAhuNos()'
-          ></v-select>
-        </v-col>
+        <v-row>
+          <br>
+          <v-col v-if="this.activeBtn === 0" class="d-flex" cols="4" sm="2">
+            <v-select
+              v-model="ahuNo.value"
+              :items="this.ahuNos"
+              item-value="value"
+              item-text="name"
+              label='공조기 선택'
+              height=13
+              max-width=100
+              @change='toggleAhuNos()'
+            ></v-select>
+          </v-col>
+            <br>
+          <v-col class="d-flex" sm="1">
+            <br>
+            <v-select
+              v-model="time.value"
+              :items="this.times"
+              item-value="value"
+              item-text="name"
+              label='시간단위'
+              height=13
+              max-width=100
+              @change='toggleTimes()'
+            ></v-select>
+          </v-col>
+          <v-col class="d-flex" sm="3">
+            <v-text-field label='시작일' hide-details class='d-inline-flex ma-0 pa-0' v-model='startTime'></v-text-field>
+          </v-col>
+          <v-col class="d-flex" sm="3">
+            <v-text-field label='종료일' hide-details class='d-inline-flex  ma-0 pa-0' v-model='endTime'></v-text-field>
+          </v-col>
+          <v-col class="d-flex" sm="3">
+            <v-btn @click="searchGraph()">
+              <span>검색</span>
+            </v-btn>
+          </v-col>
+        </v-row>
         <apexchart width="1000" height="700" type="line" :options="chartOptions" :series="series" ></apexchart>
       </div>
     </v-layout>
@@ -47,10 +71,14 @@ export default {
     return {
       ahuNo: { 'name': '그라시아스(AHU1)', 'value': 1 },
       ahuNos: [],
+      time: { 'name': '5분', 'value': 300 },
+      times: [ { 'name': '5분', 'value': 300 }, { 'name': '10분', 'value': 600 }, { 'name': '1시간', 'value': 3600 },{ 'name': '하루', 'value': (3600 * 24) }],
       activeBtn: 0,
       datas: [],
       series: [],
-      chartOptions: []
+      chartOptions: [],
+      startTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 00:00'),
+      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 23:59')
     }
   },
   methods: {
@@ -62,7 +90,7 @@ export default {
       }
     },
     getAhuTrend (ahuNo) {
-      // axios.get(`http://localhost:3000/api/rooms/solAhuTrend/${ahuNo}`)
+      // axios.put(`http://localhost:3000/api/rooms/solAhuTrend`, { ahuNo: ahuNo, startTime: this.startTime, endTime: this.endTime, time: this.time.value })
       axios.get(`${this.$apiRootPath}rooms/solAhuTrend/${ahuNo}`)
         .then((r) => {
           this.datas = r.data
@@ -74,7 +102,7 @@ export default {
             data0.push(this.datas[i].fData_damper_manual_set.toFixed(2))
             data1.push(this.datas[i].fData_temp_supply.toFixed(2))
             data2.push(this.datas[i].nPPMco2_cur.toFixed(2))
-            date.push(this.$moment(new Date(this.datas[i].nLastUpdateTime * 1000 + (9 * 60 * 60 * 1000)).toISOString()).format('YYYY/MM/DD kk:mm:ss'))
+            date.push(this.$moment(new Date(this.datas[i].m * this.time.value * 1000).toISOString()).format('YY/MM/DD kk:mm'))
           }
           this.series = [
             {
@@ -92,7 +120,13 @@ export default {
           ]
           this.chartOptions = {
             xaxis: {
-              categories: date
+              type: 'category',
+              categories: date,
+              // labels: {
+              //   show: true,
+              //   rotate: -45,
+              // },
+              // tickAmount: 10,
             },
             tooltip: {
               x: {
@@ -107,8 +141,8 @@ export default {
         })
     },
     getTrend () {
-      // axios.get(`http://localhost:3000/api/rooms/solTrend`)
-      axios.get(`${this.$apiRootPath}rooms/solTrend`)
+      // axios.put(`http://localhost:3000/api/rooms/solTrend`, { startTime: this.startTime, endTime: this.endTime, time: this.time.value })
+      axios.put(`${this.$apiRootPath}rooms/solTrend`, { ahuNo: ahuNo, startTime: this.startTime, endTime: this.endTime, time: this.time.value })
         .then((r) => {
           this.datas = r.data
           var data0 = []
@@ -121,7 +155,7 @@ export default {
             data1.push(this.datas[i].Tzone.toFixed(2))
             data2.push(this.datas[i].Rdamp.toFixed(2))
             data3.push(this.datas[i].PPMco2.toFixed(2))
-            date.push(this.$moment(new Date(this.datas[i].CurTime * 1000 + (9 * 60 * 60 * 1000)).toISOString()).format('YYYY/MM/DD kk:mm:ss'))
+            date.push(this.$moment(new Date(this.datas[i].m * this.time.value * 1000).toISOString()).format('YY/MM/DD kk:mm'))
           }
           this.series = [
             {
@@ -178,6 +212,20 @@ export default {
     },
     toggleAhuNos: function () {
       this.getAhuTrend(this.ahuNo.value)
+    },
+    toggleTimes: function () {
+      if (this.activeBtn === 0) {
+        this.getAhuTrend(this.ahuNo.value)
+      } else {
+        this.getTrend()
+      }
+    },
+    searchGraph: function () {
+      if (this.activeBtn === 0) {
+        this.getAhuTrend(this.ahuNo.value)
+      } else {
+        this.getTrend()
+      }
     },
     generateDayWiseTimeSeries (baseval, count, yrange) {
       var i = 0

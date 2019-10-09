@@ -297,10 +297,13 @@ router.put('/roomPrio', (req, res, next) => { // 수정
 	res.send({ success: true })
 })
 
-router.get('/solTrend', (req, res, next) => { // 수정
-	console.log("############ get /getSolTrend ")
+router.put('/solTrend', (req, res, next) => { // 수정
+	console.log("############ put /getSolTrend ")
+	const startTime = req.body.startTime
+	const endTime = req.body.endTime
+	const time = req.body.time
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT CurTime, FanOperationCnt, Tzone, Rdamp, PPMco2 FROM ( SELECT * FROM solbeach_stat ORDER BY CurTime DESC limit 50) A ORDER BY CurTime ASC", function(err, result, fields) {
+	mysqlDB.query("SELECT * FROM ( SELECT CurTime DIV ? AS m, AVG(FanOperationCnt) AS FanOperationCnt, AVG(Tzone) AS Tzone, AVG(Rdamp) AS Rdamp, AVG(PPMco2) AS PPMco2 FROM solbeach_stat WHERE CurTime >= UNIX_TIMESTAMP(?) AND CurTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, startTime, endTime], function(err, result, fields) {
 		if(err) {
 			console.log("getSolTrend 쿼리문에 오류가 있습니다. err : " + err)
 		}
@@ -335,11 +338,15 @@ router.get('/roomStatTrend', (req, res, next) => { // 수정
 	})
 })
 
-router.get('/solAhuTrend/:ahuNo', (req, res, next) => { // 수정
-	const ahuNo = req.params.ahuNo
-	console.log("############ get /solAhuTrend/:ahuNo  ahuNo : "+ahuNo)
+
+router.put('/solAhuTrend', (req, res, next) => { // 수정
+console.log("############ put /solAhuTrend req.body : " + JSON.stringify(req.body))
+	const ahuNo = req.body.ahuNo
+	const startTime = req.body.startTime
+	const endTime = req.body.endTime
+	const time = req.body.time
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT fData_damper_manual_set, fData_temp_supply, nPPMco2_cur, nLastUpdateTime FROM (SELECT * FROM solbeach_zone_record WHERE nZoneIdx = ? ORDER BY nLastUpdateTime DESC limit 50) A ORDER BY nLastUpdateTime ASC", [ahuNo], function(err, result, fields) {
+	mysqlDB.query("SELECT * FROM ( SELECT  nLastUpdateTime DIV ? AS m, AVG(fData_damper_manual_set) AS fData_damper_manual_set, AVG(fData_temp_supply) AS fData_temp_supply, AVG(nPPMco2_cur) AS nPPMco2_cur FROM solbeach_zone_record WHERE nZoneIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, ahuNo, startTime, endTime], function(err, result, fields) {
 		if(err) {
 			console.log("solAhuTrend 쿼리문에 오류가 있습니다. err : " + err)
 		}
@@ -762,12 +769,13 @@ router.get('/getRoomTrend/:usRoomNo', (req, res, next) => { // 수정
 	const usRoomNo = req.params.usRoomNo
 	console.log("############ get /getRoomTrend/:roomNo  roomNo : "+usRoomNo)
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT ucRoomState, ucSetStatus, ucCurStatus, fTset, fTsurf_cur, fTroom_cur, nSetLastTime FROM (SELECT * FROM floor_rad_room_record WHERE usRoomNo = ? ORDER BY nSetLastTime DESC LIMIT 50) A ORDER BY nSetLastTime ASC", [usRoomNo], function(err, result, fields) {
+	mysqlDB.query(
+		"SELECT ucRoomState, ucSetStatus, ucCurStatus,  AVG(fTset) AS fTset, AVG(fTsurf_cur) AS fTsurf_cur, AVG(fTroom_cur) AS fTroom_cur, nSetLastTime FROM floor_rad_room_record WHERE usRoomNo = ? GROUP BY SUBSTR(DATE_FORMAT(FROM_UNIXTIME(nSetLastTime),'%Y%m%H%i%S'), 1, 8), FLOOR(SUBSTR(DATE_FORMAT(FROM_UNIXTIME(nSetLastTime),'%Y%m%H%i%S'), 9, 2) / 5) ORDER BY nIdx DESC limit 720", [usRoomNo], function(err, result, fields) {
 		if(err) {
 			console.log("getRoomTrend 쿼리문에 오류가 있습니다. err : " + err)
 		}
 		else{
-			// console.log("############ get /getRoomTrend :" + JSON.stringify(result))
+			console.log("############ get /getRoomTrend :" + JSON.stringify(result))
 			res.json(result)
 		}
 	})

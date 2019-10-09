@@ -187,7 +187,7 @@ export default {
   },
   created () {
     this.getAlarm()
-    //this.timer = setInterval(this.getAlarm, 5000)
+    this.timer = setInterval(this.getAlarm, 5000)
   },
   methods: {
     getSiteInfo () {

@@ -77,7 +77,7 @@ export default {
             data2.push(this.datas[i].Tsurf_avg.toFixed(2))
             data3.push(this.datas[i].Troom_avg.toFixed(2))
             data4.push(this.datas[i].Tout.toFixed(2))
-            date.push(this.$moment(new Date((this.datas[i].CurTime * 1000) + (9 * 60 * 60 * 1000)).toISOString()).format('YYYY/MM/DD kk:mm:ss'))
+            date.push(this.$moment(new Date(this.datas[i].CurTime * 1000).toISOString()).format('YYYY/MM/DD kk:mm:ss'))
           }
           this.series = [
             {
@@ -136,7 +136,7 @@ export default {
             data3.push(this.datas[i].fTset.toFixed(2))
             data4.push(this.datas[i].fTsurf_cur.toFixed(2))
             data5.push(this.datas[i].fTroom_cur.toFixed(2))
-            date.push(this.$moment(new Date(this.datas[i].nSetLastTime * 1000 + (9 * 60 * 60 * 1000)).toISOString()).format('YYYY/MM/DD kk:mm:ss'))
+            date.push(this.$moment(new Date(this.datas[i].nSetLastTime * 1000).toISOString()).format('YYYY/MM/DD kk:mm:ss'))
           }
           this.series = [
             {
