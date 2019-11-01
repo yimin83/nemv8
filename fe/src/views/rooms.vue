@@ -130,8 +130,8 @@
                     md=12
                     sm=3
                     xs=3>
-                    <v-card-text class="text-center title mt-4" >
-                      {{(room.usRoomNo+'').substr(0, 1)}}층
+                    <v-card-text class="text-center font-weight-bold display-1 mt-4" >
+                      {{(room.usRoomNo+'').substr(0, 1)}}F
                     </v-card-text>
                   </v-card>
                 </v-col>
@@ -200,14 +200,14 @@
                           color="blue lighten-4"
                           label="실내온도"
                           x-small>
-                          <div class='overline ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
                         </v-card>
                         <v-card
                           class="d-inline-flex ma-0 mt-1 pa-0 pl-1 pr-1"
                           color="light-blue accent-1"
                           label="바닥온도"
                           x-small>
-                          <div class='overline ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
                         </v-card>
                       </div>
                     </v-card-text>
@@ -276,14 +276,14 @@
                           color="blue lighten-4"
                           label="실내온도"
                           x-small>
-                          <div class='overline ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
                         </v-card>
                         <v-card
                           class="d-inline-flex ma-0 mt-1 pa-0 pl-1 pr-1"
                           color="light-blue accent-1"
                           label="바닥온도"
                           x-small>
-                          <div class='overline ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
                         </v-card>
                       </div>
                     </v-card-text>
@@ -356,14 +356,14 @@
                       color="blue lighten-4"
                       label="실내온도"
                       x-small>
-                      <div class='overline ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
                     </v-card>
                     <v-card
                       class="d-inline-flex ma-0 mt-1 pa-0 pl-1 pr-1"
                       color="light-blue accent-1"
                       label="바닥온도"
                       x-small>
-                      <div class='overline ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
                     </v-card>
                   </div>
                 </v-card-text>
@@ -432,14 +432,14 @@
                       color="blue lighten-4"
                       label="실내온도"
                       x-small>
-                      <div class='overline ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
                     </v-card>
                     <v-card
                       class="d-inline-flex ma-0 mt-1 pa-0 pl-1 pr-1"
                       color="light-blue accent-1"
                       label="바닥온도"
                       x-small>
-                      <div class='overline ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
                     </v-card>
                   </div>
                 </v-card-text>
