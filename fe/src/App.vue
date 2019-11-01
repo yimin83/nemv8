@@ -18,21 +18,21 @@
           active-class="deep-purple--text text--accent-4"
           value="true"
         >
-        <v-list-item
-          v-for="(item, i) in items"
-          :key="i"
-          :to="item.to">
-        <v-list-item-title>
-          <v-list-tile-action>
-            <v-icon v-html="item.icon"></v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title v-text="item.title"></v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-item-title>
-      </v-list-item>
-      </v-list-item-group>
-    </v-list>
+          <v-list-item
+            v-for="(item, i) in items"
+            :key="i"
+            :to="item.to">
+            <v-list-item-title>
+              <v-list-tile-action>
+                <v-icon v-html="item.icon"></v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title v-text="item.title"></v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-item-title>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
     </v-navigation-drawer>
     <v-content>
       <router-view/>
@@ -103,10 +103,6 @@
                   </v-card>
                 </td>
               </tr>
-              <!-- <tr>
-                <td>ModuleIndex</td>
-                <td>{{alram.ModuleIndex}}</td>
-              </tr> -->
               <tr>
                 <td>알람내역</td>
                 <td>{{alram.szContent}}</td>

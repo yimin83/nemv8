@@ -9,7 +9,7 @@
       <v-chip
         class="d-inline-flex ma-0 pa-1 font-weight-bold"
         color="blue-grey lighten-4"
-        small>공실
+        x-small>공실
       </v-chip>
       <div class="text--primary">
          &nbsp;:&nbsp;공실&nbsp;
@@ -17,7 +17,7 @@
       <v-chip
         class="d-inline-flex ma-0 pa-1 font-weight-bold"
         color="orange lighten-3"
-        small>
+        x-small>
         예비
       </v-chip>
       <div class="text--primary">
@@ -102,176 +102,365 @@
     <v-divider class='my-3'></v-divider>
     <v-layout row wrap>
       <v-flex
-          v-for='room in roomStat'
-          :key='room'
           text-xs-left
         >
-        <v-item v-if='room.ucCurStatus === 1'>
-          <v-card
-            color='green accent-1'
-            class='ma-0 pa-0 font-weight-bold'
-            outlined
-            width='115px'
-            lg=12
-            md=12
-            sm=3
-            xs=3 >
-            <v-card-text class="text-center">
-              <div class="text--primary mb-1">
-                {{room.usRoomNo}}호
-              </div>
-              <div class="text-center ma-0 pa-0">
-                <v-chip
-                  v-if='room.ucRoomState === 0'
-                  class="d-inline-flex ma-0 mr-1 pa-1"
-                  color="blue-grey lighten-4"
-                  small>공실
-                </v-chip>
-                <v-chip
-                  v-if='room.ucRoomState === 1'
-                  class="d-inline-flex ma-0 mr-1 pa-1"
-                  color="orange lighten-3"
-                  small>
-                  예비
-                </v-chip>
-                <v-chip
-                  v-if='room.ucRoomState === 3'
-                  class="d-inline-flex ma-0 mr-1 pa-1"
-                  color="pink lighten-2"
-                  small
-                >
-                  입실
-                </v-chip>
-                <v-chip
-                  v-if='room.usManHeatingMode === 0'
-                  class="d-inline-flex ma-0 ml-1 pa-1"
-                  color="light-green accent-2"
-                  small
-                >
-                  자동
-                </v-chip>
-                <v-chip
-                  v-if='room.usManHeatingMode === 1'
-                  class="d-inline-flex ma-0 ml-1 pa-1"
-                  color="blue lighten-3"
-                  small
-                >
-                  수동
-                </v-chip>
-                <v-chip
-                  v-if='room.usManHeatingMode === 2'
-                  class="d-inline-flex ma-0 pa-1"
-                  color="blue-grey lighten-4"
-                  small
-                >
-                  정지
-                </v-chip>
-              </div>
-              <div class="text-center ma-0 pa-0">
-                <v-card
-                  class="d-inline-flex ma-0 mt-1 mr-1 pa-0 pt pl-1 pr-1"
-                  color="blue lighten-4"
-                  label="실내온도"
-                  small
-                >
-                  <div>{{(room.fTroom_cur !== 255) ? room.fTroom_cur : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
-                </v-card>
-                <v-card
-                  class="d-inline-flex ma-0 mt-1 ml-1 pa-0 pl-1 pr-1"
-                  color="light-blue accent-1"
-                  label="바닥온도"
-                  small
-                >
-                  <div>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
-                </v-card>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-item>
-        <v-item v-if='room.ucCurStatus === 0 || room.ucCurStatus === 2'>
-          <v-card
-            color='blue-grey lighten-5'
-            class='ma-0 pa-0 font-weight-bold'
-            outlined
-            width='115px'
-            lg=12
-            md=12
-            sm=3
-            xs=3 >
-            <v-card-text class="text-center">
-              <div class="text--primary mb-1">
-                {{room.usRoomNo}}호
-              </div>
-              <div class="text-center ma-0 pa-0">
-                <v-chip
-                  v-if='room.ucRoomState === 0'
-                  class="d-inline-flex ma-0 mr-1 pa-1"
-                  color="blue-grey lighten-4"
-                  small>공실
-                </v-chip>
-                <v-chip
-                  v-if='room.ucRoomState === 1'
-                  class="d-inline-flex ma-0 mr-1 pa-1"
-                  color="orange lighten-3"
-                  small>
-                  예비
-                </v-chip>
-                <v-chip
-                  v-if='room.ucRoomState === 3'
-                  class="d-inline-flex ma-0 mr-1 pa-1"
-                  color="pink lighten-2"
-                  small
-                >
-                  입실
-                </v-chip>
-                <v-chip
-                  v-if='room.usManHeatingMode === 0'
-                  class="d-inline-flex ma-0 ml-1 pa-1"
-                  color="light-green accent-2"
-                  small
-                >
-                  자동
-                </v-chip>
-                <v-chip
-                  v-if='room.usManHeatingMode === 1'
-                  class="d-inline-flex ma-0 ml-1 pa-1"
-                  color="blue lighten-3"
-                  small
-                >
-                  수동
-                </v-chip>
-                <v-chip
-                  v-if='room.usManHeatingMode === 2'
-                  class="d-inline-flex ma-0 pa-1"
-                  color="blue-grey lighten-4"
-                  small
-                >
-                  정지
-                </v-chip>
-              </div>
-              <div class="text-center ma-0 pa-0">
-                <v-card
-                  class="d-inline-flex ma-0 mt-1 mr-1 pa-0 pt pl-1 pr-1"
-                  color="blue lighten-4"
-                  label="실내온도"
-                  small
-                >
-                  <div>{{(room.fTroom_cur !== 255) ? room.fTroom_cur : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
-                </v-card>
-                <v-card
-                  class="d-inline-flex ma-0 mt-1 ml-1 pa-0 pl-1 pr-1"
-                  color="light-blue accent-1"
-                  label="바닥온도"
-                  small
-                >
-                  <div>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
-                </v-card>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-item>
+        <v-row justify="center">
+          <v-col
+            v-for='room in roomStat'
+            :key='room'
+            cols="auto"
+            class='ma-1 pa-0'
+          >
+            <div v-if='room.usRoomNo === 201 || room.usRoomNo === 301 || room.usRoomNo === 501 || room.usRoomNo === 601'>
+              <v-row justify="center" class='ma-0 pa-0'>
+                <v-col class='ma-0 mr-2 pa-0'>
+                  <!-- <v-divider class='ma-0 pa-0' color='deep-orange lighten-4' dark vertical></v-divider>
+                  <v-divider class='ma-0 pa-0' color='deep-orange lighten-4' dark vertical></v-divider>
+                  <v-divider class='ma-0 pa-0' color='deep-orange lighten-4' dark vertical></v-divider>
+                  <v-divider class='ma-0 pa-0' color='deep-orange lighten-4' dark vertical></v-divider>
+                  <v-divider class='ma-0 pa-0' color='deep-orange lighten-4' dark vertical></v-divider>
+                  <v-divider class='ma-0 pa-0' color='deep-orange lighten-4' dark vertical></v-divider> -->
+                  <v-card
+                    color='light-blue lighten-4'
+                    class='ma-0 pa-0 font-weight-bold'
+                    outlined
+                    width='94px'
+                    height='105px'
+                    lg=12
+                    md=12
+                    sm=3
+                    xs=3>
+                    <v-card-text class="text-center title mt-4" >
+                      {{(room.usRoomNo+'').substr(0, 1)}}층
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+                <v-col class='ma-0 pa-0'>
+                  <v-card
+                    v-if='room.ucCurStatus === 1'
+                    color='deep-orange lighten-4'
+                    class='ma-0 pa-0 font-weight-bold'
+                    outlined
+                    width='94px'
+                    lg=12
+                    md=12
+                    sm=3
+                    xs=3
+                    @click='openRoomGraph(room.usRoomNo)'>
+                    <v-card-text class="text-center">
+                      <div class="text--primary mb-1">
+                        {{room.usRoomNo}}호
+                      </div>
+                      <div class="text-center ma-0 pa-0">
+                        <v-chip
+                          v-if='room.ucRoomState === 0'
+                          class="d-inline-flex ma-0 pa-0"
+                          color="blue-grey lighten-4"
+                          x-small>공실
+                        </v-chip>
+                        <v-chip
+                          v-if='room.ucRoomState === 1'
+                          class="d-inline-flex ma-0 pa-0"
+                          color="orange lighten-3"
+                          x-small>
+                          예비
+                        </v-chip>
+                        <v-chip
+                          v-if='room.ucRoomState === 3'
+                          class="d-inline-flex ma-0 pa-0"
+                          color="pink lighten-2"
+                          x-small>
+                          입실
+                        </v-chip>
+                        <v-chip
+                          v-if='room.usManHeatingMode === 0'
+                          class="d-inline-flex ma-0 pa-0"
+                          color="light-green accent-2"
+                          x-small>
+                          자동
+                        </v-chip>
+                        <v-chip
+                          v-if='room.usManHeatingMode === 1'
+                          class="d-inline-flex ma-0 pa-0"
+                          color="blue lighten-3"
+                          x-small>
+                          수동
+                        </v-chip>
+                        <v-chip
+                          v-if='room.usManHeatingMode === 2'
+                          class="d-inline-flex ma-0 pa-0"
+                          color="blue-grey lighten-4"
+                          x-small>
+                          정지
+                        </v-chip>
+                      </div>
+                      <div class="text-center ma-0 pa-0">
+                        <v-card
+                          class="d-inline-flex ma-0 mt-1 pa-0 pl-1 pr-1"
+                          color="blue lighten-4"
+                          label="실내온도"
+                          x-small>
+                          <div class='overline ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                        </v-card>
+                        <v-card
+                          class="d-inline-flex ma-0 mt-1 pa-0 pl-1 pr-1"
+                          color="light-blue accent-1"
+                          label="바닥온도"
+                          x-small>
+                          <div class='overline ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                        </v-card>
+                      </div>
+                    </v-card-text>
+                  </v-card>
+                  <v-card
+                    v-if='room.ucCurStatus === 0 || room.ucCurStatus === 2'
+                    color='blue-grey lighten-5'
+                    class='ma-0 pa-0 font-weight-bold'
+                    outlined
+                    width='94px'
+                    lg=12
+                    md=12
+                    sm=3
+                    xs=3
+                    @click='openRoomGraph(room.usRoomNo)'>
+                    <v-card-text class="text-center">
+                      <div class="text--primary mb-1">
+                        {{room.usRoomNo}}호
+                      </div>
+                      <div class="text-center ma-0 pa-0">
+                        <v-chip
+                          v-if='room.ucRoomState === 0'
+                          class="d-inline-flex ma-0 pa-1"
+                          color="blue-grey lighten-4"
+                          x-small>공실
+                        </v-chip>
+                        <v-chip
+                          v-if='room.ucRoomState === 1'
+                          class="d-inline-flex ma-0 pa-1"
+                          color="orange lighten-3"
+                          x-small>
+                          예비
+                        </v-chip>
+                        <v-chip
+                          v-if='room.ucRoomState === 3'
+                          class="d-inline-flex ma-0 pa-1"
+                          color="pink lighten-2"
+                          x-small>
+                          입실
+                        </v-chip>
+                        <v-chip
+                          v-if='room.usManHeatingMode === 0'
+                          class="d-inline-flex ma-0 pa-1"
+                          color="light-green accent-2"
+                          x-small>
+                          자동
+                        </v-chip>
+                        <v-chip
+                          v-if='room.usManHeatingMode === 1'
+                          class="d-inline-flex ma-0 pa-1"
+                          color="blue lighten-3"
+                          x-small>
+                          수동
+                        </v-chip>
+                        <v-chip
+                          v-if='room.usManHeatingMode === 2'
+                          class="d-inline-flex ma-0 pa-1"
+                          color="blue-grey lighten-4"
+                          x-small>
+                          정지
+                        </v-chip>
+                      </div>
+                      <div class="text-center ma-0 pa-0">
+                        <v-card
+                          class="d-inline-flex ma-0 mt-1 pa-0 pl-1 pr-1"
+                          color="blue lighten-4"
+                          label="실내온도"
+                          x-small>
+                          <div class='overline ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                        </v-card>
+                        <v-card
+                          class="d-inline-flex ma-0 mt-1 pa-0 pl-1 pr-1"
+                          color="light-blue accent-1"
+                          label="바닥온도"
+                          x-small>
+                          <div class='overline ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                        </v-card>
+                      </div>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </div>
+            <div v-if='!(room.usRoomNo === 201 || room.usRoomNo === 301 || room.usRoomNo === 501 || room.usRoomNo === 601)'>
+              <v-card
+                v-if='room.ucCurStatus === 1'
+                color='deep-orange lighten-4'
+                class='ma-0 pa-0 font-weight-bold'
+                outlined
+                width='94px'
+                lg=12
+                md=12
+                sm=3
+                xs=3
+                @click='openRoomGraph(room.usRoomNo)'>
+                <v-card-text class="text-center">
+                  <div class="text--primary mb-1">
+                    {{room.usRoomNo}}호
+                  </div>
+                  <div class="text-center ma-0 pa-0">
+                    <v-chip
+                      v-if='room.ucRoomState === 0'
+                      class="d-inline-flex ma-0 pa-1"
+                      color="blue-grey lighten-4"
+                      x-small>공실
+                    </v-chip>
+                    <v-chip
+                      v-if='room.ucRoomState === 1'
+                      class="d-inline-flex ma-0 pa-0"
+                      color="orange lighten-3"
+                      x-small>
+                      예비
+                    </v-chip>
+                    <v-chip
+                      v-if='room.ucRoomState === 3'
+                      class="d-inline-flex ma-0 pa-1"
+                      color="pink lighten-2"
+                      x-small>
+                      입실
+                    </v-chip>
+                    <v-chip
+                      v-if='room.usManHeatingMode === 0'
+                      class="d-inline-flex ma-0 pa-1"
+                      color="light-green accent-2"
+                      x-small>
+                      자동
+                    </v-chip>
+                    <v-chip
+                      v-if='room.usManHeatingMode === 1'
+                      class="d-inline-flex ma-0 pa-1"
+                      color="blue lighten-3"
+                      x-small>
+                      수동
+                    </v-chip>
+                    <v-chip
+                      v-if='room.usManHeatingMode === 2'
+                      class="d-inline-flex ma-0 pa-1"
+                      color="blue-grey lighten-4"
+                      x-small>
+                      정지
+                    </v-chip>
+                  </div>
+                  <div class="text-center ma-0 pa-0">
+                    <v-card
+                      class="d-inline-flex ma-0 mt-1 pa-0 pl-1 pr-1"
+                      color="blue lighten-4"
+                      label="실내온도"
+                      x-small>
+                      <div class='overline ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                    </v-card>
+                    <v-card
+                      class="d-inline-flex ma-0 mt-1 pa-0 pl-1 pr-1"
+                      color="light-blue accent-1"
+                      label="바닥온도"
+                      x-small>
+                      <div class='overline ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                    </v-card>
+                  </div>
+                </v-card-text>
+              </v-card>
+              <v-card
+                v-if='room.ucCurStatus === 0 || room.ucCurStatus === 2'
+                color='blue-grey lighten-5'
+                class='ma-0 pa-0 font-weight-bold'
+                outlined
+                width='94px'
+                lg=12
+                md=12
+                sm=3
+                xs=3
+                @click='openRoomGraph(room.usRoomNo)'>
+                <v-card-text class="text-center">
+                  <div class="text--primary mb-1">
+                    {{room.usRoomNo}}호
+                  </div>
+                  <div class="text-center ma-0 pa-0">
+                    <v-chip
+                      v-if='room.ucRoomState === 0'
+                      class="d-inline-flex ma-0 pa-1"
+                      color="blue-grey lighten-4"
+                      x-small>공실
+                    </v-chip>
+                    <v-chip
+                      v-if='room.ucRoomState === 1'
+                      class="d-inline-flex ma-0 pa-1"
+                      color="orange lighten-3"
+                      x-small>
+                      예비
+                    </v-chip>
+                    <v-chip
+                      v-if='room.ucRoomState === 3'
+                      class="d-inline-flex ma-0 pa-1"
+                      color="pink lighten-2"
+                      x-small>
+                      입실
+                    </v-chip>
+                    <v-chip
+                      v-if='room.usManHeatingMode === 0'
+                      class="d-inline-flex ma-0 pa-1"
+                      color="light-green accent-2"
+                      x-small>
+                      자동
+                    </v-chip>
+                    <v-chip
+                      v-if='room.usManHeatingMode === 1'
+                      class="d-inline-flex ma-0 pa-1"
+                      color="blue lighten-3"
+                      x-small>
+                      수동
+                    </v-chip>
+                    <v-chip
+                      v-if='room.usManHeatingMode === 2'
+                      class="d-inline-flex ma-0 pa-1"
+                      color="blue-grey lighten-4"
+                      x-small>
+                      정지
+                    </v-chip>
+                  </div>
+                  <div class="text-center ma-0 pa-0">
+                    <v-card
+                      class="d-inline-flex ma-0 mt-1 pa-0 pl-1 pr-1"
+                      color="blue lighten-4"
+                      label="실내온도"
+                      x-small>
+                      <div class='overline ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                    </v-card>
+                    <v-card
+                      class="d-inline-flex ma-0 mt-1 pa-0 pl-1 pr-1"
+                      color="light-blue accent-1"
+                      label="바닥온도"
+                      x-small>
+                      <div class='overline ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                    </v-card>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </div>
+          </v-col>
+        </v-row>
       </v-flex>
     </v-layout>
+    <v-dialog v-model='roomGraphModal' max-width='1000px'>
+      <v-card>
+        <v-card-title>
+          <span class='headline'>{{roomNo}}호 상태 그래프</span>
+        </v-card-title>
+        <v-card-text>
+          <div>
+            <apexchart type="line" :options="chartOptions" :series="series" ></apexchart>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model='rsvRoomModal' persistent max-width='500px'>
       <v-card>
         <v-card-title>
@@ -635,10 +824,10 @@
                 Today
               </v-btn>
               <v-btn fab text small @click='prev'>
-                <v-icon small>arrow_back_ios</v-icon>
+                <v-icon x-small>arrow_back_ios</v-icon>
               </v-btn>
               <v-btn fab text small @click='next'>
-                <v-icon small>arrow_forward_ios</v-icon>
+                <v-icon x-small>arrow_forward_ios</v-icon>
               </v-btn>
               <v-toolbar-title>{{ title }}</v-toolbar-title>
               <v-spacer></v-spacer>
@@ -723,6 +912,7 @@ export default {
         'day': 'Day',
         '4day': '4 Days'
       },
+      datas: [],
       start: null,
       end: null,
       selectedElement: null,
@@ -815,7 +1005,12 @@ export default {
       roomNo: 0,
       roomIdx: 0,
       trnCheckInTime: 0,
-      trnCheckOutTime: 0
+      trnCheckOutTime: 0,
+      series: [],
+      chartOptions: [],
+      roomGraphModal: false,
+      startTime: this.$moment(new Date((new Date().getTime()-(2*24*60*60*1000))).toISOString()).format('YYYY/MM/DD kk:mm'),
+      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD kk:mm')
     }
   },
   computed: {
@@ -1295,6 +1490,75 @@ export default {
           alert(e.message)
           console.log(e.message)
         })
+    },
+    openRoomGraph: function (roomNo) {
+      this.roomNo = roomNo
+      axios.put(`${this.$apiRootPath}rooms/roomSummaryTrend`, { usRoomNo: roomNo, startTime: this.startTime, endTime: this.endTime, time: 600 })
+        .then((r) => {
+          this.datas = r.data
+          var data0 = []
+          var data1 = []
+          var data2 = []
+          var date = []
+          for (var i = 0; i < this.datas.length; i++) {
+            data0.push(this.datas[i].ucCurStatus)
+            if (this.datas[i].fTsurf_cur < 100) {
+              data1.push(this.datas[i].fTsurf_cur.toFixed(2))
+            } else {
+              data1.push(-1)
+            }
+            // data1.push(this.datas[i].fTsurf_cur.toFixed(2))
+            if (this.datas[i].fTroom_cur < 100) {
+              data2.push(this.datas[i].fTroom_cur.toFixed(2))
+            } else {
+              data2.push(-1)
+            }
+            date.push(new Date((this.datas[i].m * 600 + (9 * 60 * 60)) * 1000).toISOString())
+          }
+          this.series = [
+            {
+              name: '난방가동상태',
+              data: data0
+            },
+            {
+              name: '바닥온도',
+              data: data1
+            },
+            {
+              name: '실내온도',
+              data: data2
+            }
+          ]
+          this.chartOptions = {
+            chart: {
+                height: 350,
+                width: '100%',
+                markers: {
+                  size: 6
+                }
+            },
+            xaxis: {
+              type: 'datetime',
+              categories: date,
+              labels: {
+                show: true,
+                rotate: 0,
+                //format: 'yy/MM/dd HH:mm',
+                formatter: function(value) {
+                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
+                }
+              }
+            }
+            // yaxis: {
+            //   max:50
+            // }
+          }
+        })
+        .catch((e) => {
+          alert(e.message)
+          console.error(e.message)
+        })
+        this.roomGraphModal = true
     },
     toggleAutoCheckIn: function () {
     },

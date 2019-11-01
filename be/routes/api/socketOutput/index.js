@@ -126,11 +126,12 @@ net.writeData = function (socket, data, seq) {
 
 var alarm = null
 var processOAMmsg = function (data, seq) {
-  var ret = 0;
+  var ret = 0
 	let res
   var oamMsgDat = oam_msg_t.decode(data, ems_msg_header_t.size(), {endian:"BE"});
-  console.log("seq : " + seq + ", oamMsgDat : " + oamMsgDat.OAMMsgType +", oamMsgDat.DataLen : " + oamMsgDat.DataLen +", oamMsgDat.Data : "  + oamMsgDat.Data + ", ems_sys_config_t.size() : " + ems_sys_config_t.size());
-  if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_sys_config )
+	var size = 0
+
+	if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_sys_config )
    && oamMsgDat.DataLen == ems_sys_config_t.size()) {
      var emsSysConfigDat = ems_sys_config_t.decode(data, ems_msg_header_t.size() +oam_msg_t.size(), {endian:"LE"});
 		 if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config) {
@@ -178,6 +179,35 @@ var processOAMmsg = function (data, seq) {
       console.log("else!!!! oamMsgDat.OAMMsgType = " + oamMsgDat.OAMMsgType)
 			ret = -1;
   }
+
+	if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_sys_config )) {
+    size = ems_sys_config_t.size()
+  }
+  else if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_cmd_floorRad_manual_heating && oamMsgDat.DataLen == manual_heating_msg_t.size()) {
+    size = manual_heating_msg_t.size()
+  }
+  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_room_config)) {
+    size = room_config_t.size()
+  }
+  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_solBeach_zone_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_solBeach_zone_config)) {
+		size = ahu_zone_config_msg_t.size()
+  }
+  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_solBeach_damper_scheduler || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_solBeach_damper_scheduler)) {
+		size = damper_scheduler_config_t.size()
+  }
+  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_state || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_room_state)) {
+		size = floor_rad_room_state_t.size()
+  }
+  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_priority || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_room_priority)) {
+		size = 'oam_msg_type_e.oam_set_floorRad_room_priority'
+  }
+  else if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_event_alarm) {
+		size = 'oam_msg_type_e.oam_event_alarm'
+  }
+  else {
+    size = 'else'
+  }
+	console.log("seq : " + seq + ", oamMsgDat : " + oamMsgDat.OAMMsgType +", oamMsgDat.DataLen : " + oamMsgDat.DataLen +", oamMsgDat.Data : "  + oamMsgDat.Data + ", size() : " + size);
   return ret;
 }
 // var ems_alarm_t = new struct("ems_alarm_t", [
@@ -646,7 +676,7 @@ var economizer_cycle_t = new struct("economizer_cycle_t", [
 		"Tout", struct.float32(),
     "Hout", struct.float32(),
 		"Eout", struct.float32(),
-    "Reserved", struct.int32()
+    "Reserved", struct.uint32()
 ]);
 net.makeEconomizerCycle_t = function(tout, hout, eout, reserved) {
   var buffer = new Buffer(economizer_cycle_t.size());
@@ -854,6 +884,7 @@ net.getSizeRoomConfig_t = function() {
 
 var ahu_zone_config_msg_t = new struct("ahu_zone_config_msg_t", [
 	"AhuIndex", struct.uint16(),
+	"UseScheduler", struct.uint8(),
 	"NotifyOccupantsState", struct.uint8(),
 	"EconomizerCycle", struct.uint8(),
 	"VarTempControl", struct.int8(),
@@ -869,6 +900,7 @@ net.makeAhuZoneConfigMsg_t = function(ahuIndex, notifyOccupantsState, economizer
   var buffer = new Buffer(ahu_zone_config_msg_t.size());
   ahu_zone_config_msg_t.encode(buffer,0, {
     AhuIndex: ahuIndex,
+		UseScheduler: useScheduler,
     NotifyOccupantsState: notifyOccupantsState,
     EconomizerCycle: economizerCycle,
 		VarTempControl: varTempControl,

@@ -110,8 +110,16 @@ export default {
           for (var i = 0; i < this.datas.length; i++) {
             data0.push(this.datas[i].HeatingCnt.toFixed(2))
             data1.push(this.datas[i].HeatingRoomCnt.toFixed(2))
-            data2.push(this.datas[i].Tsurf_avg.toFixed(2))
-            data3.push(this.datas[i].Troom_avg.toFixed(2))
+            if (this.datas[i].Tsurf_avg < 100) {
+              data2.push(this.datas[i].Tsurf_avg.toFixed(2))
+            } else {
+              data2.push(-1)
+            }
+            if (this.datas[i].Troom_avg < 100) {
+              data3.push(this.datas[i].Troom_avg.toFixed(2))
+            } else {
+              ddata3ata5.push(-1)
+            }
             data4.push(this.datas[i].Tout.toFixed(2))
             date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
           }
@@ -174,8 +182,16 @@ export default {
             data1.push((this.datas[i].ucSetStatus * 10).toFixed(2))
             data2.push((this.datas[i].ucCurStatus * 15).toFixed(2))
             data3.push(this.datas[i].fTset.toFixed(2))
-            data4.push(this.datas[i].fTsurf_cur.toFixed(2))
-            data5.push(this.datas[i].fTroom_cur.toFixed(2))
+            if (this.datas[i].fTsurf_cur < 100) {
+              data4.push(this.datas[i].fTsurf_cur.toFixed(2))
+            } else {
+              data4.push(-1)
+            }
+            if (this.datas[i].fTroom_cur < 100) {
+              data5.push(this.datas[i].fTroom_cur.toFixed(2))
+            } else {
+              data5.push(-1)
+            }
             //if(i === 0) alert(new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(0, 10) + ' ' + new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(11, 5))
             //date.push(new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(0, 10) + ' ' + new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(11, 5) )
             date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())

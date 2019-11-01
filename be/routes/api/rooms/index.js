@@ -314,12 +314,31 @@ router.put('/roomStatTrend', (req, res, next) => { // 수정
 	const endTime = req.body.endTime
 	const time = req.body.time
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT * FROM ( SELECT CurTime DIV ? AS m, AVG(HeatingCnt) AS HeatingCnt, AVG(HeatingRoomCnt) AS HeatingRoomCnt, AVG(Tsurf_avg) AS Tsurf_avg, AVG(Troom_avg) AS Troom_avg, AVG(Tout) AS Tout FROM floor_rad_stat WHERE CurTime >= UNIX_TIMESTAMP(?) AND CurTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, startTime, endTime], function(err, result, fields) {
+	mysqlDB.query("SELECT * FROM ( SELECT CurTime DIV ? AS m, AVG(HeatingCnt) AS HeatingCnt, AVG(HeatingRoomCnt) AS HeatingRoomCnt, AVG(if(Tsurf_avg > 50, null, Tsurf_avg)) AS Tsurf_avg, AVG(if(Troom_avg > 50, null, Troom_avg)) AS Troom_avg, AVG(if(Tout > 50, null, Tout)) AS Tout FROM floor_rad_stat WHERE CurTime >= UNIX_TIMESTAMP(?) AND CurTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, startTime, endTime], function(err, result, fields) {
 		if(err) {
 			console.log("############ put /roomStatTrend error : " + err)
 		}
 		else{
 			//console.log("############ get /roomStatTrend :" + JSON.stringify(result))
+			res.json(result)
+		}
+	})
+})
+
+router.put('/roomSummaryTrend', (req, res, next) => { // 수정
+	console.log("############ put /roomSummaryTrend : " + JSON.stringify(req.body))
+	const usRoomNo = req.body.usRoomNo
+	const startTime = req.body.startTime
+	const endTime = req.body.endTime
+	const time = req.body.time
+  // console.log("######################### getRoomConfig ######################### ")
+	mysqlDB.query(
+	"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m,  AVG(ucCurStatus) AS ucCurStatus, AVG(if(fTsurf_cur > 50, null, fTsurf_cur)) AS fTsurf_cur, AVG(if(fTroom_cur > 50, null, fTroom_cur)) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
+		if(err) {
+			console.log("############ put /roomSummaryTrend error : " + err)
+		}
+		else{
+			// console.log("############ get /roomSummaryTrend :" + JSON.stringify(result))
 			res.json(result)
 		}
 	})
@@ -333,12 +352,12 @@ router.put('/getRoomTrend', (req, res, next) => { // 수정
 	const usRoomNo = req.body.usRoomNo
   // console.log("######################### getRoomConfig ######################### ")
 	mysqlDB.query(
-		"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m, AVG(ucRoomState) AS ucRoomState, AVG(ucSetStatus) AS ucSetStatus, AVG(ucCurStatus) AS ucCurStatus, AVG(fTset) AS fTset, AVG(fTsurf_cur) AS fTsurf_cur, AVG(fTroom_cur) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
+		"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m, AVG(ucRoomState) AS ucRoomState, AVG(ucSetStatus) AS ucSetStatus, AVG(ucCurStatus) AS ucCurStatus, AVG(if(fTset > 50, null, fTset)) AS fTset, AVG(if(fTsurf_cur > 50, null, fTsurf_cur)) AS fTsurf_cur, AVG(if(fTroom_cur > 50, null, fTroom_cur)) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
 		if(err) {
 			console.log("############ put /getRoomTrend error : " + err)
 		}
 		else{
-			console.log("############ put /getRoomTrend :" + JSON.stringify(result))
+			// console.log("############ put /getRoomTrend :" + JSON.stringify(result))
 			res.json(result)
 		}
 	})
@@ -350,12 +369,12 @@ router.put('/solTrend', (req, res, next) => { // 수정
 	const endTime = req.body.endTime
 	const time = req.body.time
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT * FROM ( SELECT CurTime DIV ? AS m, AVG(HCOnCnt) AS HCOnCnt, AVG(HCOffCnt) AS HCOffCnt, AVG(VentilationCnt) AS VentilationCnt, AVG(Tzone) AS Tzone, AVG(Rdamp) AS Rdamp, AVG(PPMco2) AS PPMco2 FROM solbeach_stat WHERE CurTime >= UNIX_TIMESTAMP(?) AND CurTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, startTime, endTime], function(err, result, fields) {
+	mysqlDB.query("SELECT * FROM ( SELECT CurTime DIV ? AS m, AVG(HCOnCnt) AS HCOnCnt, AVG(HCOffCnt) AS HCOffCnt, AVG(VentilationCnt) AS VentilationCnt, AVG(if(Tzone > 50, null, Tzone)) AS Tzone, AVG(Rdamp) AS Rdamp, AVG(PPMco2) AS PPMco2 FROM solbeach_stat WHERE CurTime >= UNIX_TIMESTAMP(?) AND CurTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, startTime, endTime], function(err, result, fields) {
 		if(err) {
 			console.log("############ put /getSolTrend error : " + err)
 		}
 		else{
-			console.log("############ get /getSolTrend :" + JSON.stringify(result))
+			// console.log("############ get /getSolTrend :" + JSON.stringify(result))
 			res.json(result)
 		}
 	})
@@ -367,7 +386,7 @@ console.log("############ put /siteEnv req.body : " + JSON.stringify(req.body))
 	const endTime = req.body.endTime
 	const time = req.body.time
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT * FROM ( SELECT  nLastUpdateTime DIV ? AS m, AVG(fTout) AS fTout FROM site_env_record WHERE nSiteIdx = 2 AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, startTime, endTime], function(err, result, fields) {
+	mysqlDB.query("SELECT * FROM ( SELECT  nLastUpdateTime DIV ? AS m, AVG(if(fTout > 50, null, fTout)) AS fTout FROM site_env_record WHERE nSiteIdx = 2 AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, startTime, endTime], function(err, result, fields) {
 		if(err) {
 			console.log("############ put /siteEnv error : " + err)
 		}
@@ -892,7 +911,7 @@ router.get('/getRoomStat/:roomNo', function(req, res, next) {
 exports.setSeqMap = function (seq, jsonData) {
     // res.redirect("/")
     seqMap.set(seq, jsonData)
-    console.log('setSeqMap seq : '+seq+' seqMap.get(seq) : ' + seqMap.get(seq))
+    // console.log('setSeqMap seq : '+seq+' seqMap.get(seq) : ' + seqMap.get(seq))
 }
 
 exports.reconnectAuth = function () {
