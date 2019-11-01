@@ -15,30 +15,32 @@ const ems_msg_type_e = {
 };
 
 const oam_msg_type_e = {
-	oam_set_sys_config : 1,		// if you change this, you should change _ems_msg_type_stat_e [_set_sys_config] too
-	oam_get_sys_config : 2,			// get sys config
+	oam_set_sys_config: 1,		// if you change this, you should change _ems_msg_type_stat_e [_set_sys_config] too
+	oam_get_sys_config: 2,			// get sys config
 
-	oam_cmd_floorRad_manual_heating : 3,
-	oam_cmd_floorRad_room_state : 4,
-	oam_cmd_checkIn : 5,
-	oam_cmd_load_db : 6,
+	oam_cmd_floorRad_manual_heating: 3,
+	oam_cmd_floorRad_room_state: 4,
+	oam_cmd_checkIn: 5,
+	oam_cmd_load_db: 6,
 
-	oam_set_floorRad_room_config : 7,
-	oam_get_floorRad_room_config : 8,
+	oam_set_floorRad_room_config: 7,
+	oam_get_floorRad_room_config: 8,
 
-	oam_set_solBeach_zone_config : 9,
-	oam_get_solBeach_zone_config : 10,
+	oam_set_solBeach_zone_config: 9,
+	oam_get_solBeach_zone_config: 10,
 
-	oam_set_solBeach_damper_scheduler : 11,
-	oam_get_solBeach_damper_scheduler : 12,
+	oam_set_solBeach_damper_scheduler: 11,
+	oam_get_solBeach_damper_scheduler: 12,
 
-	oam_set_floorRad_room_state : 13,
-	oam_get_floorRad_room_state : 14,
+	oam_set_floorRad_room_state: 13,
+	oam_get_floorRad_room_state: 14,
 
-	oam_set_floorRad_room_priority : 15,
-	oam_get_floorRad_room_priority : 16,
+	oam_set_floorRad_room_priority: 15,
+	oam_get_floorRad_room_priority: 16,
 
-	oam_event_alarm : 17
+	oam_get_session_info: 17,
+
+	oam_event_alarm: 18
 };
 const MAX_ROOM_CNT = 91
 net.getConnection = function () {
@@ -111,7 +113,7 @@ net.getConnection = function () {
 }
 
 net.writeData = function (socket, data, seq) {
-  console.log('writeData start : ' + data.toString('hex') + ", seq : " + seq)
+  // console.log('writeData start : ' + data.toString('hex') + ", seq : " + seq)
   var success = !socket.write(data);
   if(!success) {
         (function(socket, data) {
@@ -366,15 +368,19 @@ var var_temp_conf_t = new struct("var_temp_conf_t", [
     "HeatingHighTemp", struct.float32(),
     "HeatingLowTemp", struct.float32(),
     "HeatingDelatTemp", struct.float32(),
-    "LowCoolingTemp", struct.float32()
+		"CoolingHighTemp", struct.float32(),
+    "CoolingLowTemp", struct.float32(),
+		"CoolingDelatTemp", struct.float32()
 ]);
-net.makeVarTempConf_t = function(heatingHighTemp, heatingLowTemp, heatingDelatTemp, lowCoolingTemp) {
+net.makeVarTempConf_t = function(heatingHighTemp, heatingLowTemp, heatingDelatTemp, coolingHighTemp, coolingLowTemp, coolingDelatTemp) {
   var buffer = new Buffer(var_temp_conf_t.size());
   var_temp_conf_t.encode(buffer,0, {
     HeatingHighTemp: heatingHighTemp,
     HeatingLowTemp: heatingLowTemp,
     HeatingDelatTemp: heatingDelatTemp,
-    LowCoolingTemp: lowCoolingTemp
+		CoolingHighTemp: coolingHighTemp,
+    CoolingLowTemp: coolingLowTemp,
+		CoolingDelatTemp: coolingDelatTemp
   },{endian:"BE"})
   return buffer;
 }
@@ -430,27 +436,43 @@ net.getSizeDemandResponseConf_t = function() {
 
 var pre_heating_conf_t = new struct("pre_heating_conf_t", [
     "Option", struct.uint32(),
-    "RerservedRoomOption", struct.uint32(),
     "Tout_avg", struct.float32(),
     "WF_Toutdoor", struct.int32(),
     "WF_Tdiff", struct.int32(),
     "IncTempRate", struct.float32(),
     "DecTempRate", struct.float32(),
     "PH_StartTimeErrRange", struct.int32(),
-    "PH_LowLoadStartTimeErrRange", struct.int32()
+    "PH_LowLoadStartTimeErrRange", struct.int32(),
+    "PH_TimeSecBeforeMax1", struct.int32(),
+    "CooledRoomTsurf_init", struct.float32(),
+    "CooledRoomPHHourInc", struct.float32(),
+    "CooledRoomPHHourIncMax", struct.float32(),
+    "MaxPreHeatingStartHour", struct.uint32(),
+    "ControlPeriodSec", struct.uint32(),
+    "LowLoadTimeUseRatio", struct.float32(),
+    "OccupiedRoomHeatingRatio", struct.float32(),
+    "ReservedRoomHeatingRatio", struct.float32()
 ]);
-net.makePreHeatingConf_t = function(option, rerservedRoomOption, tout_avg, wf_Toutdoor, wf_Tdiff, incTempRate, decTempRate, ph_StartTimeErrRange, ph_LowLoadStartTimeErrRange) {
+net.makePreHeatingConf_t = function(option, tout_avg, wf_Toutdoor, wf_Tdiff, incTempRate, decTempRate, ph_StartTimeErrRange, ph_LowLoadStartTimeErrRange, ph_TimeSecBeforeMax1, cooledRoomTsurf_init, cooledRoomPHHourInc, cooledRoomPHHourIncMax, maxPreHeatingStartHour, controlPeriodSec, lowLoadTimeUseRatio, occupiedRoomHeatingRatio, reservedRoomHeatingRatio) {
   var buffer = new Buffer(pre_heating_conf_t.size());
   pre_heating_conf_t.encode(buffer,0, {
     Option: option,
-    RerservedRoomOption: rerservedRoomOption,
     Tout_avg: tout_avg,
     WF_Toutdoor: wf_Toutdoor,
     WF_Tdiff: wf_Tdiff,
     IncTempRate: incTempRate,
     DecTempRate: decTempRate,
     PH_StartTimeErrRange: ph_StartTimeErrRange,
-    PH_LowLoadStartTimeErrRange: ph_LowLoadStartTimeErrRange
+    PH_LowLoadStartTimeErrRange: ph_LowLoadStartTimeErrRange,
+		PH_TimeSecBeforeMax1: ph_TimeSecBeforeMax1,
+    CooledRoomTsurf_init: cooledRoomTsurf_init,
+    CooledRoomPHHourInc: cooledRoomPHHourInc,
+    CooledRoomPHHourIncMax: cooledRoomPHHourIncMax,
+    MaxPreHeatingStartHour: maxPreHeatingStartHour,
+    ControlPeriodSec: controlPeriodSec,
+    LowLoadTimeUseRatio: lowLoadTimeUseRatio,
+    OccupiedRoomHeatingRatio: occupiedRoomHeatingRatio,
+    ReservedRoomHeatingRatio: reservedRoomHeatingRatio
   },{endian:"BE"})
   return buffer;
 }
@@ -458,59 +480,79 @@ net.getSizePreHeatingConf_t = function() {
   return pre_heating_conf_t.size()
 }
 
+var notify_conf_t = new struct("notify_conf_t", [
+		"NotifyOption", struct.uint32(),
+    "NotifyIntervalSec", struct.int32(),
+		"NotifyStartHour", struct.int32(),
+    "NotifyEndHour", struct.int32()
+]);
+net.makeNotifyConf_t = function(notifyOption, notifyIntervalSec, notifyStartHour, notifyEndHour) {
+  var buffer = new Buffer(notify_conf_t.size());
+  notify_conf_t.encode(buffer,0, {
+		NotifyOption: notifyOption,
+    NotifyIntervalSec: notifyIntervalSec,
+		NotifyStartHour: notifyStartHour,
+		NotifyEndHour: notifyEndHour
+  },{endian:"BE"})
+  return buffer;
+}
+net.getSizeNotifyConf_t = function() {
+  return notify_conf_t.size()
+}
+
 var floor_rad_conf_t = new struct("floor_rad_conf_t", [
     "ControlOption", struct.uint32(),
-    "RoomCount", struct.int32(),
+    "RoomCnt", struct.int32(),
     "UseTsurf", struct.int32(),
     "Troom_set", struct.float32(),
     "Tsurf_set", struct.float32(),
     "Troom_cr", struct.float32(),
     "Tsurf_cr", struct.float32(),
     "Tctrl_res", struct.float32(),
-    "Tsurf_init", struct.float32(),
-    "Tset_init_inc", struct.float32(),
-		"Tset_init_inc_max", struct.float32(),
     "CheckInHour", struct.int32(),
-    "RR_CheckInHour", struct.int32(),
 		"RR_StayHour", struct.int32(),
     "TelNumber0", struct.char(12),
     "TelNumber1", struct.char(12),
     "TelNumber2", struct.char(12),
     "TelNumber3", struct.char(12),
     "TelNumber4", struct.char(12),
+    "OperationOption", struct.uint32(),
+    "Reserved1", struct.uint32(),
+    "Reserved2", struct.uint32(),
     "tVariableTemp", var_temp_conf_t,
     "tPeak", peak_demand_conf_t,
     "tOptimalStop", optimal_stop_conf_t,
     "tDemandResponse", demand_response_conf_t,
-    "tPreHeating", pre_heating_conf_t // reserved.
+    "tPreHeating", pre_heating_conf_t,
+		"tNotify", notify_conf_t
 ]);
-net.makeFloorRadConf_t = function(controlOption, roomCount, useTsurf, troom_set, tsurf_set, troom_cr, tsurf_cr, tctrl_res, tsurf_init, tset_init_inc, tset_init_inc_max, checkInHour, rr_CheckInHour, rr_StayHour, telNumber0, telNumber1, telNumber2, telNumber3, telNumber4, tVariableTemp, tPeak, tOptimalStop, tDemandResponse, tPreHeating) {
+net.makeFloorRadConf_t = function(controlOption, roomCnt, useTsurf, troom_set, tsurf_set, troom_cr, tsurf_cr, tctrl_res, tsurf_init, tset_init_inc, tset_init_inc_max, checkInHour, rr_CheckInHour, rr_StayHour, telNumber0, telNumber1, telNumber2, telNumber3, telNumber4, operationOption, reserved1, reserved2, tVariableTemp, tPeak, tOptimalStop, tDemandResponse, tPreHeating, tNotify) {
   var buffer = new Buffer(floor_rad_conf_t.size());
   floor_rad_conf_t.encode(buffer,0, {
     ControlOption: controlOption,
-    RoomCount: roomCount,
+    RoomCnt: roomCnt,
     UseTsurf: useTsurf,
     Troom_set: troom_set,
     Tsurf_set: tsurf_set,
     Troom_cr: troom_cr,
     Tsurf_cr: tsurf_cr,
     Tctrl_res: tctrl_res,
-    Tsurf_init: tsurf_init,
-    Tset_init_inc: tset_init_inc,
-		Tset_init_inc_max: tset_init_inc_max,
     CheckInHour: checkInHour,
-    RR_CheckInHour: rr_CheckInHour,
     RR_StayHour: rr_StayHour,
 		TelNumber0: telNumber0,
 		TelNumber1: telNumber1,
 		TelNumber2: telNumber2,
 		TelNumber3: telNumber3,
 		TelNumber4: telNumber4,
+		OperationOption: operationOption,
+		Reserved1: reserved1,
+		Reserved2: reserved2,
     tVariableTemp: tVariableTemp,
     tPeak: tPeak,
     tOptimalStop: tOptimalStop,
     tDemandResponse: tDemandResponse,
-    tPreHeating: tPreHeating
+    tPreHeating: tPreHeating,
+		tNotify: tNotify
   },{endian:"BE"})
   return buffer;
 }
@@ -525,25 +567,22 @@ var damp_control_conf_t = new struct("damp_control_conf_t", [
     "Rdamp_min", struct.float32(),
     "Rdamp_max", struct.float32(),
     "Rdamp_ctrl_res", struct.float32(),
-    "NotifyIntervalSec", struct.int32(),
+		"Rdamp_noctrl_max", struct.float32(),
     "PPMco2_set", struct.int32(),
-    "DamperAutoManual", struct.uint32(),
-    "NotifyStartHour", struct.uint32(),
-    "NotifyEndHour", struct.int32()
+    "DamperAutoManual", struct.uint32()
 ]);
-net.makeDampControlConf_t = function( damperCtrlMode, rdamp_set, rdamp_min, rdamp_max, rdamp_ctrl_res, notifyIntervalSec, ppmCo2_set, damperAutoManual, notifyStartHour, notifyEndHour) {
+net.makeDampControlConf_t = function( damperCtrlMode, rdamp_set, rdamp_min, rdamp_max, rdamp_ctrl_res, rdamp_noctrl_max, ppmCo2_set, damperAutoManual) {
   var buffer = new Buffer(damp_control_conf_t.size());
   damp_control_conf_t.encode(buffer,0, {
+
     DamperCtrlMode: damperCtrlMode,
     Rdamp_set: rdamp_set,
     Rdamp_min: rdamp_min,
     Rdamp_max: rdamp_max,
     Rdamp_ctrl_res: rdamp_ctrl_res,
-    NotifyIntervalSec: notifyIntervalSec,
+    Rdamp_noctrl_max: rdamp_noctrl_max,
     PPMco2_set: ppmCo2_set,
-    DamperAutoManual: damperAutoManual,
-    NotifyStartHour: notifyStartHour,
-    NotifyEndHour: notifyEndHour
+    DamperAutoManual: damperAutoManual
   },{endian:"BE"})
   return buffer;
 }
@@ -603,6 +642,26 @@ net.getSizeCo2Conf_t = function() {
   return co2_conf_t.size()
 }
 
+var economizer_cycle_t = new struct("economizer_cycle_t", [
+		"Tout", struct.float32(),
+    "Hout", struct.float32(),
+		"Eout", struct.float32(),
+    "Reserved", struct.int32()
+]);
+net.makeEconomizerCycle_t = function(tout, hout, eout, reserved) {
+  var buffer = new Buffer(economizer_cycle_t.size());
+  economizer_cycle_t.encode(buffer,0, {
+		Tout: tout,
+    Hout: hout,
+		Eout: eout,
+		Reserved: reserved
+  },{endian:"BE"})
+  return buffer;
+}
+net.getSizeEconomizerCycle_t = function() {
+  return economizer_cycle_t.size()
+}
+
 var solbeach_conf_t = new struct("solbeach_conf_t", [
     "ControlOption", struct.uint32(),
     "ZoneCnt", struct.int32(),
@@ -615,11 +674,18 @@ var solbeach_conf_t = new struct("solbeach_conf_t", [
     "TelNumber3", struct.char(12),
     "TelNumber4", struct.char(12),
 		"CO2LoadPeriodSec", struct.uint32(),
+		"NoControlOption", struct.uint32(),
+		"SchedulerOption", struct.uint32(),
+		"Reserved1", struct.uint32(),
+		"Reserved2", struct.uint32(),
     "tRdamp", damp_control_conf_t,
 	  "tPID", pid_control_conf_t,
 		"tC02Conf", co2_conf_t,
+		"tVariableTemp", var_temp_conf_t,
+		"tEconomizerCycle", economizer_cycle_t,
+		"tNotify", notify_conf_t
 ]);
-net.makeSolbeachConf_t = function(controlOption, zoneCnt, hcMode, tzone_set, tctrl_res, telNumber0, telNumber1, telNumber2, telNumber3, telNumber4, co2LoadPeriodSec, tRdamp, tPID) {
+net.makeSolbeachConf_t = function(controlOption, zoneCnt, hcMode, tzone_set, tctrl_res, telNumber0, telNumber1, telNumber2, telNumber3, telNumber4, co2LoadPeriodSec, noControlOption, schedulerOption, reserved1, reserved2, tRdamp, tPID, tC02Conf, tVariableTemp, tEconomizerCycle, tNotify) {
   var buffer = new Buffer(solbeach_conf_t.size());
   solbeach_conf_t.encode(buffer,0, {
     ControlOption: controlOption,
@@ -633,8 +699,16 @@ net.makeSolbeachConf_t = function(controlOption, zoneCnt, hcMode, tzone_set, tct
 		TelNumber3: telNumber3,
 		TelNumber4: telNumber4,
 		CO2LoadPeriodSec: co2LoadPeriodSec,
+		NoControlOption: noControlOption,
+		SchedulerOption: schedulerOption,
+		Reserved1: reserved1,
+		Reserved2: reserved2,
     tRdamp: tRdamp,
-    tPID: tPID
+    tPID: tPID,
+    tC02Conf: tC02Conf,
+    tVariableTemp: tVariableTemp,
+		tEconomizerCycle: tEconomizerCycle,
+		tNotify: tNotify
   },{endian:"BE"})
   return buffer;
 }
@@ -649,14 +723,16 @@ var ems_sys_config_t = new struct("ems_sys_config_t", [
     "tLog", log_conf_t,
 		"tDataBase", db_confg_t,
 		"tSMS", sms_confg_t,
+		"DummyPktPeriod", struct.uint32(),
 	  "ReservedOption1", struct.uint32(),
 		"ReservedOption2", struct.uint32(),
+		"SiteInfo", struct.uint16(),
     "tRemoteAddr", address_conf_t,
     "tFloorRadConf", floor_rad_conf_t,
     "tSolBeachConf", solbeach_conf_t
 ]);
 
-net.makeEmsSysConf_t = function(packetMinIntervalSec, controlPeriodSec, tAddr, tLog, tDataBase, tSMS, reservedOption1, reservedOption2, tRemoteAddr, tFloorRadConf, tSolBeachConf) {
+net.makeEmsSysConf_t = function(packetMinIntervalSec, controlPeriodSec, tAddr, tLog, tDataBase, tSMS, dummyPktPeriod, reservedOption1, reservedOption2, siteInfo, tRemoteAddr, tFloorRadConf, tSolBeachConf) {
   var buffer = new Buffer(ems_sys_config_t.size());
   ems_sys_config_t.encode(buffer,0, {
     PacketMinIntervalSec: packetMinIntervalSec,
@@ -665,8 +741,10 @@ net.makeEmsSysConf_t = function(packetMinIntervalSec, controlPeriodSec, tAddr, t
     tLog: tLog,
     tDataBase: tDataBase,
     tSMS: tSMS,
-		ReservedOption1:reservedOption1,
-		ReservedOption2:reservedOption2,
+		DummyPktPeriod: dummyPktPeriod,
+		ReservedOption1: reservedOption1,
+		ReservedOption2: reservedOption2,
+		SiteInfo: siteInfo,
     tRemoteAddr: tRemoteAddr,
     tFloorRadConf: tFloorRadConf,
     tSolBeachConf: tSolBeachConf
@@ -775,21 +853,25 @@ net.getSizeRoomConfig_t = function() {
 
 
 var ahu_zone_config_msg_t = new struct("ahu_zone_config_msg_t", [
-    "AhuIndex", struct.uint16(),
-    "NotifyOccupantsState", struct.uint8(),
-    "HCMode", struct.int8(),
-		"FanAutoManual", struct.int8(),
-    "DamperAutoManual", struct.int8(),
-    "Tzone_set", struct.float32(),
-    "Rdamp_set", struct.float32(),
-    "PPMco2_set", struct.int32(),
-    "Desc", struct.char(32)
+	"AhuIndex", struct.uint16(),
+	"NotifyOccupantsState", struct.uint8(),
+	"EconomizerCycle", struct.uint8(),
+	"VarTempControl", struct.int8(),
+	"HCMode", struct.int8(),
+	"FanAutoManual", struct.int8(),
+	"DamperAutoManual", struct.int8(),
+	"Tzone_set", struct.float32(),
+	"Rdamp_set", struct.float32(),
+	"PPMco2_set", struct.int32(),
+	"Desc", struct.char(32)
 ]);
-net.makeAhuZoneConfigMsg_t = function(ahuIndex, notifyOccupantsState, hcMode, fanAutoManual, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, desc) {
+net.makeAhuZoneConfigMsg_t = function(ahuIndex, notifyOccupantsState, economizerCycle, varTempControl, hcMode, fanAutoManual, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, desc) {
   var buffer = new Buffer(ahu_zone_config_msg_t.size());
   ahu_zone_config_msg_t.encode(buffer,0, {
     AhuIndex: ahuIndex,
     NotifyOccupantsState: notifyOccupantsState,
+    EconomizerCycle: economizerCycle,
+		VarTempControl: varTempControl,
     HCMode: hcMode,
     FanAutoManual: fanAutoManual,
     DamperAutoManual: damperAutoManual,
@@ -806,7 +888,10 @@ net.getSizeAhuZoneConfigMsg_t = function() {
 
 var ahu_zone_config_t = new struct("ahu_zone_config_t", [
     "AhuIndex", struct.uint16(),
+		"UseScheduler", struct.uint8(),
     "NotifyOccupantsState", struct.uint8(),
+		"EconomizerCycle", struct.uint8(),
+		"VarTempControl", struct.char(),
     "HCMode", struct.char(),
 		"FanAutoManual", struct.char(),
     "DamperAutoManual", struct.char(),
@@ -815,11 +900,14 @@ var ahu_zone_config_t = new struct("ahu_zone_config_t", [
     "PPMco2_set", struct.int32(),
     "Desc", struct.char(32)
 ]);
-net.makeAhuZoneConfig_t = function(ahuIndex, notifyOccupantsState, hcMode, fanAutoManual, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, desc) {
+net.makeAhuZoneConfig_t = function(ahuIndex, useScheduler, notifyOccupantsState, economizerCycle, varTempControl, hcMode, fanAutoManual, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, desc) {
   var buffer = new Buffer(ahu_zone_config_t.size());
   ahu_zone_config_t.encode(buffer,0, {
     AhuIndex: ahuIndex,
+		UseScheduler: useScheduler,
     NotifyOccupantsState: notifyOccupantsState,
+    EconomizerCycle: economizerCycle,
+		VarTempControl: varTempControl,
     HCMode: hcMode,
     FanAutoManual: fanAutoManual,
     DamperAutoManual: damperAutoManual,
@@ -835,18 +923,28 @@ net.getSizeAhuZoneConfig_t = function() {
 }
 
 var damper_scheduler_t = new struct("damper_scheduler_t", [
-    "Mode", struct.uint8(),
     "Hour", struct.uint8(),
     "Min", struct.uint8(),
-    "Ratio", struct.uint8()
+		"DamperAM", struct.int8(),
+		"DamperRun", struct.int8(),
+    "DamperRatio", struct.uint8(),
+		"FanAM", struct.int8(),
+		"FanRun", struct.int8(),
+		"Tset", struct.float32(),
+		"Economizer", struct.uint8(),
 ]);
-net.makeDamperScheduler_t = function(mode, hour, hcMode, min, ratio) {
+net.makeDamperScheduler_t = function(hour, min, damperAM, damperRun, damperRatio, fanAM, fanRun, tSet, economizer) {
   var buffer = new Buffer(damper_scheduler_t.size());
   damper_scheduler_t.encode(buffer,0, {
-    Mode: mode,
     Hour: hour,
     Min: min,
-    Ratio: ratio
+    DamperAM: damperAM,
+    DamperRun: damperRun,
+    DamperRatio: damperRatio,
+    FanAM: fanAM,
+    FanRun: fanRun,
+    Tset: tSet,
+    Economizer: economizer
   },{endian:"BE"})
   return buffer;
 }

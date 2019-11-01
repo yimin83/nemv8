@@ -60,6 +60,14 @@
                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="datas.NotifyOccupantsState"></v-text-field></v-list-item-title>
                 </v-list-item>
                 <v-list-item>
+                  <v-list-item-title>EconomizerCycle:</v-list-item-title>
+                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="datas.EconomizerCycle"></v-text-field></v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>VarTempControl:</v-list-item-title>
+                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="datas.VarTempControl"></v-text-field></v-list-item-title>
+                </v-list-item>
+                <v-list-item>
                   <v-list-item-title>HCMode:</v-list-item-title>
                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="datas.HCMode"></v-text-field></v-list-item-title>
                 </v-list-item>

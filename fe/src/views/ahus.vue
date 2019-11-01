@@ -46,26 +46,26 @@
 import axios from 'axios'
 export default {
   created () {
-      this.getAhus()
-      this.getZones()
-      this.timer = setInterval(this.getAhus, 10000)
-      this.timer = setInterval(this.getZones, 10000)
+    this.getAhus()
+    this.getZones()
+    this.timer = setInterval(this.getAhus, 10000)
+    this.timer = setInterval(this.getZones, 10000)
   },
   data () {
     return {
-      settingTitle : '',
-      mergezones : [],
-      ahus : [],
-      zones : [],
-      hcModes : ['난방', '냉방'],
-      manualModes : ['중지', '가동'],
-      damperAutoManual : ['자동', '수동']
+      settingTitle: '',
+      mergezones: [],
+      ahus: [],
+      zones: [],
+      hcModes: ['난방', '냉방'],
+      manualModes: ['중지', '가동'],
+      damperAutoManual: ['자동', '수동']
     }
   },
   methods: {
     getAhus () {
-     // axios.get(`http://localhost:3000/api/rooms/ahusConfig`)
-     axios.get(`${this.$apiRootPath}rooms/ahusConfig`)
+      // axios.get(`http://localhost:3000/api/rooms/ahusConfig`)
+      axios.get(`${this.$apiRootPath}rooms/ahusConfig`)
         .then((r) => {
           this.ahus = r.data
         })
@@ -82,22 +82,22 @@ export default {
           this.mergeZonesAhu()
         })
         .catch((e) => {
-          alert("getZones error : " +e.message)
+          alert('getZones error : ' + e.message)
           console.error(e.message)
         })
     },
     mergeZonesAhu () {
-      var trncMode_hc_mode = ''
-      var trncMode_manual_mode = ''
-      var trncMode_damper_auto_manual = ''
-      var trncState_supplay_fan = ''
+      var trncMode_hc_mode
+      var trncMode_manual_mode
+      var trncMode_damper_auto_manual
+      var trncState_supplay_fan
       this.mergezones = []
-      for ( var i = 0; i < this.zones.length; i++) {
-        trncMode_hc_mode = (this.zones[i].cMode_hc_mode !== -1 ) ? this.hcModes[this.zones[i].cMode_hc_mode] : '중지'
-        trncMode_manual_mode = (this.zones[i].cMode_manual_mode !== -1 ) ? this.manualModes[this.zones[i].cMode_manual_mode] : '미설정'
-        trncState_supplay_fan = (this.zones[i].cState_supplay_fan !== -1 ) ? this.manualModes[this.zones[i].cState_supplay_fan] : '미설정'
-        trncMode_damper_auto_manual = (this.zones[i].cMode_damper_auto_manual !== -1 ) ? this.damperAutoManual[this.zones[i].cMode_damper_auto_manual] : '미설정'
-        this.mergezones.push({ zone: this.zones[i], ahu: this.ahus[i], hc_mode: trncMode_hc_mode, manual_mode: trncMode_manual_mode, supplay_fan: trncState_supplay_fan, damper_auto_manual: trncMode_damper_auto_manual  })
+      for (var i = 0; i < this.zones.length; i++) {
+        trncMode_hc_mode = (this.zones[i].cMode_hc_mode !== -1) ? this.hcModes[this.zones[i].cMode_hc_mode] : '중지'
+        trncMode_manual_mode = (this.zones[i].cMode_manual_mode !== -1) ? this.manualModes[this.zones[i].cMode_manual_mode] : '미설정'
+        trncState_supplay_fan = (this.zones[i].cState_supplay_fan !== -1) ? this.manualModes[this.zones[i].cState_supplay_fan] : '미설정'
+        trncMode_damper_auto_manual = (this.zones[i].cMode_damper_auto_manual !== -1) ? this.damperAutoManual[this.zones[i].cMode_damper_auto_manual] : '미설정'
+        this.mergezones.push({ zone: this.zones[i], ahu: this.ahus[i], hc_mode: trncMode_hc_mode, manual_mode: trncMode_manual_mode, supplay_fan: trncState_supplay_fan, damper_auto_manual: trncMode_damper_auto_manual })
       }
     }
   }

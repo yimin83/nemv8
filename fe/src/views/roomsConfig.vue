@@ -10,12 +10,12 @@
             >
               <v-list
                 shaped
-                class="overflow-y-auto"
+                class="overflow-y-auto">
                 <v-list-item>
                   <v-list-item-title>난방모드:</v-list-item-title>
                   <v-list-item-title>
                     <v-select
-                      v-model="roomStat.RoomState"
+                      v-model="roomStat.HeatingMode"
                       :items="this.roomHeatingModes"
                       item-value="value"
                       item-text="name"
@@ -70,7 +70,7 @@
               </v-list>
             </v-card>
           </v-col>
-          <v-col v-if="roomStat.RoomState === 0">
+          <v-col v-if="roomStat.HeatingMode === 0">
             <v-card
               max-width="500"
               class="mx-auto">
@@ -123,7 +123,7 @@
             </v-list>
           </v-card>
         </v-col>
-        <v-col v-if="roomStat.RoomState === 1">
+        <v-col v-if="roomStat.HeatingMode === 1">
           <v-card
           max-width="500"
           class="mx-auto">
@@ -306,7 +306,7 @@ export default {
       ],
       roomScheduleUsed: [ { name: '사용안함', value: 0 }, { name: '사용', value: 1 }
       ],
-      roomStats: [ { name: '빈방', value: 0 }, { name: '예약', value: 1 }, { name: '재실', value: 2 }
+      roomStats: [ { name: '공실', value: 0 }, { name: '예비', value: 1 }, { name: '입실', value: 2 }
       ],
       roomHeatingModes: [ { name: '자동', value: 0 }, { name: '수동', value: 1 }, { name: '정지', value: 2 } ],
       heatingModes: [ { name: '자동', value: 0 }, { name: '수동', value: 1 }, { name: '정지', value: 2 } ],

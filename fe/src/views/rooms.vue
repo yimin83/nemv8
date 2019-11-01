@@ -1,76 +1,102 @@
 <template>
   <v-container grid-list-md>
-    <v-divider class='my-3'></v-divider>
-    난방(보일러 on) : {{this.SetStatus}}({{this.CurStatus}})
-    <v-divider class='my-3'></v-divider>
+    <v-divider class='my-3 mt-0'></v-divider>
+      <div class="text--primary ma-0">
+      난방(보일러 on) : {{this.SetStatus}}({{this.CurStatus}})
+      </div>
+    <v-divider class='my-3 mt-0'></v-divider>
     <v-layout row wrap >
       <v-chip
-        class="d-inline-flex ma-1 pa-1"
+        class="d-inline-flex ma-0 pa-1 font-weight-bold"
         color="blue-grey lighten-4"
-        x-small>공실
-      </v-chip> : 공실&nbsp;&nbsp;
+        small>공실
+      </v-chip>
+      <div class="text--primary">
+         &nbsp;:&nbsp;공실&nbsp;
+      </div>
       <v-chip
-        class="d-inline-flex ma-1 pa-1"
+        class="d-inline-flex ma-0 pa-1 font-weight-bold"
         color="orange lighten-3"
-        x-small>
+        small>
         예비
-      </v-chip> : 예비난방&nbsp;&nbsp;
+      </v-chip>
+      <div class="text--primary">
+         &nbsp;:&nbsp;예비난방&nbsp;
+      </div>
       <v-chip
-        class="d-inline-flex ma-1 pa-1"
+        class="d-inline-flex ma-0 pa-1 font-weight-bold"
         color="pink lighten-2"
-        x-small
+        small
       >
-        재실
-      </v-chip> : 재실&nbsp;&nbsp;
+        입실
+      </v-chip>
+      <div class="text--primary">
+         &nbsp;:&nbsp;입실&nbsp;&nbsp;|&nbsp;&nbsp;
+      </div>
       <v-chip
-        class="d-inline-flex ma-1 pa-1"
-        color="green lighten-2"
-        x-small
+        class="d-inline-flex ma-0 pa-1 font-weight-bold"
+        color="light-green accent-2"
+        small
       >
         자동
-      </v-chip> : 난방모드 자동&nbsp;&nbsp;
+      </v-chip>
+      <div class="text--primary">
+         &nbsp;:&nbsp;난방모드 자동&nbsp;
+      </div>
       <v-chip
-        class="d-inline-flex ma-1 pa-1"
-        color="blue lighten-3"
-        x-small
+        class="d-inline-flex ma-0 pa-1 font-weight-bold"
+        color="indigo lighten-2"
+        small
       >
         수동
-      </v-chip> : 난방모드 수동&nbsp;&nbsp;
+      </v-chip>
+      <div class="text--primary">
+         &nbsp;:&nbsp;난방모드 수동&nbsp;
+      </div>
       <v-chip
-        class="d-inline-flex ma-1 pa-1"
+        class="d-inline-flex ma-0 pa-1 font-weight-bold"
         color="blue-grey lighten-4"
-        x-small
+        small
       >
         정지
-      </v-chip> : 난방모드 정지 &nbsp;&nbsp;
+      </v-chip>
+      <div class="text--primary">
+         &nbsp;:&nbsp;난방모드 정지 &nbsp;&nbsp;|&nbsp;&nbsp;
+      </div>
       <v-chip
-        class="d-inline-flex ma-1 pa-1"
-        color="red darken-1"
-        x-small
+        class="d-inline-flex ma-0 pa-1 font-weight-bold"
+        color="deep-orange lighten-4"
+        small
       >
-        ON
-      </v-chip> : 보일러 가동&nbsp;&nbsp;
+        &nbsp;
+      </v-chip>
+      <div class="text--primary">
+         &nbsp;:&nbsp;보일러 가동&nbsp;
+      </div>
       <v-chip
-        class="d-inline-flex ma-1 pa-1"
-        color="blue-grey lighten-4"
-        x-small
+        class="d-inline-flex ma-0 pa-1 font-weight-bold"
+        color="blue-grey lighten-5"
+        small
       >
-        OFF
-      </v-chip> : 보일러 중지&nbsp;&nbsp;
+        &nbsp;
+      </v-chip>
+      <div class="text--primary">
+         &nbsp;:&nbsp;보일러 중지&nbsp;|&nbsp;&nbsp;
+      </div>
       <v-card
-        class="d-inline-flex  ma-0 pa-0"
+        class="d-inline-flex  ma-0 pa-0 font-weight-bold"
         color="blue lighten-4"
         outlined
       >
-        <div>실내온도</div>
+        <div class="text--primary">실내온도</div>
       </v-card>
-      &nbsp;&nbsp;
+      &nbsp;
       <v-card
-        class="d-inline-flex ma-0 pa-0"
+        class="d-inline-flex ma-0 pa-0 font-weight-bold"
         color="light-blue accent-1"
         outlined
       >
-        <div>바닥온도</div>
+        <div class="text--primary">바닥온도</div>
       </v-card>
     </v-layout>
     <v-divider class='my-3'></v-divider>
@@ -80,97 +106,163 @@
           :key='room'
           text-xs-left
         >
-        <v-item >
+        <v-item v-if='room.ucCurStatus === 1'>
           <v-card
-            :elevation="10"
-            color='grey lighten-3' class='ma-0 pa-0'
-            full-width
-            width='110px'
+            color='green accent-1'
+            class='ma-0 pa-0 font-weight-bold'
+            outlined
+            width='115px'
             lg=12
             md=12
             sm=3
-            xs=3>
-            <v-card-title>
+            xs=3 >
+            <v-card-text class="text-center">
+              <div class="text--primary mb-1">
                 {{room.usRoomNo}}호
-            </v-card-title>
-            <v-card-text>
+              </div>
               <div class="text-center ma-0 pa-0">
                 <v-chip
                   v-if='room.ucRoomState === 0'
-                  class="d-inline-flex ma-1 pa-1"
+                  class="d-inline-flex ma-0 mr-1 pa-1"
                   color="blue-grey lighten-4"
-                  x-small>공실
+                  small>공실
                 </v-chip>
                 <v-chip
                   v-if='room.ucRoomState === 1'
-                  class="d-inline-flex ma-1 pa-1"
+                  class="d-inline-flex ma-0 mr-1 pa-1"
                   color="orange lighten-3"
-                  x-small>
+                  small>
                   예비
                 </v-chip>
                 <v-chip
                   v-if='room.ucRoomState === 3'
-                  class="d-inline-flex ma-1 pa-1"
+                  class="d-inline-flex ma-0 mr-1 pa-1"
                   color="pink lighten-2"
-                  x-small
+                  small
                 >
-                  재실
+                  입실
                 </v-chip>
                 <v-chip
                   v-if='room.usManHeatingMode === 0'
-                  class="d-inline-flex ma-1 pa-1"
-                  color="green lighten-2"
-                  x-small
+                  class="d-inline-flex ma-0 ml-1 pa-1"
+                  color="light-green accent-2"
+                  small
                 >
                   자동
                 </v-chip>
                 <v-chip
                   v-if='room.usManHeatingMode === 1'
-                  class="d-inline-flex ma-1 pa-1"
+                  class="d-inline-flex ma-0 ml-1 pa-1"
                   color="blue lighten-3"
-                  x-small
+                  small
                 >
                   수동
                 </v-chip>
                 <v-chip
                   v-if='room.usManHeatingMode === 2'
-                  class="d-inline-flex ma-1 pa-1"
+                  class="d-inline-flex ma-0 pa-1"
                   color="blue-grey lighten-4"
-                  x-small
+                  small
                 >
                   정지
-                </v-chip>
-                <v-chip
-                  v-if='room.ucCurStatus === 0 || room.ucCurStatus === 2'
-                  class="d-inline-flex ma-1 pa-1"
-                  color="blue-grey lighten-4"
-                  x-small
-                >
-                  OFF
-                </v-chip>
-                <v-chip
-                  v-if='room.ucCurStatus === 1'
-                  class="d-inline-flex ma-1 pa-1"
-                  color="red darken-1"
-                  x-small
-                >
-                  ON
                 </v-chip>
               </div>
               <div class="text-center ma-0 pa-0">
                 <v-card
-                  class="d-inline-flex  ma-1 pa-0"
+                  class="d-inline-flex ma-0 mt-1 mr-1 pa-0 pt pl-1 pr-1"
                   color="blue lighten-4"
                   label="실내온도"
-                  x-small
+                  small
                 >
                   <div>{{(room.fTroom_cur !== 255) ? room.fTroom_cur : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
                 </v-card>
                 <v-card
-                  class="d-inline-flex ma-1 pa-0"
+                  class="d-inline-flex ma-0 mt-1 ml-1 pa-0 pl-1 pr-1"
                   color="light-blue accent-1"
                   label="바닥온도"
-                  x-small
+                  small
+                >
+                  <div>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                </v-card>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-item>
+        <v-item v-if='room.ucCurStatus === 0 || room.ucCurStatus === 2'>
+          <v-card
+            color='blue-grey lighten-5'
+            class='ma-0 pa-0 font-weight-bold'
+            outlined
+            width='115px'
+            lg=12
+            md=12
+            sm=3
+            xs=3 >
+            <v-card-text class="text-center">
+              <div class="text--primary mb-1">
+                {{room.usRoomNo}}호
+              </div>
+              <div class="text-center ma-0 pa-0">
+                <v-chip
+                  v-if='room.ucRoomState === 0'
+                  class="d-inline-flex ma-0 mr-1 pa-1"
+                  color="blue-grey lighten-4"
+                  small>공실
+                </v-chip>
+                <v-chip
+                  v-if='room.ucRoomState === 1'
+                  class="d-inline-flex ma-0 mr-1 pa-1"
+                  color="orange lighten-3"
+                  small>
+                  예비
+                </v-chip>
+                <v-chip
+                  v-if='room.ucRoomState === 3'
+                  class="d-inline-flex ma-0 mr-1 pa-1"
+                  color="pink lighten-2"
+                  small
+                >
+                  입실
+                </v-chip>
+                <v-chip
+                  v-if='room.usManHeatingMode === 0'
+                  class="d-inline-flex ma-0 ml-1 pa-1"
+                  color="light-green accent-2"
+                  small
+                >
+                  자동
+                </v-chip>
+                <v-chip
+                  v-if='room.usManHeatingMode === 1'
+                  class="d-inline-flex ma-0 ml-1 pa-1"
+                  color="blue lighten-3"
+                  small
+                >
+                  수동
+                </v-chip>
+                <v-chip
+                  v-if='room.usManHeatingMode === 2'
+                  class="d-inline-flex ma-0 pa-1"
+                  color="blue-grey lighten-4"
+                  small
+                >
+                  정지
+                </v-chip>
+              </div>
+              <div class="text-center ma-0 pa-0">
+                <v-card
+                  class="d-inline-flex ma-0 mt-1 mr-1 pa-0 pt pl-1 pr-1"
+                  color="blue lighten-4"
+                  label="실내온도"
+                  small
+                >
+                  <div>{{(room.fTroom_cur !== 255) ? room.fTroom_cur : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                </v-card>
+                <v-card
+                  class="d-inline-flex ma-0 mt-1 ml-1 pa-0 pl-1 pr-1"
+                  color="light-blue accent-1"
+                  label="바닥온도"
+                  small
                 >
                   <div>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
                 </v-card>
@@ -340,10 +432,10 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn v-if='roomScheInfo.nIdx === 0' color='blue darken-1' flat @click='reserveRoomSche()'>예약</v-btn>
-          <v-btn v-if='roomScheInfo.nIdx != 0' color='blue darken-1' flat @click='saveReserveRoom(roomScheInfo.nIdx)'>예약수정</v-btn>
-          <v-btn v-if='roomScheInfo.nIdx != 0' color='blue darken-1' flat @click='cancelReserveRoom(roomScheInfo.nIdx)'>예약취소</v-btn>
-          <v-btn color='blue darken-1' flat @click='closeReserveRoom()'>닫기</v-btn>
+          <v-btn v-if='roomScheInfo.nIdx === 0' color='indigo lighten-2' flat @click='reserveRoomSche()'>예약</v-btn>
+          <v-btn v-if='roomScheInfo.nIdx != 0' color='indigo lighten-2' flat @click='saveReserveRoom(roomScheInfo.nIdx)'>예약수정</v-btn>
+          <v-btn v-if='roomScheInfo.nIdx != 0' color='indigo lighten-2' flat @click='cancelReserveRoom(roomScheInfo.nIdx)'>예약취소</v-btn>
+          <v-btn color='indigo lighten-2' flat @click='closeReserveRoom()'>닫기</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -527,10 +619,10 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color='blue darken-1' flat @click='cmdRoomState(roomConfigs.RoomNo)'>{{reservedTxt}}</v-btn>
-          <v-btn v-if='roomStatInfo.usManHeatingMode === 1' color='blue darken-1' flat @click='cmdManualHeating(roomConfigs.RoomNo)'>{{boilerOnOffTxt}}</v-btn>
-          <v-btn color='blue darken-1' flat @click='saveSettingRoom(roomConfigs.RoomNo)'>저장</v-btn>
-          <v-btn color='blue darken-1' flat @click.native='settingRoomModal = false'>닫기</v-btn>
+          <v-btn color='indigo lighten-2' flat @click='cmdRoomState(roomConfigs.RoomNo)'>{{reservedTxt}}</v-btn>
+          <v-btn v-if='roomStatInfo.usManHeatingMode === 1' color='indigo lighten-2' flat @click='cmdManualHeating(roomConfigs.RoomNo)'>{{boilerOnOffTxt}}</v-btn>
+          <v-btn color='indigo lighten-2' flat @click='saveSettingRoom(roomConfigs.RoomNo)'>저장</v-btn>
+          <v-btn color='indigo lighten-2' flat @click.native='settingRoomModal = false'>닫기</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -605,7 +697,7 @@
             <v-card>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color='blue darken-1' flat @click.native='roomScheduleModal = false'>닫기</v-btn>
+                <v-btn color='indigo lighten-2' flat @click.native='roomScheduleModal = false'>닫기</v-btn>
               </v-card-actions>
             </v-card>
         </v-flex>

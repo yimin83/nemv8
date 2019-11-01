@@ -16,33 +16,34 @@ var Msg_Status_OK = 0
 var web_interface = 0x80
 
 const oam_msg_type_e = {
-	oam_set_sys_config : 1,		// if you change this, you should change _ems_msg_type_stat_e [_set_sys_config] too
-	oam_get_sys_config : 2,			// get sys config
+	oam_set_sys_config: 1,		// if you change this, you should change _ems_msg_type_stat_e [_set_sys_config] too
+	oam_get_sys_config: 2,			// get sys config
 
-	oam_cmd_floorRad_manual_heating : 3,
-	oam_cmd_floorRad_room_state : 4,
-	oam_cmd_checkIn : 5,
-	oam_cmd_load_db : 6,
+	oam_cmd_floorRad_manual_heating: 3,
+	oam_cmd_floorRad_room_state: 4,
+	oam_cmd_checkIn: 5,
+	oam_cmd_load_db: 6,
 
-	oam_set_floorRad_room_config : 7,
-	oam_get_floorRad_room_config : 8,
+	oam_set_floorRad_room_config: 7,
+	oam_get_floorRad_room_config: 8,
 
-	oam_set_solBeach_zone_config : 9,
-	oam_get_solBeach_zone_config : 10,
+	oam_set_solBeach_zone_config: 9,
+	oam_get_solBeach_zone_config: 10,
 
-	oam_set_solBeach_damper_scheduler : 11,
-	oam_get_solBeach_damper_scheduler : 12,
+	oam_set_solBeach_damper_scheduler: 11,
+	oam_get_solBeach_damper_scheduler: 12,
 
-	oam_set_floorRad_room_state : 13,
-	oam_get_floorRad_room_state : 14,
+	oam_set_floorRad_room_state: 13,
+	oam_get_floorRad_room_state: 14,
 
-	oam_set_floorRad_room_priority : 15,
-	oam_get_floorRad_room_priority : 16,
+	oam_set_floorRad_room_priority: 15,
+	oam_get_floorRad_room_priority: 16,
 
-	oam_event_alarm : 17
+	oam_get_session_info: 17,
+
+	oam_event_alarm: 18
 }
 
-mysqlDB.connect()
 var client = net.getConnection()
 /* GET home page. */
 
@@ -83,7 +84,7 @@ var roomsArr = []
 var makeRsvRoomsArr = function () {
 	mysqlDB.query("SELECT * FROM floor_rad_room", function(err, result, fields) {
     if(err) {
-      console.log("############ makeRsvRoomsArr 쿼리문에 오류가 있습니다.")
+      console.log("############ makeRsvRoomsArr error : " + err)
     }
     else{
 			if(result!=null) {
@@ -126,7 +127,7 @@ function refreshRsvRooms (option, callback) {
 	for ( var i = 0; i < roomsArr.length; i++) {
 		mysqlDB.query("SELECT * FROM roomsschedule where usRoomNo = ? ORDER BY nCheckInTime asc limit 1", [roomsArr[i].usRoomNo], function(err, result, fields) {
 	    if(err) {
-	      console.log("############ refreshRsvRooms 쿼리문에 오류가 있습니다. err : " + err)
+	      console.log("############ refreshRsvRooms error : " + err)
 	    }
 	    else{
 				if(result.length != 0  ) {
@@ -165,7 +166,7 @@ var checkRsvRoomsArr = function () {
 	for ( var i = 0; i < roomsArr.length; i++) {
 		mysqlDB.query("SELECT * FROM roomsschedule where usRoomNo = ? ORDER BY nCheckInTime asc limit 1", [roomsArr[i].usRoomNo], function(err, result, fields) {
 	    if(err) {
-	      console.log("############ checkRsvRoomsArr 쿼리문에 오류가 있습니다. err : " + err)
+	      console.log("############ checkRsvRoomsArr error : " + err)
 	    }
 	    else{
 				if(result.length != 0  ) {
@@ -188,7 +189,7 @@ router.get('/', function(req, res, next) {
 	console.log("############ get floor_rad_room ############")
   mysqlDB.query("SELECT * FROM floor_rad_room", function(err, result, fields) {
     if(err) {
-      console.log("############ get floor_rad_room 쿼리문에 오류가 있습니다.")
+      console.log("############ get floor_rad_room error : " + err)
     }
     else{
       res.json(result)
@@ -252,6 +253,7 @@ router.put('/ahusConfig', (req, res, next) => { // 수정
 	for (var key in req.body.ahuIdxs) {
 		dataBuffer = net.makeAhuZoneConfigMsg_t(
 			req.body.ahuIdxs[key], req.body.config.NotifyOccupantsState,
+			req.body.config.EconomizerCycle, req.body.config.VarTempControl,
 			req.body.config.HCMode, req.body.config.FanAutoManual,
 			req.body.config.DamperAutoManual, req.body.config.Tzone_set,
 			req.body.config.Rdamp_set, req.body.config.PPMco2_set, req.body.config.Desc
@@ -314,7 +316,7 @@ router.put('/roomStatTrend', (req, res, next) => { // 수정
   // console.log("######################### getRoomConfig ######################### ")
 	mysqlDB.query("SELECT * FROM ( SELECT CurTime DIV ? AS m, AVG(HeatingCnt) AS HeatingCnt, AVG(HeatingRoomCnt) AS HeatingRoomCnt, AVG(Tsurf_avg) AS Tsurf_avg, AVG(Troom_avg) AS Troom_avg, AVG(Tout) AS Tout FROM floor_rad_stat WHERE CurTime >= UNIX_TIMESTAMP(?) AND CurTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, startTime, endTime], function(err, result, fields) {
 		if(err) {
-			console.log("roomStatTrend 쿼리문에 오류가 있습니다. err : " + err)
+			console.log("############ put /roomStatTrend error : " + err)
 		}
 		else{
 			//console.log("############ get /roomStatTrend :" + JSON.stringify(result))
@@ -333,7 +335,7 @@ router.put('/getRoomTrend', (req, res, next) => { // 수정
 	mysqlDB.query(
 		"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m, AVG(ucRoomState) AS ucRoomState, AVG(ucSetStatus) AS ucSetStatus, AVG(ucCurStatus) AS ucCurStatus, AVG(fTset) AS fTset, AVG(fTsurf_cur) AS fTsurf_cur, AVG(fTroom_cur) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
 		if(err) {
-			console.log("getRoomTrend 쿼리문에 오류가 있습니다. err : " + err)
+			console.log("############ put /getRoomTrend error : " + err)
 		}
 		else{
 			console.log("############ put /getRoomTrend :" + JSON.stringify(result))
@@ -348,12 +350,29 @@ router.put('/solTrend', (req, res, next) => { // 수정
 	const endTime = req.body.endTime
 	const time = req.body.time
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT * FROM ( SELECT CurTime DIV ? AS m, AVG(FanOperationCnt) AS FanOperationCnt, AVG(Tzone) AS Tzone, AVG(Rdamp) AS Rdamp, AVG(PPMco2) AS PPMco2 FROM solbeach_stat WHERE CurTime >= UNIX_TIMESTAMP(?) AND CurTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, startTime, endTime], function(err, result, fields) {
+	mysqlDB.query("SELECT * FROM ( SELECT CurTime DIV ? AS m, AVG(HCOnCnt) AS HCOnCnt, AVG(HCOffCnt) AS HCOffCnt, AVG(VentilationCnt) AS VentilationCnt, AVG(Tzone) AS Tzone, AVG(Rdamp) AS Rdamp, AVG(PPMco2) AS PPMco2 FROM solbeach_stat WHERE CurTime >= UNIX_TIMESTAMP(?) AND CurTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, startTime, endTime], function(err, result, fields) {
 		if(err) {
-			console.log("getSolTrend 쿼리문에 오류가 있습니다. err : " + err)
+			console.log("############ put /getSolTrend error : " + err)
 		}
 		else{
-			// console.log("############ get /getSolTrend :" + JSON.stringify(result))
+			console.log("############ get /getSolTrend :" + JSON.stringify(result))
+			res.json(result)
+		}
+	})
+})
+
+router.put('/siteEnv', (req, res, next) => { // 수정
+console.log("############ put /siteEnv req.body : " + JSON.stringify(req.body))
+	const startTime = req.body.startTime
+	const endTime = req.body.endTime
+	const time = req.body.time
+  // console.log("######################### getRoomConfig ######################### ")
+	mysqlDB.query("SELECT * FROM ( SELECT  nLastUpdateTime DIV ? AS m, AVG(fTout) AS fTout FROM site_env_record WHERE nSiteIdx = 2 AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, startTime, endTime], function(err, result, fields) {
+		if(err) {
+			console.log("############ put /siteEnv error : " + err)
+		}
+		else{
+			// console.log("############ get /solAhuTrend :" + JSON.stringify(result))
 			res.json(result)
 		}
 	})
@@ -366,9 +385,9 @@ console.log("############ put /solAhuTrend req.body : " + JSON.stringify(req.bod
 	const endTime = req.body.endTime
 	const time = req.body.time
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT * FROM ( SELECT  nLastUpdateTime DIV ? AS m, AVG(fData_damper_manual_set) AS fData_damper_manual_set, AVG(fData_temp_supply) AS fData_temp_supply, AVG(nPPMco2_cur) AS nPPMco2_cur FROM solbeach_zone_record WHERE nZoneIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, ahuNo, startTime, endTime], function(err, result, fields) {
+	mysqlDB.query("SELECT * FROM ( SELECT  nLastUpdateTime DIV ? AS m, AVG(fData_damper_manual_set) AS fData_damper_manual_set, AVG(fData_temp_supply) AS fData_temp_supply, AVG(cState_supplay_fan) AS cState_supplay_fan, AVG(fData_hc_set_temp) AS fData_hc_set_temp, AVG(fData_temp_return) AS fData_temp_return, AVG(cMode_damper_auto_manual) AS cMode_damper_auto_manual, AVG(nPPMco2_cur) AS nPPMco2_cur, AVG(cMode_manual_mode) AS cMode_manual_mode, AVG(cMode_auto_mode) AS cMode_auto_mode, AVG(cMode_auto_manual) AS cMode_auto_manual FROM solbeach_zone_record WHERE nZoneIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, ahuNo, startTime, endTime], function(err, result, fields) {
 		if(err) {
-			console.log("solAhuTrend 쿼리문에 오류가 있습니다. err : " + err)
+			console.log("############ put /solAhuTrend error : " + err)
 		}
 		else{
 			// console.log("############ get /solAhuTrend :" + JSON.stringify(result))
@@ -392,35 +411,65 @@ router.get('/emsSysConfig', function(req, res, next) {
 })
 
 router.put('/emsSysConfig', (req, res, next) => { // 수정
-	console.log("############ put emsSysConfig values : " + JSON.stringify(req.body))
-	console.log("emsSysConfig req.body.configs : " + JSON.stringify(req.body.configs) + ", PacketMinIntervalSec : " + req.body.configs.PacketMinIntervalSec)
+	// console.log("############ put emsSysConfig values : " + JSON.stringify(req.body))
+	console.log("############ put emsSysConfig req.body.configs : " + JSON.stringify(req.body.configs) + ", HeatingHighTemp : " + req.body.configs.tSolBeachConf.tVariableTemp.HeatingHighTemp)
 	var dataBuffer = new Buffer(net.getSizeEmsSysConf_t())
 	dataBuffer = net.makeEmsSysConf_t(
-		req.body.configs.PacketMinIntervalSec, req.body.configs.ControlPeriodSec,
-		{IpAddress:req.body.configs.tAddr.IpAddress, PortNo:req.body.configs.tAddr.PortNo},
-		{LogOption:req.body.configs.tLog.LogOption, LogDir:req.body.configs.tLog.LogDir, StatFileName:req.body.configs.tLog.StatFileName,
-			LogFileName:req.body.configs.tLog.LogFileName, DBFileName:req.body.configs.tLog.DBFileName, LogPeriod:req.body.configs.tLog.LogPeriod,
-			StatPeriod:req.body.configs.tLog.StatPeriod, DBStatPeriod:req.body.configs.tLog.DBStatPeriod},
-		{tAddr:{IpAddress:req.body.configs.tDataBase.tAddr.IpAddress, PortNo:req.body.configs.tDataBase.tAddr.PortNo},
-		  Name:req.body.configs.tDataBase.Name, ID:req.body.configs.tDataBase.ID, PassWd:req.body.configs.tDataBase.PassWd},
-		{ID:req.body.configs.tSMS.ID, Key:req.body.configs.tSMS.Key},
-		req.body.configs.ReservedOption1, req.body.configs.ReservedOption2,
-		{IpAddress:req.body.configs.tRemoteAddr.IpAddress, PortNo:req.body.configs.tRemoteAddr.PortNo},
-		{ControlOption:req.body.configs.tFloorRadConf.ControlOption, RoomCount:req.body.configs.tFloorRadConf.RoomCount,
-			UseTsurf:req.body.configs.tFloorRadConf.UseTsurf, Troom_set:req.body.configs.tFloorRadConf.Troom_set,
-			Tsurf_set:req.body.configs.tFloorRadConf.Tsurf_set, Troom_cr:req.body.configs.tFloorRadConf.Troom_cr,
-			Tsurf_cr:req.body.configs.tFloorRadConf.Tsurf_cr, Tctrl_res:req.body.configs.tFloorRadConf.Tctrl_res,
-			Tsurf_init:req.body.configs.tFloorRadConf.Tsurf_init, Tset_init_inc:req.body.configs.tFloorRadConf.Tset_init_inc,
-			Tset_init_inc_max:req.body.configs.tFloorRadConf.Tset_init_inc_max, CheckInHour:req.body.configs.tFloorRadConf.CheckInHour,
-			Tset_init_inc_max:req.body.configs.tFloorRadConf.RR_CheckInHour, CheckInHour:req.body.configs.tFloorRadConf.RR_StayHour,
-			TelNumber0:req.body.configs.tFloorRadConf.TelNumber0, TelNumber1:req.body.configs.tFloorRadConf.TelNumber1,
-			TelNumber2:req.body.configs.tFloorRadConf.TelNumber2, TelNumber3:req.body.configs.tFloorRadConf.TelNumber3,
+		req.body.configs.PacketMinIntervalSec,
+		req.body.configs.ControlPeriodSec,
+		{
+			IpAddress:req.body.configs.tAddr.IpAddress,
+			PortNo:req.body.configs.tAddr.PortNo},
+		{
+			LogOption:req.body.configs.tLog.LogOption,
+			LogDir:req.body.configs.tLog.LogDir,
+			StatFileName:req.body.configs.tLog.StatFileName,
+			LogFileName:req.body.configs.tLog.LogFileName,
+			DBFileName:req.body.configs.tLog.DBFileName,
+			LogPeriod:req.body.configs.tLog.LogPeriod,
+			StatPeriod:req.body.configs.tLog.StatPeriod,
+			DBStatPeriod:req.body.configs.tLog.DBStatPeriod},
+		{
+			tAddr:{IpAddress:req.body.configs.tDataBase.tAddr.IpAddress, PortNo:req.body.configs.tDataBase.tAddr.PortNo},
+		  Name:req.body.configs.tDataBase.Name,
+			ID:req.body.configs.tDataBase.ID,
+			PassWd:req.body.configs.tDataBase.PassWd},
+		{
+			ID:req.body.configs.tSMS.ID,
+			Key:req.body.configs.tSMS.Key},
+		req.body.configs.DummyPktPeriod,
+		req.body.configs.ReservedOption1,
+		req.body.configs.ReservedOption2,
+		req.body.configs.SiteInfo,
+		{
+			IpAddress:req.body.configs.tRemoteAddr.IpAddress,
+			PortNo:req.body.configs.tRemoteAddr.PortNo},
+		{
+			ControlOption:req.body.configs.tFloorRadConf.ControlOption,
+			RoomCnt:req.body.configs.tFloorRadConf.RoomCnt,
+			UseTsurf:req.body.configs.tFloorRadConf.UseTsurf,
+			Troom_set:req.body.configs.tFloorRadConf.Troom_set,
+			Tsurf_set:req.body.configs.tFloorRadConf.Tsurf_set,
+			Troom_cr:req.body.configs.tFloorRadConf.Troom_cr,
+			Tsurf_cr:req.body.configs.tFloorRadConf.Tsurf_cr,
+			Tctrl_res:req.body.configs.tFloorRadConf.Tctrl_res,
+			CheckInHour:req.body.configs.tFloorRadConf.CheckInHour,
+			RR_StayHour:req.body.configs.tFloorRadConf.RR_StayHour,
+			TelNumber0:req.body.configs.tFloorRadConf.TelNumber0,
+			TelNumber1:req.body.configs.tFloorRadConf.TelNumber1,
+			TelNumber2:req.body.configs.tFloorRadConf.TelNumber2,
+			TelNumber3:req.body.configs.tFloorRadConf.TelNumber3,
 			TelNumber4:req.body.configs.tFloorRadConf.TelNumber4,
+			OperationOption:req.body.configs.tFloorRadConf.OperationOption,
+			Reserved1:req.body.configs.tFloorRadConf.Reserved1,
+			Reserved2:req.body.configs.tFloorRadConf.Reserved2,
 			tVariableTemp:{
 				HeatingHighTemp:req.body.configs.tFloorRadConf.tVariableTemp.HeatingHighTemp,
 				HeatingLowTemp:req.body.configs.tFloorRadConf.tVariableTemp.HeatingLowTemp,
 				HeatingDelatTemp:req.body.configs.tFloorRadConf.tVariableTemp.HeatingDelatTemp,
-				LowCoolingTemp:req.body.configs.tFloorRadConf.tVariableTemp.LowCoolingTemp},
+				CoolingHighTemp:req.body.configs.tFloorRadConf.tVariableTemp.CoolingHighTemp,
+				CoolingLowTemp:req.body.configs.tFloorRadConf.tVariableTemp.CoolingLowTemp,
+				CoolingDelatTemp:req.body.configs.tFloorRadConf.tVariableTemp.CoolingDelatTemp},
 			tPeak:{
 				MaxHeatingRoom:req.body.configs.tFloorRadConf.tPeak.MaxHeatingRoom,
 				NightMaxHeatingRoom:req.body.configs.tFloorRadConf.tPeak.NightMaxHeatingRoom},
@@ -431,50 +480,89 @@ router.put('/emsSysConfig', (req, res, next) => { // 수정
 				DRTimeHour:req.body.configs.tFloorRadConf.tDemandResponse.DRTimeHour},
 			tPreHeating:{
 				Option:req.body.configs.tFloorRadConf.tPreHeating.Option,
-				RerservedRoomOption:req.body.configs.tFloorRadConf.tPreHeating.RerservedRoomOption,
 				Tout_avg:req.body.configs.tFloorRadConf.tPreHeating.Tout_avg,
 				WF_Toutdoor:req.body.configs.tFloorRadConf.tPreHeating.WF_Toutdoor,
 				WF_Tdiff:req.body.configs.tFloorRadConf.tPreHeating.WF_Tdiff,
 				IncTempRate:req.body.configs.tFloorRadConf.tPreHeating.IncTempRate,
 				DecTempRate:req.body.configs.tFloorRadConf.tPreHeating.DecTempRate,
 				PH_StartTimeErrRange:req.body.configs.tFloorRadConf.tPreHeating.PH_StartTimeErrRange,
-				PH_LowLoadStartTimeErrRange:req.body.configs.tFloorRadConf.tPreHeating.PH_LowLoadStartTimeErrRange}
-			},
-			{ ControlOption:req.body.configs.tSolBeachConf.ControlOption, ZoneCnt:req.body.configs.tSolBeachConf.ZoneCnt,
-				HCMode:req.body.configs.tSolBeachConf.HCMode, Tzone_set:req.body.configs.tSolBeachConf.Tzone_set,
-				Tctrl_res:req.body.configs.tSolBeachConf.Tctrl_res, TelNumber0:req.body.configs.tSolBeachConf.TelNumber0,
-				TelNumber1:req.body.configs.tSolBeachConf.TelNumber1, TelNumber2:req.body.configs.tSolBeachConf.TelNumber2,
-				TelNumber3:req.body.configs.tSolBeachConf.TelNumber3, TelNumber4:req.body.configs.tSolBeachConf.TelNumber4,
-				CO2LoadPeriodSec:req.body.configs.tSolBeachConf.CO2LoadPeriodSec,
-				tRdamp:{
-					DamperCtrlMode:req.body.configs.tSolBeachConf.tRdamp.DamperCtrlMode,
-					Rdamp_set:req.body.configs.tSolBeachConf.tRdamp.Rdamp_set,
-					Rdamp_min:req.body.configs.tSolBeachConf.tRdamp.Rdamp_min,
-					Rdamp_max:req.body.configs.tSolBeachConf.tRdamp.Rdamp_max,
-					Rdamp_ctrl_res:req.body.configs.tSolBeachConf.tRdamp.Rdamp_ctrl_res,
-					NotifyIntervalSec:req.body.configs.tSolBeachConf.tRdamp.NotifyIntervalSec,
-					PPMco2_set:req.body.configs.tSolBeachConf.tRdamp.PPMco2_set,
-					DamperAutoManual:req.body.configs.tSolBeachConf.tRdamp.DamperAutoManual,
-					NotifyStartHour:req.body.configs.tSolBeachConf.tRdamp.NotifyStartHour,
-					NotifyEndHour:req.body.configs.tSolBeachConf.tRdamp.NotifyEndHour},
-				tPID:{
-					PIDCtrlMode:req.body.configs.tSolBeachConf.tPID.PIDCtrlMode,
-					ControlStepValue:req.body.configs.tSolBeachConf.tPID.ControlStepValue,
-					Kp:req.body.configs.tSolBeachConf.tPID.Kp,
-					Ki:req.body.configs.tSolBeachConf.tPID.Ki,
-					Kd:req.body.configs.tSolBeachConf.tPID.Kd},
-				tC02Conf:{
-					ControlMode:req.body.configs.tSolBeachConf.tC02Conf.ControlMode,
-					PPMco2_rate_wf:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_rate_wf,
-					PPMco2_empty:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_empty,
-					PPMco2_occupied:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_occupied,
-					PPMco2_inc_rate:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_inc_rate,
-					PPMco2_dec_rate:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_dec_rate,
-					PPMco2_inc_time:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_inc_time,
-					PPMco2_dec_time:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_dec_time}
-				}
+				PH_LowLoadStartTimeErrRange:req.body.configs.tFloorRadConf.tPreHeating.PH_LowLoadStartTimeErrRange,
+				PH_TimeSecBeforeMax1:req.body.configs.tFloorRadConf.tPreHeating.PH_TimeSecBeforeMax1,
+				CooledRoomTsurf_init:req.body.configs.tFloorRadConf.tPreHeating.CooledRoomTsurf_init,
+				CooledRoomPHHourInc:req.body.configs.tFloorRadConf.tPreHeating.CooledRoomPHHourInc,
+				CooledRoomPHHourIncMax:req.body.configs.tFloorRadConf.tPreHeating.CooledRoomPHHourIncMax,
+				MaxPreHeatingStartHour:req.body.configs.tFloorRadConf.tPreHeating.MaxPreHeatingStartHour,
+				ControlPeriodSec:req.body.configs.tFloorRadConf.tPreHeating.ControlPeriodSec,
+				LowLoadTimeUseRatio:req.body.configs.tFloorRadConf.tPreHeating.LowLoadTimeUseRatio,
+				OccupiedRoomHeatingRatio:req.body.configs.tFloorRadConf.tPreHeating.OccupiedRoomHeatingRatio,
+				ReservedRoomHeatingRatio:req.body.configs.tFloorRadConf.tPreHeating.ReservedRoomHeatingRatio},
+			tNotify:{
+				NotifyOption:req.body.configs.tFloorRadConf.tNotify.NotifyOption,
+				NotifyIntervalSec:req.body.configs.tFloorRadConf.tNotify.NotifyIntervalSec,
+				NotifyStartHour:req.body.configs.tFloorRadConf.tNotify.NotifyStartHour,
+				NotifyEndHour:req.body.configs.tFloorRadConf.tNotify.NotifyEndHour}
+		},
+		{
+			ControlOption:req.body.configs.tSolBeachConf.ControlOption,
+			ZoneCnt:req.body.configs.tSolBeachConf.ZoneCnt,
+			HCMode:req.body.configs.tSolBeachConf.HCMode,
+			Tzone_set:req.body.configs.tSolBeachConf.Tzone_set,
+			Tctrl_res:req.body.configs.tSolBeachConf.Tctrl_res,
+			TelNumber0:req.body.configs.tSolBeachConf.TelNumber0,
+			TelNumber1:req.body.configs.tSolBeachConf.TelNumber1,
+			TelNumber2:req.body.configs.tSolBeachConf.TelNumber2,
+			TelNumber3:req.body.configs.tSolBeachConf.TelNumber3,
+			TelNumber4:req.body.configs.tSolBeachConf.TelNumber4,
+			CO2LoadPeriodSec:req.body.configs.tSolBeachConf.CO2LoadPeriodSec,
+			NoControlOption:req.body.configs.tSolBeachConf.NoControlOption,
+			SchedulerOption:req.body.configs.tSolBeachConf.SchedulerOption,
+			Reserved1:req.body.configs.tSolBeachConf.Reserved1,
+			Reserved2:req.body.configs.tSolBeachConf.Reserved2,
+			tRdamp:{
+				DamperCtrlMode:req.body.configs.tSolBeachConf.tRdamp.DamperCtrlMode,
+				Rdamp_set:req.body.configs.tSolBeachConf.tRdamp.Rdamp_set,
+				Rdamp_min:req.body.configs.tSolBeachConf.tRdamp.Rdamp_min,
+				Rdamp_max:req.body.configs.tSolBeachConf.tRdamp.Rdamp_max,
+				Rdamp_ctrl_res:req.body.configs.tSolBeachConf.tRdamp.Rdamp_ctrl_res,
+				Rdamp_noctrl_max:req.body.configs.tSolBeachConf.tRdamp.Rdamp_noctrl_max,
+				PPMco2_set:req.body.configs.tSolBeachConf.tRdamp.PPMco2_set,
+				DamperAutoManual:req.body.configs.tSolBeachConf.tRdamp.DamperAutoManual},
+			tPID:{
+				PIDCtrlMode:req.body.configs.tSolBeachConf.tPID.PIDCtrlMode,
+				ControlStepValue:req.body.configs.tSolBeachConf.tPID.ControlStepValue,
+				Kp:req.body.configs.tSolBeachConf.tPID.Kp,
+				Ki:req.body.configs.tSolBeachConf.tPID.Ki,
+				Kd:req.body.configs.tSolBeachConf.tPID.Kd},
+			tC02Conf:{
+				ControlMode:req.body.configs.tSolBeachConf.tC02Conf.ControlMode,
+				PPMco2_rate_wf:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_rate_wf,
+				PPMco2_wf:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_wf,
+				PPMco2_empty:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_empty,
+				PPMco2_occupied:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_occupied,
+				PPMco2_inc_rate:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_inc_rate,
+				PPMco2_dec_rate:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_dec_rate,
+				PPMco2_inc_time:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_inc_time,
+				PPMco2_dec_time:req.body.configs.tSolBeachConf.tC02Conf.PPMco2_dec_time},
+			tVariableTemp:{
+				HeatingHighTemp:req.body.configs.tSolBeachConf.tVariableTemp.HeatingHighTemp,
+				HeatingLowTemp:req.body.configs.tSolBeachConf.tVariableTemp.HeatingLowTemp,
+				HeatingDelatTemp:req.body.configs.tSolBeachConf.tVariableTemp.HeatingDelatTemp,
+				CoolingHighTemp:req.body.configs.tSolBeachConf.tVariableTemp.CoolingHighTemp,
+				CoolingLowTemp:req.body.configs.tSolBeachConf.tVariableTemp.CoolingLowTemp,
+				CoolingDelatTemp:req.body.configs.tSolBeachConf.tVariableTemp.CoolingDelatTemp},
+			tEconomizerCycle:{
+				Tout:req.body.configs.tSolBeachConf.tEconomizerCycle.Tout,
+				Hout:req.body.configs.tSolBeachConf.tEconomizerCycle.Hout,
+				Eout:req.body.configs.tSolBeachConf.tEconomizerCycle.Eout,
+				Reserved:req.body.configs.tSolBeachConf.tEconomizerCycle.Reserved},
+			tNotify:{
+				NotifyOption:req.body.configs.tSolBeachConf.tNotify.NotifyOption,
+				NotifyIntervalSec:req.body.configs.tSolBeachConf.tNotify.NotifyIntervalSec,
+				NotifyStartHour:req.body.configs.tSolBeachConf.tNotify.NotifyStartHour,
+				NotifyEndHour:req.body.configs.tSolBeachConf.tNotify.NotifyEndHour}
+		}
 	)
-	console.log(dataBuffer.toString('hex'))
+	// console.log(dataBuffer.toString('hex'))
 	dataLen = net.getSizeEmsSysConf_t()
   msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_sys_config, dataLen, null)
   totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
@@ -493,7 +581,7 @@ router.get('/ahusConfig', function(req, res, next) {
 	console.log("############ get ahusConfig ")
   mysqlDB.query("SELECT * FROM ahu_info", function(err, result, fields) {
     if(err) {
-      console.log("############ get ahusConfig 쿼리문에 오류가 있습니다.")
+      console.log("############ get ahusConfig error : " + err)
     }
     else{
       res.json(result)
@@ -505,7 +593,7 @@ router.get('/zones', function(req, res, next) {
 	console.log("############ get zones ")
   mysqlDB.query("SELECT * FROM solbeach_zone", function(err, result, fields) {
     if(err) {
-      console.log("############ get zones 쿼리문에 오류가 있습니다.")
+      console.log("############ get zones error : " + err)
     }
     else{
 			// console.log(JSON.stringify(result))
@@ -517,11 +605,11 @@ router.get('/zones', function(req, res, next) {
 
 router.get('/ahusConfig/:ahuIndex', function(req, res, next) {
   const ahuIndex = req.params.ahuIndex
-  var dataBuffer = new Buffer(4)
-  dataBuffer.writeUInt32LE(ahuIndex)
+	var data = new Uint16Array(2)
+	data[0] = ahuIndex
 	console.log("############ get /ahusConfig/:ahuIndex : " + ahuIndex)
   dataLen = 0
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_solBeach_zone_config, dataLen, dataBuffer)
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_solBeach_zone_config, dataLen, data)
   totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
   nSeq = counter.get()
   msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
@@ -535,10 +623,10 @@ router.get('/ahusConfig/:ahuIndex', function(req, res, next) {
 router.get('/damperConfig/:ahuIndex', function(req, res, next) {
 	console.log("############ get /damperConfig/:ahuIndex values : " + JSON.stringify(req.body))
   const ahuIndex = req.params.ahuIndex
-  var dataBuffer = new Buffer(4)
-  dataBuffer.writeUInt32LE(ahuIndex)
+	var data = new Uint16Array(2)
+	data[0] = ahuIndex
   dataLen = 0
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_solBeach_damper_scheduler, dataLen, dataBuffer)
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_solBeach_damper_scheduler, dataLen, data)
   totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
   nSeq = counter.get()
   msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
@@ -594,7 +682,7 @@ router.put('/cmdManualHeating', (req, res, next) => { // 수정
 
 router.put('/cmdRoomState', (req, res, next) => { // 수정
 	console.log("############ put cmdRoomState values : " + JSON.stringify(req.body))
-  var data = new Uint32Array(2)
+  var data = new Uint16Array(2)
 	data[0] = req.body.RoomNo
 	data[1] = req.body.RoomState
 	dataLen = 0
@@ -633,7 +721,7 @@ router.get('/:usRoomNo', (req, res, next) => { // 수정
 	// console.log("get room schedule : " + usRoomNo)
     mysqlDB.query("SELECT * FROM RoomsSchedule where usRoomNo = ?", [usRoomNo], function(err, result, fields) {
       if(err) {
-        console.log("###### /:usRoomNo 쿼리문에 오류가 있습니다.")
+        console.log("###### /:usRoomNo error : " + err)
       }
       else{
         res.json(result)
@@ -645,11 +733,10 @@ router.get('/getRoomConfig/:roomNo', (req, res, next) => { // 수정
 	const roomNo = req.params.roomNo
 	console.log("############ get /getRoomConfig/:roomNo  roomNo : "+roomNo+", body : " + JSON.stringify(req.body))
   // console.log("######################### getRoomConfig ######################### ")
-  var dataBuffer = new Buffer(2)
-  dataBuffer.writeUInt16LE(roomNo)
-  // console.log("###### getRoomConfig ###### roomNo : "+roomNo+", dataBuffer : " + dataBuffer.toString('hex') )
-  dataLen = 0
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_config, dataLen, dataBuffer)
+	var data = new Uint16Array(2)
+	data[0] = roomNo
+	dataLen = 0
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_config, dataLen, data)
   totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
   nSeq = counter.get()
   msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
@@ -787,11 +874,11 @@ var processCmdCheckIn = function(datas) {
 
 router.get('/getRoomStat/:roomNo', function(req, res, next) {
   const roomNo = req.params.roomNo
-  var dataBuffer = new Buffer(4)
-  dataBuffer.writeUInt32LE(roomNo)
+	var data = new Uint16Array(2)
+	data[0] = roomNo
 	console.log("############ get /getRoomStat/:roomNo : " + roomNo)
   dataLen = 0
-  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_state, dataLen, dataBuffer)
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_state, dataLen, data)
   totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
   nSeq = counter.get()
   msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
@@ -802,24 +889,10 @@ router.get('/getRoomStat/:roomNo', function(req, res, next) {
   IntervalA = setInterval(checkMap, 100, nSeq, res)
 })
 
-
-exports.getMysqlDB = function () {
-    console.log('getMysqlDB!!!!!!!!!!!!!!!!!!' )
-    //return mysqlDB
-}
-exports.getNet = function () {
-    console.log('getNet!!!!!!!!!!!!!!!!!!' )
-    //return client
-}
-exports.testFunc = function (res) {
-    console.log('testFunc!!!!!!!!!!!!!!!!!! ' + res )
-    //res.redirect("/")
-}
-
 exports.setSeqMap = function (seq, jsonData) {
-    //res.redirect("/")
+    // res.redirect("/")
     seqMap.set(seq, jsonData)
-    // console.log('setSeqMap seq : '+seq+' seqMap.get(seq) : ' + seqMap.get(seq))
+    console.log('setSeqMap seq : '+seq+' seqMap.get(seq) : ' + seqMap.get(seq))
 }
 
 exports.reconnectAuth = function () {
