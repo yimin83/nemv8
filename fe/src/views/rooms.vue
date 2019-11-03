@@ -104,7 +104,7 @@
       <v-flex
           text-xs-left
         >
-        <v-row justify="center">
+        <v-row justify="left">
           <v-col
             v-for='room in roomStat'
             :key='room'
@@ -449,8 +449,8 @@
         </v-row>
       </v-flex>
     </v-layout>
-    <v-dialog v-model='roomGraphModal' max-width='1000px'>
-      <v-card>
+    <v-dialog v-model='roomGraphModal' max-width='1000px' max-height='450px'>
+      <v-card max-height='450px'>
         <v-card-title>
           <span class='headline'>{{roomNo}}호 상태 그래프</span>
         </v-card-title>
@@ -1543,15 +1543,11 @@ export default {
               labels: {
                 show: true,
                 rotate: 0,
-                //format: 'yy/MM/dd HH:mm',
                 formatter: function(value) {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
             }
-            // yaxis: {
-            //   max:50
-            // }
           }
         })
         .catch((e) => {

@@ -896,7 +896,7 @@ var ahu_zone_config_msg_t = new struct("ahu_zone_config_msg_t", [
 	"PPMco2_set", struct.int32(),
 	"Desc", struct.char(32)
 ]);
-net.makeAhuZoneConfigMsg_t = function(ahuIndex, notifyOccupantsState, economizerCycle, varTempControl, hcMode, fanAutoManual, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, desc) {
+net.makeAhuZoneConfigMsg_t = function(ahuIndex, useScheduler, notifyOccupantsState, economizerCycle, varTempControl, hcMode, fanAutoManual, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, desc) {
   var buffer = new Buffer(ahu_zone_config_msg_t.size());
   ahu_zone_config_msg_t.encode(buffer,0, {
     AhuIndex: ahuIndex,

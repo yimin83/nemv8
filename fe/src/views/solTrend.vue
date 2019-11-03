@@ -55,12 +55,47 @@
             </v-btn>
           </v-col>
         </v-row>
-        <apexchart width="1000" height="700" type="line" :options="chartOptions" :series="series" ></apexchart>
+        <div id="wrapper">
+          <div id="chart-line2">
+            <apexchart type=line height=300 :options="chartOptionsLine2" :series="series2" />
+          </div>
+          <div id="chart-line">
+            <apexchart type=line height=200 :options="chartOptionsLine1" :series="series1" />
+          </div>
+          <div id="chart-line3">
+            <apexchart type=line height=150 :options="chartOptionsLine3" :series="series3" />
+          </div>
+          <div id="chart-line4">
+            <apexchart type=line height=150 :options="chartOptionsLine4" :series="series4" />
+          </div>
+        </div>
       </div>
     </v-layout>
   </v-container>
 </template>
 <script>
+Apex = {
+  dataLabels: {
+    enabled: false
+  },
+  stroke: {
+    curve: 'straight'
+  },
+  toolbar: {
+    tools: {
+      selection: false
+    }
+  },
+  grid: {
+    clipMarkers: false
+  },
+  yaxis: {
+    tickAmount: 3
+  },
+  xaxis: {
+    type: 'datetime'
+  },
+}
 import axios from 'axios'
 export default {
   mounted () {
@@ -77,8 +112,16 @@ export default {
       datas: [],
       envDatas: [],
       mergeDatas: [],
-      series: [],
-      chartOptions: [],
+      series1: [],
+      chartOptionsLine1: [],
+      series2: [],
+      chartOptionsLine2: [],
+      series3: [],
+      chartOptionsLine3: [],
+      series4: [],
+      chartOptionsLine4: [],
+      pSize: 0,
+      phSize: 0,
       startTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 00:00'),
       endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 23:59')
     }
@@ -117,8 +160,6 @@ export default {
         if( Tout > 50 || Tout < -50) Tout = 0;
         this.mergeDatas.push({ 'ahu':this.datas[i], 'Tout':Tout });
       }
-      // alert("data len : " + this.datas.length + ", envDatas len : " + this.envDatas.length + ", mergeDatas len : " + this.mergeDatas.length )
-      // alert("data len : " + JSON.stringify(this.mergeDatas))
     },
     getAhuTrend () {
       // axios.put(`http://localhost:3000/api/rooms/solAhuTrend`, { ahuNo: ahuNo, startTime: this.startTime, endTime: this.endTime, time: this.time.value })
@@ -141,24 +182,64 @@ export default {
           var data10 = []
           var date = []
           for (var i = 0; i < this.datas.length; i++) {
-            data0.push(this.mergeDatas[i].ahu.fData_damper_manual_set.toFixed(2))
-            data1.push(this.mergeDatas[i].ahu.fData_temp_supply.toFixed(2))
-            data2.push(this.mergeDatas[i].ahu.fData_temp_return.toFixed(2))
-            data3.push((this.mergeDatas[i].ahu.cState_supplay_fan * 5).toFixed(2))
-            data4.push((this.mergeDatas[i].ahu.cMode_damper_auto_manual * 10).toFixed(2))
-            data5.push(this.mergeDatas[i].ahu.fData_hc_set_temp.toFixed(2))
-            data6.push((this.mergeDatas[i].ahu.nPPMco2_cur / 10).toFixed(2))
-            data7.push((this.mergeDatas[i].ahu.cMode_manual_mode * 15).toFixed(2))
-            data8.push((this.mergeDatas[i].ahu.cMode_auto_mode * 15).toFixed(2))
-            data9.push((this.mergeDatas[i].ahu.cMode_auto_manual * 20).toFixed(2))
-            data10.push(this.mergeDatas[i].Tout.toFixed(2))
+            if (this.datas[i].fData_damper_manual_set !== null) {
+              data0.push(this.mergeDatas[i].ahu.fData_damper_manual_set.toFixed(2))
+            } else {
+              data0.push(-1)
+            }
+            if (this.datas[i].fData_temp_supply !== null) {
+              data1.push(this.mergeDatas[i].ahu.fData_temp_supply.toFixed(2))
+            } else {
+              data1.push(-1)
+            }
+            if (this.datas[i].fData_temp_return !== null) {
+              data2.push(this.mergeDatas[i].ahu.fData_temp_return.toFixed(2))
+            } else {
+              data2.push(-1)
+            }
+            if (this.datas[i].cState_supplay_fan !== null) {
+              data3.push(this.mergeDatas[i].ahu.cState_supplay_fan.toFixed(2))
+            } else {
+              data3.push(-1)
+            }
+            if (this.datas[i].cMode_damper_auto_manual !== null) {
+              data4.push(this.mergeDatas[i].ahu.cMode_damper_auto_manual.toFixed(2))
+            } else {
+              data4.push(-1)
+            }
+            if (this.datas[i].fData_hc_set_temp !== null) {
+              data5.push(this.mergeDatas[i].ahu.fData_hc_set_temp.toFixed(2))
+            } else {
+              data5.push(-1)
+            }
+            if (this.datas[i].nPPMco2_cur !== null) {
+              data6.push(this.mergeDatas[i].ahu.nPPMco2_cur.toFixed(2))
+            } else {
+              data6.push(-1)
+            }
+            if (this.datas[i].cMode_manual_mode !== null) {
+              data7.push(this.mergeDatas[i].ahu.cMode_manual_mode.toFixed(2))
+            } else {
+              data7.push(-1)
+            }
+            if (this.datas[i].cMode_auto_mode !== null) {
+              data8.push(this.mergeDatas[i].ahu.cMode_auto_mode.toFixed(2))
+            } else {
+              data8.push(-1)
+            }
+            if (this.datas[i].cMode_auto_manual !== null) {
+              data9.push(this.mergeDatas[i].ahu.cMode_auto_manual.toFixed(2))
+            } else {
+              data9.push(-1)
+            }
+            if (this.datas[i].Tout !== null) {
+              data10.push(this.mergeDatas[i].Tout.toFixed(2))
+            } else {
+              data10.push(-1)
+            }
             date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
           }
-          this.series = [
-            {
-              name: '댐퍼설정값',
-              data: data0
-            },
+          this.series1 = [
             {
               name: '급기온도',
               data: data1
@@ -172,16 +253,30 @@ export default {
               data: data5
             },
             {
+              name: '외부온도',
+              data: data10
+            }
+          ]
+          this.series2 = [
+            {
+              name: 'CO2',
+              data: data6
+            }
+          ]
+          this.series3 = [
+            {
+              name: '댐퍼설정값',
+              data: data0
+            }
+          ]
+          this.series4 = [
+            {
               name: '공급팬상태',
               data: data3
             },
             {
               name: '댐퍼자동수동',
               data: data4
-            },
-            {
-              name: 'CO2',
-              data: data6
             },
             {
               name: '수동팬설정',
@@ -194,13 +289,91 @@ export default {
             {
               name: '팬자동수동',
               data: data9
-            },
-            {
-              name: '외부온도',
-              data: data10
             }
           ]
-          this.chartOptions = {
+          this.chartOptionsLine1 = {
+            chart: {
+              id: 'ab',
+              group: 'social',
+            },
+            markers: {
+              size: this.pSize,
+              hover: {
+                size: this.phSize
+              }
+            },
+            xaxis: {
+              type: 'datetime',
+              categories: date,
+              labels: {
+                show: true,
+                rotate: 0,
+                //format: 'yy/MM/dd HH:mm',
+                formatter: function(value) {
+                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
+                }
+              }
+            }
+          }
+          this.chartOptionsLine2 = {
+            chart: {
+              id: 'bw',
+              group: 'social',
+            },
+            markers: {
+              size: this.pSize,
+              hover: {
+                size: this.phSize
+              }
+            },
+            xaxis: {
+              type: 'datetime',
+              categories: date,
+              labels: {
+                show: true,
+                rotate: 0,
+                //format: 'yy/MM/dd HH:mm',
+                formatter: function(value) {
+                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
+                }
+              }
+            }
+          }
+          this.chartOptionsLine3 = {
+            chart: {
+              id: 'cb',
+              group: 'social',
+            },
+            markers: {
+              size: this.pSize,
+              hover: {
+                size: this.phSize
+              }
+            },
+            xaxis: {
+              type: 'datetime',
+              categories: date,
+              labels: {
+                show: true,
+                rotate: 0,
+                //format: 'yy/MM/dd HH:mm',
+                formatter: function(value) {
+                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
+                }
+              }
+            }
+          }
+          this.chartOptionsLine4 = {
+            chart: {
+              id: 'db',
+              group: 'social',
+            },
+            markers: {
+              size: this.pSize,
+              hover: {
+                size: this.phSize
+              }
+            },
             xaxis: {
               type: 'datetime',
               categories: date,
@@ -232,36 +405,52 @@ export default {
           var data4 = []
           var data5 = []
           var date = []
-          var HCOnCnt = 0
-          var HCOffCnt = 0
-          var VentilationCnt = 0
           for (var i = 0; i < this.datas.length; i++) {
-            HCOnCnt = 0;
-            HCOffCnt = 0
-            data1.push(this.datas[i].Tzone.toFixed(2))
-            data2.push(this.datas[i].Rdamp.toFixed(2))
-            data3.push((this.datas[i].PPMco2 / 100).toFixed(2))
-            if (this.datas[i].HCOnCnt !== null) HCOnCnt = this.datas[i].HCOnCnt;
-            if (this.datas[i].HCOffCnt !== null) HCOffCnt = this.datas[i].HCOffCnt;
-            if (this.datas[i].VentilationCnt !== null) VentilationCnt = this.datas[i].VentilationCnt;
-            data0.push(HCOnCnt.toFixed(2))
-            data4.push(HCOffCnt.toFixed(2))
-            data5.push(VentilationCnt.toFixed(2))
+            if (this.datas[i].HCOnCnt !== null) {
+              data0.push(this.datas[i].HCOnCnt.toFixed(2))
+            } else {
+              data0.push(-1)
+            }
+            if (this.datas[i].Tzone !== null) {
+              data1.push(this.datas[i].Tzone.toFixed(2))
+            } else {
+              data1.push(-1)
+            }
+            if (this.datas[i].Rdamp !== null) {
+              data2.push(this.datas[i].Rdamp.toFixed(2))
+            } else {
+              data2.push(-1)
+            }
+            if (this.datas[i].PPMco2 !== null) {
+              data3.push(this.datas[i].PPMco2.toFixed(2))
+            } else {
+              data3.push(-1)
+            }
+            if (this.datas[i].HCOffCnt !== null) {
+              data4.push(this.datas[i].HCOffCnt.toFixed(2))
+            } else {
+              data4.push(-1)
+            }
+            if (this.datas[i].VentilationCnt !== null) {
+              data5.push(this.datas[i].VentilationCnt.toFixed(2))
+            } else {
+              data5.push(-1)
+            }
             date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
           }
-          this.series = [
+          this.series1 = [
             {
               name: '실내온도',
               data: data1
-            },
-            {
-              name: '댐퍼설정값',
-              data: data2
-            },
+            }
+          ]
+          this.series2 = [
             {
               name: 'CO2',
               data: data3
-            },
+            }
+          ]
+          this.series3 = [
             {
               name: '냉난방 on 수',
               data: data0
@@ -273,9 +462,97 @@ export default {
             {
               name: '환기 수',
               data: data5
-            },
+            }
           ]
-          this.chartOptions = {
+          this.series4 = [
+            {
+              name: '댐퍼설정값',
+              data: data2
+            }
+          ]
+          this.chartOptionsLine1 = {
+            chart: {
+              id: 'ab',
+              group: 'social',
+            },
+            markers: {
+              size: this.pSize,
+              hover: {
+                size: this.phSize
+              }
+            },
+            xaxis: {
+              type: 'datetime',
+              categories: date,
+              labels: {
+                show: true,
+                rotate: 0,
+                //format: 'yy/MM/dd HH:mm',
+                formatter: function(value) {
+                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
+                }
+              }
+            }
+          }
+          this.chartOptionsLine2 = {
+            chart: {
+              id: 'bw',
+              group: 'social',
+            },
+            markers: {
+              size: this.pSize,
+              hover: {
+                size: this.phSize
+              }
+            },
+            xaxis: {
+              type: 'datetime',
+              categories: date,
+              labels: {
+                show: true,
+                rotate: 0,
+                //format: 'yy/MM/dd HH:mm',
+                formatter: function(value) {
+                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
+                }
+              }
+            }
+          }
+          this.chartOptionsLine3 = {
+            chart: {
+              id: 'cb',
+              group: 'social',
+            },
+            markers: {
+              size: this.pSize,
+              hover: {
+                size: this.phSize
+              }
+            },
+            xaxis: {
+              type: 'datetime',
+              categories: date,
+              labels: {
+                show: true,
+                rotate: 0,
+                //format: 'yy/MM/dd HH:mm',
+                formatter: function(value) {
+                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
+                }
+              }
+            }
+          }
+          this.chartOptionsLine4 = {
+            chart: {
+              id: 'db',
+              group: 'social',
+            },
+            markers: {
+              size: this.pSize,
+              hover: {
+                size: this.phSize
+              }
+            },
             xaxis: {
               type: 'datetime',
               categories: date,
@@ -297,7 +574,7 @@ export default {
     },
     getAhus () {
       // axios.get(`http://localhost:3000/api/rooms/ahusConfig`)
-      axios.get(`${this.$apiRootPath}rooms/ahusConfig`)
+      axios.get(`${this.$apiRootPath}rooms/ahusConfigDB`)
         .then((r) => {
           var ahuData = []
           for (var i = 0; i < r.data.length; i++) {
@@ -318,6 +595,13 @@ export default {
       this.getSiteEnv()
     },
     toggleTimes: function () {
+      if (this.time.value >= 3600) {
+        this.pSize = 1
+        this.phSize = 5
+      } else {
+        this.pSize = 0
+        this.phSize = 5
+      }
       if (this.activeBtn === 0) {
         this.getSiteEnv()
       } else {

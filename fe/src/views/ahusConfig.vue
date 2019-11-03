@@ -1,114 +1,102 @@
 <template>
   <v-container grid-list-md>
-    <v-layout row wrap>
+    <v-simple-table dense class="ma-0 pa-0" style="width:1300px;">
       <template>
-        <v-row>
-          <v-col>
-            <v-card
-              class="mx-auto"
-              max-width="300"
-            >
-              <v-list
-                shaped
-                class="overflow-y-auto"
-                max-height="600">
-                <template
-                v-for="(ahuNo, i) in ahuNos">
-                  <v-list-item v-if="i===0">
-                    <v-list-item-action class="ma-0 pa-1">
-                      <v-checkbox
-                        v-model="beAll"
-                        color="primary"
-                        @change="allCheckBox()"
-                      ></v-checkbox>
-                    </v-list-item-action>
-                    <v-list-item-content class="ma-0 pa-0">
-                      <v-list-item-subtitle>전체</v-list-item-subtitle>
-                    </v-list-item-content>
-                  </v-list-item>
-                  <v-list-item >
-                    <v-list-item-action class="ma-0 pa-0">
-                      <v-checkbox
-                        v-model="ahuNo.beChecked"
-                        color="primary"
-                        @change="selectCheckBox(ahuNo.value)"
-                      ></v-checkbox>
-                    </v-list-item-action>
-                    <v-list-item-content class="ma-0 pa-0">
-                      <v-list-item-subtitle>
-                        {{ahuNo.name}}
-                      </v-list-item-subtitle>
-                    </v-list-item-content>
-                  </v-list-item>
-                </template>
-              </v-list>
-            </v-card>
-          </v-col>
-          <v-col>
-            <v-card
-            max-width="500"
-            class="mx-auto">
-              <v-card-title class="subheading font-weight-bold">공조기 설정</v-card-title>
-              <v-divider class='my-0'></v-divider>
-              <v-list dense>
-                <v-list-item>
-                  <v-list-item-title>AhuIndex:</v-list-item-title>
-                  <v-list-item-title class="align-end">{{datas.AhuIndex}}</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>NotifyOccupantsState:</v-list-item-title>
-                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="datas.NotifyOccupantsState"></v-text-field></v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>EconomizerCycle:</v-list-item-title>
-                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="datas.EconomizerCycle"></v-text-field></v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>VarTempControl:</v-list-item-title>
-                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="datas.VarTempControl"></v-text-field></v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>HCMode:</v-list-item-title>
-                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="datas.HCMode"></v-text-field></v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>FanAutoManual:</v-list-item-title>
-                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="datas.FanAutoManual"></v-text-field></v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>DamperAutoManual:</v-list-item-title>
-                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="datas.DamperAutoManual"></v-text-field></v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>Tzone_set:</v-list-item-title>
-                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="datas.Tzone_set"></v-text-field></v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>Rdamp_set:</v-list-item-title>
-                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="datas.Rdamp_set"></v-text-field></v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>PPMco2_set:</v-list-item-title>
-                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="datas.PPMco2_set"></v-text-field></v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>Desc:</v-list-item-title>
-                  <v-list-item-title class="align-end">
-                    <v-text-field height=13 v-model="datas.Desc"></v-text-field>
-                  </v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-card>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color='blue darken-1' flat @click='saveAhuConfig()'>저장</v-btn>
-            </v-card-actions>
-          </v-col>
-        </v-row>
+        <thead>
+          <tr class="ma-0 pa-0">
+            <th class="text-center ma-0 pa-0 pt-5" style="width:200px;">구분</th>
+            <th class="text-center ma-0 pa-0 pt-3" style="">거주자<br>상태 보고</th>
+            <th class="text-center ma-0 pa-0 pt-0" style="">이코노<br>마이저<br>사용</th>
+            <th class="text-center ma-0 pa-0 pt-0" style="">외기온도<br>보상제어<br>사용</th>
+            <th class="text-center ma-0 pa-0 pt-3" style="">냉난방<br>모드</th>
+            <th class="text-center ma-0 pa-0 pt-0" style="">팬<br>자동/수동<br>설정</th>
+            <th class="text-center ma-0 pa-0 pt-0" style="">댐퍼<br>자동/수동<br>설정</th>
+            <th class="text-center ma-0 pa-0 pt-3" style="">내부<br>설정온도</th>
+            <th class="text-center ma-0 pa-0 pt-3" style="">댐퍼 수동<br>설정값</th>
+            <th class="text-center ma-0 pa-0 pt-3" style="">CO2 농도<br>기준 설정값</th>
+            <th class="text-center ma-0 pa-0 pt-5" style="">설명</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="datas in ahuConfigs" class="ma-0 pa-0">
+            <td class="text-center ma-0 pa-0 pt-3 pb-2" style="">{{ahuNos[datas.AhuIndex-1].name}}</td>
+            <td class="text-center ma-0 pa-0" style="" >
+              <v-select
+              v-model="datas.NotifyOccupantsState"
+              :items="useUnuses"
+              item-value="value"
+              item-text="name"
+              append-icon=""
+              menu-props="auto"
+              style="margin:-4px 0px -30px 0px;text-indent: 35px;"
+              class="grey--text caption"
+            ></v-select></td>
+            <td class="text-center ma-0 pa-0" style="">
+              <v-select
+              v-model="datas.EconomizerCycle"
+              :items="useUnuses"
+              item-value="value"
+              item-text="name"
+              append-icon=""
+              style="margin:-4px 0px -30px 0px;text-indent: 35px;"
+              class="grey--text caption"></v-select>
+            </td>
+            <td class="text-center ma-0 pa-0" style="">
+              <v-select
+              v-model="datas.VarTempControl"
+              :items="useUnuses"
+              item-value="value"
+              item-text="name"
+              append-icon=""
+              style="margin:-4px 0px -30px 0px;text-indent: 35px;"
+              class="grey--text caption"></v-select>
+            </td>
+            <td class="text-center ma-0 pa-0" style="">
+              <v-select
+              v-model="datas.HCMode"
+              :items="hcOnOffs"
+              item-value="value"
+              item-text="name"
+              append-icon=""
+              style="margin:-4px 0px -30px 0px;text-indent: 35px;"
+              class="grey--text caption"></v-select>
+            </td>
+            <td class="text-center ma-0 pa-0" style="">
+              <v-select
+              v-model="datas.FanAutoManual"
+              :items="onOffs"
+              item-value="value"
+              item-text="name"
+              append-icon=""
+              style="margin:-4px 0px -30px 0px;text-indent: 35px;"
+              class="grey--text caption"></v-select>
+            </td>
+            <td class="text-center ma-0 pa-0" style="">
+              <v-select
+              v-model="datas.DamperAutoManual"
+              :items="onOffs"
+              item-value="value"
+              item-text="name"
+              append-icon=""
+              style="margin:-4px 0px -30px 0px;text-indent: 35px;"
+              class="grey--text caption"></v-select>
+            </td>
+            <td class="text-center ma-0 pa-0" style=""><v-text-field class="centered-input text--darken-3" dense style="margin:-4px 0px -30px 0px;" v-model="datas.Tzone_set"></v-text-field></td>
+            <td class="text-center ma-0 pa-0" style=""><v-text-field class="centered-input text--darken-3" dense style="margin:-4px 0px -30px 0px;" v-model="datas.Rdamp_set"></v-text-field></td>
+            <td class="text-center ma-0 pa-0" style=""><v-text-field class="centered-input text--darken-3" dense style="margin:-4px 0px -30px 0px;" v-model="datas.PPMco2_set"></v-text-field></td>
+            <td class="text-center ma-0 pa-0" style=""><v-text-field class="centered-input text--darken-3" dense style="margin:-4px 0px -30px 0px;" v-model="datas.Desc"></v-text-field></td>
+          </tr>
+        </tbody>
       </template>
-    </v-layout>
+    </v-simple-table>
+    <v-btn color='blue darken-1' right flat @click='saveAhuConfig()'>저장</v-btn>
   </v-container>
 </template>
+<style>
+.centered-input input {
+  text-align: center
+}
+</style>
 <script>
 import axios from 'axios'
 export default {
@@ -121,33 +109,39 @@ export default {
       ahuData: [],
       datas: [],
       beAll: false,
-      curAhuId: 1
+      curAhuId: 1,
+      ahuConfigs: [],
+      tempAhuConfigs: [],
+      onOffs: [ {'name': '사용안함', 'value': -1}, {'name': '자동', 'value': 0}, {'name': '수동', 'value': 1}],
+      hcOnOffs: [ {'name': '사용안함', 'value': -1}, {'name': '난방', 'value': 0}, {'name': '냉방', 'value': 1}],
+      useUnuses: [{'name': '사용안함', 'value': 0}, {'name': '사용', 'value': 1}]
     }
   },
   methods: {
     getAhus () {
       // axios.get(`http://localhost:3000/api/rooms/ahusConfig`)
-      axios.get(`${this.$apiRootPath}rooms/ahusConfig`)
+      axios.get(`${this.$apiRootPath}rooms/ahusConfigDB`)
         .then((r) => {
           this.ahuNos = []
           for (var key in r.data) {
             if (r.data.hasOwnProperty(key)) {
-              this.ahuNos.push({ 'name': r.data[key].ahu_desc + '(' + r.data[key].ahu_name + ')', 'value': r.data[key].ahu_id, 'beChecked': (r.data[key].ahu_id === this.curAhuId) })
+              this.ahuNos.push({ 'name': r.data[key].ahu_desc , 'value': r.data[key].ahu_id, 'beChecked': (r.data[key].ahu_id === this.curAhuId) })
             }
           }
-          this.getAhuConfig(this.curAhuId)
+          this.getAhuConfig()
         })
         .catch((e) => {
           alert(e.message)
           console.error(e.message)
         })
     },
-    getAhuConfig (ahuNo) {
+    getAhuConfig () {
       // axios.get(`http://localhost:3000/api/rooms/ahusConfig/${ahuNo}`)
-      axios.get(`${this.$apiRootPath}rooms/ahusConfig/${ahuNo}`)
+      axios.get(`${this.$apiRootPath}rooms/ahusConfig/${1}`)
         .then((r) => {
-          this.datas = JSON.parse(r.data)
-          // alert("getAhuConfig : " + JSON.stringify(this.datas))
+          this.ahuConfigs = r.data
+          this.tempAhuConfigs = JSON.parse(JSON.stringify(r.data))
+          // alert(JSON.stringify(this.tempAhuConfigs))
         })
         .catch((e) => {
           alert(e.message)
@@ -156,110 +150,30 @@ export default {
     },
     saveAhuConfig: function () {
       var ahuIdxs = []
-      for (var key in this.ahuNos) {
-        if (this.ahuNos[key].beChecked) {
-          ahuIdxs.push(this.ahuNos[key].value)
+      for (var i = 0; i < this.ahuConfigs.length; i++) {
+        if (!(this.ahuConfigs[i].NotifyOccupantsState === this.tempAhuConfigs[i].NotifyOccupantsState &&
+          this.ahuConfigs[i].EconomizerCycle === this.tempAhuConfigs[i].EconomizerCycle &&
+          this.ahuConfigs[i].VarTempControl === this.tempAhuConfigs[i].VarTempControl &&
+          this.ahuConfigs[i].HCMode === this.tempAhuConfigs[i].HCMode &&
+          this.ahuConfigs[i].FanAutoManual === this.tempAhuConfigs[i].FanAutoManual &&
+          this.ahuConfigs[i].DamperAutoManual === this.tempAhuConfigs[i].DamperAutoManual &&
+          this.ahuConfigs[i].Tzone_set === this.tempAhuConfigs[i].Tzone_set &&
+          this.ahuConfigs[i].Rdamp_set === this.tempAhuConfigs[i].Rdamp_set &&
+          this.ahuConfigs[i].PPMco2_set === this.tempAhuConfigs[i].PPMco2_set &&
+          this.ahuConfigs[i].Desc === this.tempAhuConfigs[i].Desc)) {
+          ahuIdxs.push(this.ahuConfigs[i].AhuIndex)
         }
       }
       // axios.put(`http://localhost:3000/api/rooms/ahusConfig`, { config: this.datas, ahuIdxs: ahuIdxs })
-      axios.put(`${this.$apiRootPath}rooms/ahusConfig`, { config: this.data, ahuIdxs: ahuIdxs })
+      axios.put(`${this.$apiRootPath}rooms/ahusConfig`, { config: this.ahuConfigs, ahuIdxs: ahuIdxs })
         .then((r) => {
           // this.$data.settingRoomModal = false
-          this.getAhuConfig(this.curAhuId)
+          this.getAhuConfig()
         })
         .catch((e) => {
           alert(e.message)
           console.log(e.message)
         })
-    },
-    selectCheckBox (ahuId) {
-      this.curAhuId = ahuId
-      for (var key in this.ahuNos) {
-        if (this.ahuNos[key].value === ahuId && this.ahuNos[key].beChecked) {
-          this.getAhuConfig(ahuId)
-          break
-        }
-      }
-    },
-    allCheckBox () {
-      for (var key in this.ahuNos) {
-        this.ahuNos[key].beChecked = this.beAll
-      }
-    },
-    refresItems () {
-      var srcArr = []
-      var tmpPri = []
-      var i, j
-      if (this.bePriShow) {
-        for (i = 0; i < this.items.length; i++) {
-          for (j = i; j < this.items.length; j++) {
-            if (this.items[i].Priority > this.items[j].Priority) {
-              tmpPri = this.items[i]
-              this.items[i] = this.items[j]
-              this.items[j] = tmpPri
-            }
-          }
-        }
-      } else {
-        for (i = 0; i < this.items.length; i++) {
-          for (j = i; j < this.items.length; j++) {
-            if (this.items[i].RoomNo > this.items[j].RoomNo) {
-              tmpPri = this.items[i]
-              this.items[i] = this.items[j]
-              this.items[j] = tmpPri
-            }
-          }
-        }
-      }
-      srcArr = this.items
-      this.items = []
-      this.items = srcArr
-    },
-    upPrio (roomNo) {
-      var beChanged = false
-      var tmpPri
-      for (var key in this.items) {
-        if (this.items[key].RoomNo === roomNo) {
-          if (this.items[key].Priority === 1) {
-            break
-          }
-          tmpPri = this.items[key].Priority
-          for (var key2 in this.items) {
-            if (this.items[key2].Priority === (tmpPri - 1)) {
-              this.items[key2].Priority = tmpPri
-              this.items[key].Priority = (tmpPri - 1)
-              beChanged = true
-              break
-            }
-          }
-        }
-      }
-      if (beChanged) {
-        this.saveRoomPrio()
-      }
-    },
-    downPrio (roomNo) {
-      var beChanged = false
-      var tmpPri
-      for (var key in this.items) {
-        if (this.items[key].RoomNo === roomNo) {
-          if (this.items[key].Priority === this.items.length) {
-            break
-          }
-          tmpPri = this.items[key].Priority
-          for (var key2 in this.items) {
-            if (this.items[key2].Priority === (tmpPri + 1)) {
-              this.items[key2].Priority = tmpPri
-              this.items[key].Priority = (tmpPri + 1)
-              beChanged = true
-              break
-            }
-          }
-        }
-      }
-      if (beChanged) {
-        this.saveRoomPrio()
-      }
     }
   }
 }

@@ -248,26 +248,38 @@ router.put('/roomStat', (req, res, next) => { // 수정
 
 
 router.put('/ahusConfig', (req, res, next) => { // 수정
-	console.log("############ put ahusConfig values : " + JSON.stringify(req.body))
+	console.log("############ put ahusConfig values : " + JSON.stringify(req.body.ahuIdxs))
 	var dataBuffer = new Buffer(net.getSizeAhuZoneConfig_t())
 	for (var key in req.body.ahuIdxs) {
-		dataBuffer = net.makeAhuZoneConfigMsg_t(
-			req.body.ahuIdxs[key], req.body.config.NotifyOccupantsState,
-			req.body.config.EconomizerCycle, req.body.config.VarTempControl,
-			req.body.config.HCMode, req.body.config.FanAutoManual,
-			req.body.config.DamperAutoManual, req.body.config.Tzone_set,
-			req.body.config.Rdamp_set, req.body.config.PPMco2_set, req.body.config.Desc
-		)
-		dataLen = net.getSizeAhuZoneConfig_t()
-	  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_solBeach_zone_config, dataLen, null)
-	  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
-		nSeq = counter.get()
-		msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
-		fullBuffer = new Buffer(totalSize)
-		msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
-		msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
-		dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
-		net.writeData(client, fullBuffer, nSeq)
+		for (var i in req.body.config) {
+			if (req.body.ahuIdxs[key] == req.body.config[i].AhuIndex){
+				dataBuffer = net.makeAhuZoneConfigMsg_t(
+					req.body.config[i].AhuIndex,
+					req.body.config[i].UseScheduler,
+					req.body.config[i].NotifyOccupantsState,
+					req.body.config[i].EconomizerCycle,
+					req.body.config[i].VarTempControl,
+					req.body.config[i].HCMode,
+					req.body.config[i].FanAutoManual,
+					req.body.config[i].DamperAutoManual,
+					req.body.config[i].Tzone_set,
+					req.body.config[i].Rdamp_set,
+					req.body.config[i].PPMco2_set,
+					req.body.config[i].Desc
+				)
+				dataLen = net.getSizeAhuZoneConfig_t()
+			  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_solBeach_zone_config, dataLen, null)
+			  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+				nSeq = counter.get()
+				msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+				fullBuffer = new Buffer(totalSize)
+				msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+				msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+				dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
+				net.writeData(client, fullBuffer, nSeq)
+				break;
+			}
+		}
 	}
 	res.send({ success: true })
 })
@@ -314,7 +326,7 @@ router.put('/roomStatTrend', (req, res, next) => { // 수정
 	const endTime = req.body.endTime
 	const time = req.body.time
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT * FROM ( SELECT CurTime DIV ? AS m, AVG(HeatingCnt) AS HeatingCnt, AVG(HeatingRoomCnt) AS HeatingRoomCnt, AVG(if(Tsurf_avg > 50, null, Tsurf_avg)) AS Tsurf_avg, AVG(if(Troom_avg > 50, null, Troom_avg)) AS Troom_avg, AVG(if(Tout > 50, null, Tout)) AS Tout FROM floor_rad_stat WHERE CurTime >= UNIX_TIMESTAMP(?) AND CurTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, startTime, endTime], function(err, result, fields) {
+	mysqlDB.query("SELECT * FROM ( SELECT CurTime DIV ? AS m, AVG(HeatingCnt) AS HeatingCnt, AVG(HeatingRoomCnt) AS HeatingRoomCnt, AVG(Tsurf_avg) AS Tsurf_avg, AVG(Troom_avg) AS Troom_avg, AVG(Tout) AS Tout FROM floor_rad_stat WHERE CurTime >= UNIX_TIMESTAMP(?) AND CurTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, startTime, endTime], function(err, result, fields) {
 		if(err) {
 			console.log("############ put /roomStatTrend error : " + err)
 		}
@@ -333,7 +345,7 @@ router.put('/roomSummaryTrend', (req, res, next) => { // 수정
 	const time = req.body.time
   // console.log("######################### getRoomConfig ######################### ")
 	mysqlDB.query(
-	"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m,  AVG(ucCurStatus) AS ucCurStatus, AVG(if(fTsurf_cur > 50, null, fTsurf_cur)) AS fTsurf_cur, AVG(if(fTroom_cur > 50, null, fTroom_cur)) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
+	"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m,  AVG(ucCurStatus) AS ucCurStatus, AVG(fTsurf_cur) AS fTsurf_cur, AVG(fTroom_cur) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
 		if(err) {
 			console.log("############ put /roomSummaryTrend error : " + err)
 		}
@@ -352,7 +364,7 @@ router.put('/getRoomTrend', (req, res, next) => { // 수정
 	const usRoomNo = req.body.usRoomNo
   // console.log("######################### getRoomConfig ######################### ")
 	mysqlDB.query(
-		"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m, AVG(ucRoomState) AS ucRoomState, AVG(ucSetStatus) AS ucSetStatus, AVG(ucCurStatus) AS ucCurStatus, AVG(if(fTset > 50, null, fTset)) AS fTset, AVG(if(fTsurf_cur > 50, null, fTsurf_cur)) AS fTsurf_cur, AVG(if(fTroom_cur > 50, null, fTroom_cur)) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
+		"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m, AVG(ucRoomState) AS ucRoomState, AVG(ucSetStatus) AS ucSetStatus, AVG(ucCurStatus) AS ucCurStatus, AVG(fTset) AS fTset, AVG(fTsurf_cur) AS fTsurf_cur, AVG(fTroom_cur) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
 		if(err) {
 			console.log("############ put /getRoomTrend error : " + err)
 		}
@@ -369,7 +381,7 @@ router.put('/solTrend', (req, res, next) => { // 수정
 	const endTime = req.body.endTime
 	const time = req.body.time
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT * FROM ( SELECT CurTime DIV ? AS m, AVG(HCOnCnt) AS HCOnCnt, AVG(HCOffCnt) AS HCOffCnt, AVG(VentilationCnt) AS VentilationCnt, AVG(if(Tzone > 50, null, Tzone)) AS Tzone, AVG(Rdamp) AS Rdamp, AVG(PPMco2) AS PPMco2 FROM solbeach_stat WHERE CurTime >= UNIX_TIMESTAMP(?) AND CurTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, startTime, endTime], function(err, result, fields) {
+	mysqlDB.query("SELECT * FROM ( SELECT CurTime DIV ? AS m, AVG(HCOnCnt) AS HCOnCnt, AVG(HCOffCnt) AS HCOffCnt, AVG(VentilationCnt) AS VentilationCnt, AVG(Tzone) AS Tzone, AVG(Rdamp) AS Rdamp, AVG(PPMco2) AS PPMco2 FROM solbeach_stat WHERE CurTime >= UNIX_TIMESTAMP(?) AND CurTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, startTime, endTime], function(err, result, fields) {
 		if(err) {
 			console.log("############ put /getSolTrend error : " + err)
 		}
@@ -386,7 +398,7 @@ console.log("############ put /siteEnv req.body : " + JSON.stringify(req.body))
 	const endTime = req.body.endTime
 	const time = req.body.time
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT * FROM ( SELECT  nLastUpdateTime DIV ? AS m, AVG(if(fTout > 50, null, fTout)) AS fTout FROM site_env_record WHERE nSiteIdx = 2 AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, startTime, endTime], function(err, result, fields) {
+	mysqlDB.query("SELECT * FROM ( SELECT  nLastUpdateTime DIV ? AS m, AVG(fTout) AS fTout FROM site_env_record WHERE nSiteIdx = 2 AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, startTime, endTime], function(err, result, fields) {
 		if(err) {
 			console.log("############ put /siteEnv error : " + err)
 		}
@@ -596,11 +608,11 @@ router.put('/emsSysConfig', (req, res, next) => { // 수정
 })
 
 
-router.get('/ahusConfig', function(req, res, next) {
-	console.log("############ get ahusConfig ")
+router.get('/ahusConfigDB', function(req, res, next) {
+	console.log("############ get ahusConfigDB ")
   mysqlDB.query("SELECT * FROM ahu_info", function(err, result, fields) {
     if(err) {
-      console.log("############ get ahusConfig error : " + err)
+      console.log("############ get ahusConfigDB error : " + err)
     }
     else{
       res.json(result)
@@ -622,9 +634,13 @@ router.get('/zones', function(req, res, next) {
   })
 })
 
+var IntervalB
+var IntervalC
+var ahusConfigData = []
 router.get('/ahusConfig/:ahuIndex', function(req, res, next) {
   const ahuIndex = req.params.ahuIndex
 	var data = new Uint16Array(2)
+	ahusConfigData = []
 	data[0] = ahuIndex
 	console.log("############ get /ahusConfig/:ahuIndex : " + ahuIndex)
   dataLen = 0
@@ -636,9 +652,48 @@ router.get('/ahusConfig/:ahuIndex', function(req, res, next) {
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
   msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
   net.writeData(client, fullBuffer, nSeq)
-  IntervalA = setInterval(checkMap, 100, nSeq, res)
+  IntervalB = setInterval(pushMap, 10, nSeq, res, 1)
 })
 
+var pushMap = function(seq, res, idx) {
+  // console.log("######################### checkMap ######################### ")
+	if(idx == 1) 	clearInterval(IntervalB)
+	if (idx <= 20) {
+		var json = seqMap.get(seq)
+	  if(json != '' && json != null) {
+			try {
+				// console.log("############ pushMap push!!!!!! ############# ")
+	    	ahusConfigData.push(JSON.parse(seqMap.get(nSeq)))
+				// throw new Error('오류 핸들링 테스트')
+			}
+			catch (exception) {
+				console.log("############ exception!!!!!! ############# ")
+				console.log(exception)
+				console.log("########################################## ")
+				return true
+			}
+			var data = new Uint16Array(2)
+			data[0] = idx+1
+		  dataLen = 0
+		  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_solBeach_zone_config, dataLen, data)
+		  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+		  nSeq = counter.get()
+		  msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+		  fullBuffer = new Buffer(totalSize)
+		  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+		  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+		  net.writeData(client, fullBuffer, nSeq)
+			// console.log("############ pushMap len : " + ahusConfigData.length)
+		  clearInterval(IntervalC)
+		  IntervalC = setInterval(pushMap, 10, nSeq, res, idx+1)
+	  }
+	} else {
+		clearInterval(IntervalC)
+		console.log("############ pushMap end len : " + ahusConfigData.length)
+		res.json(ahusConfigData)
+	}
+
+}
 router.get('/damperConfig/:ahuIndex', function(req, res, next) {
 	console.log("############ get /damperConfig/:ahuIndex values : " + JSON.stringify(req.body))
   const ahuIndex = req.params.ahuIndex
