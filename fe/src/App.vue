@@ -130,48 +130,7 @@ export default {
       fixed: false,
       timer: '',
       alram: {},
-      items: [
-        {
-          icon: 'bubble_chart',
-          title: '메인',
-          to: { path: '/' }
-        },
-        {
-          icon: 'favorite',
-          title: '객실상태',
-          to: { path: '/rooms' }
-        },
-        {
-          icon: 'favorite',
-          title: '객실설정',
-          to: { path: '/roomsConfig' }
-        },
-        {
-          icon: 'favorite',
-          title: '설정',
-          to: { path: '/emsSysConfig' }
-        },
-        {
-          icon: 'favorite',
-          title: '공조기설정',
-          to: { path: '/ahusConfig' }
-        },
-        {
-          icon: 'help',
-          title: '트랜드',
-          to: { path: '/trend' }
-        },
-        {
-          icon: 'help',
-          title: '쏠트랜드',
-          to: { path: '/solTrend' }
-        },
-        {
-          icon: 'help',
-          title: '이력',
-          to: { path: '/history' }
-        }
-      ],
+      items: [],
       miniVariant: false,
       right: true,
       rightDrawer: false,
@@ -201,11 +160,6 @@ export default {
                 icon: 'favorite',
                 title: '객실상태',
                 to: { path: '/rooms' }
-              },
-              {
-                icon: 'favorite',
-                title: '객실설정',
-                to: { path: '/roomsConfig' }
               },
               {
                 icon: 'help',

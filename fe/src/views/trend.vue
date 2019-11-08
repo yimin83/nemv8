@@ -23,13 +23,11 @@
               :items='roomNos'
               v-model='roomNo'
               label='room number'
-              height=13
-              max-width=30
-              @change='toggleRoomNos()'
+              class='ma-0 mt-1 pa-0 grey--text caption'
             ></v-select>
           </v-col>
             <br>
-          <v-col class="d-flex" sm="1">
+          <v-col class="d-flex" sm="2">
             <br>
             <v-select
               v-model="time.value"
@@ -37,18 +35,16 @@
               item-value="value"
               item-text="name"
               label='시간단위'
-              height=13
-              max-width=120
-              @change='toggleTimes()'
+              class='ma-0 mt-1 pa-0 grey--text caption'
             ></v-select>
           </v-col>
           <v-col class="d-flex" sm="3">
-            <v-text-field label='시작일' hide-details class='d-inline-flex ma-0 pa-0' v-model='startTime'></v-text-field>
+            <v-text-field label='시작일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='startTime'></v-text-field>
           </v-col>
           <v-col class="d-flex" sm="3">
-            <v-text-field label='종료일' hide-details class='d-inline-flex  ma-0 pa-0' v-model='endTime'></v-text-field>
+            <v-text-field label='종료일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='endTime'></v-text-field>
           </v-col>
-          <v-col class="d-flex" sm="3">
+          <v-col class="d-flex" sm="1">
             <v-btn @click="searchGraph()">
               <span>검색</span>
             </v-btn>
@@ -67,12 +63,18 @@
   </v-container>
 </template>
 <script>
+import axios from 'axios'
 Apex = {
+  animations: { enabled: false },
   dataLabels: {
     enabled: false
   },
   stroke: {
-    curve: 'straight'
+    show: true,
+    curve: 'smooth',
+    lineCap: 'butt',
+    width: 3,
+    //dashArray: [0,10],
   },
   toolbar: {
     tools: {
@@ -83,13 +85,18 @@ Apex = {
     clipMarkers: false
   },
   yaxis: {
-    tickAmount: 2
+    tickAmount: 3
+  },
+  markers: {
+    size: 0,
+    hover: {
+      size: 0
+    }
   },
   xaxis: {
     type: 'datetime'
-  },
+  }
 }
-import axios from 'axios'
 export default {
   mounted () {
     this.getRooms()
@@ -99,7 +106,7 @@ export default {
   data: function () {
     return {
       activeBtn: 0,
-      time: { 'name': '5분', 'value': 300 },
+      time: { 'name': '10분', 'value': 600 },
       times: [{ 'name': '5분', 'value': 300 }, { 'name': '10분', 'value': 600 }, { 'name': '1시간', 'value': 3600 }, { 'name': '하루', 'value': (3600 * 24) }],
       datas: [],
       series1: [],
@@ -184,7 +191,7 @@ export default {
               type: 'line',
               data: data4
             }
-          ],
+          ]
           this.series2 = [
             {
               name: '난방 가동 수',
@@ -196,17 +203,11 @@ export default {
               type: 'line',
               data: data1
             }
-          ],
+          ]
           this.chartOptionsLine1 = {
             chart: {
               id: 'fb',
-              group: 'social',
-            },
-            markers: {
-              size: this.pSize,
-              hover: {
-                size: this.phSize
-              }
+              group: 'social'
             },
             xaxis: {
               type: 'datetime',
@@ -214,23 +215,17 @@ export default {
               labels: {
                 show: true,
                 rotate: 0,
-                //format: 'yy/MM/dd HH:mm',
-                formatter: function(value) {
+                // format: 'yy/MM/dd HH:mm',
+                formatter: function (value) {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
             }
-          },
+          }
           this.chartOptionsLine2 = {
             chart: {
               id: 'tw',
-              group: 'social',
-            },
-            markers: {
-              size: this.pSize,
-              hover: {
-                size: this.phSize
-              }
+              group: 'social'
             },
             xaxis: {
               type: 'datetime',
@@ -238,8 +233,8 @@ export default {
               labels: {
                 show: true,
                 rotate: 0,
-                //format: 'yy/MM/dd HH:mm',
-                formatter: function(value) {
+                // format: 'yy/MM/dd HH:mm',
+                formatter: function (value) {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
@@ -294,8 +289,8 @@ export default {
             } else {
               data5.push(-1)
             }
-            //if(i === 0) alert(new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(0, 10) + ' ' + new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(11, 5))
-            //date.push(new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(0, 10) + ' ' + new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(11, 5) )
+            // if(i === 0) alert(new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(0, 10) + ' ' + new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(11, 5))
+            // date.push(new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(0, 10) + ' ' + new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(11, 5) )
             date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
           }
           this.series1 = [
@@ -311,7 +306,7 @@ export default {
               name: '현재실내온도',
               data: data5
             }
-          ],
+          ]
           this.series2 = [
             {
               name: '방상태',
@@ -325,17 +320,11 @@ export default {
               name: '난방가동상태',
               data: data2
             }
-          ],
+          ]
           this.chartOptionsLine1 = {
             chart: {
               id: 'fb',
-              group: 'social',
-            },
-            markers: {
-              size: this.pSize,
-              hover: {
-                size: this.phSize
-              }
+              group: 'social'
             },
             xaxis: {
               type: 'datetime',
@@ -343,8 +332,8 @@ export default {
               labels: {
                 show: true,
                 rotate: 0,
-                //format: 'yy/MM/dd HH:mm',
-                formatter: function(value) {
+                // format: 'yy/MM/dd HH:mm',
+                formatter: function (value) {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
@@ -353,13 +342,7 @@ export default {
           this.chartOptionsLine2 = {
             chart: {
               id: 'tw',
-              group: 'social',
-            },
-            markers: {
-              size: this.pSize,
-              hover: {
-                size: this.phSize
-              }
+              group: 'social'
             },
             xaxis: {
               type: 'datetime',
@@ -367,8 +350,8 @@ export default {
               labels: {
                 show: true,
                 rotate: 0,
-                //format: 'yy/MM/dd HH:mm',
-                formatter: function(value) {
+                // format: 'yy/MM/dd HH:mm',
+                formatter: function (value) {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
@@ -404,13 +387,6 @@ export default {
       }
     },
     toggleTimes: function () {
-      if (this.time.value >= 3600) {
-        this.pSize = 1
-        this.phSize = 5
-      } else {
-        this.pSize = 0
-        this.phSize = 5
-      }
       if (this.activeBtn === 0) {
         this.getTrend(this.roomNo)
       } else {

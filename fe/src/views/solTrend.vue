@@ -24,9 +24,7 @@
               item-value="value"
               item-text="name"
               label='공조기 선택'
-              height=13
-              max-width=100
-              @change='toggleAhuNos()'
+              class='ma-0 mt-1 pa-0 grey--text caption'
             ></v-select>
           </v-col>
             <br>
@@ -38,18 +36,16 @@
               item-value="value"
               item-text="name"
               label='시간단위'
-              height=13
-              max-width=120
-              @change='toggleTimes()'
+              class='ma-0 mt-1 pa-0 grey--text caption'
             ></v-select>
           </v-col>
-          <v-col class="d-flex" sm="3">
-            <v-text-field label='시작일' hide-details class='d-inline-flex ma-0 pa-0' v-model='startTime'></v-text-field>
+          <v-col class="d-flex" sm="2">
+            <v-text-field label='시작일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='startTime'></v-text-field>
           </v-col>
-          <v-col class="d-flex" sm="3">
-            <v-text-field label='종료일' hide-details class='d-inline-flex  ma-0 pa-0' v-model='endTime'></v-text-field>
+          <v-col class="d-flex" sm="2">
+            <v-text-field label='종료일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='endTime'></v-text-field>
           </v-col>
-          <v-col class="d-flex" sm="3">
+          <v-col class="d-flex" sm="1">
             <v-btn @click="searchGraph()">
               <span>검색</span>
             </v-btn>
@@ -57,16 +53,13 @@
         </v-row>
         <div id="wrapper">
           <div id="chart-line2">
-            <apexchart type=line height=300 :options="chartOptionsLine2" :series="series2" />
+            <apexchart type=line height=200 width='1300' :options="chartOptionsLine2" :series="series2" />
           </div>
           <div id="chart-line">
-            <apexchart type=line height=200 :options="chartOptionsLine1" :series="series1" />
+            <apexchart type=line height=200 width='1300' :options="chartOptionsLine1" :series="series1" />
           </div>
           <div id="chart-line3">
-            <apexchart type=line height=150 :options="chartOptionsLine3" :series="series3" />
-          </div>
-          <div id="chart-line4">
-            <apexchart type=line height=150 :options="chartOptionsLine4" :series="series4" />
+            <apexchart type=line height=200 width='1300' :options="chartOptionsLine3" :series="series3" />
           </div>
         </div>
       </div>
@@ -74,12 +67,18 @@
   </v-container>
 </template>
 <script>
+import axios from 'axios'
 Apex = {
+  animations: { enabled: false },
   dataLabels: {
     enabled: false
   },
   stroke: {
-    curve: 'straight'
+    show: true,
+    curve: 'smooth',
+    lineCap: 'butt',
+    width: 3,
+    //dashArray: [0,10],
   },
   toolbar: {
     tools: {
@@ -92,11 +91,16 @@ Apex = {
   yaxis: {
     tickAmount: 3
   },
+  markers: {
+    size: 0,
+    hover: {
+      size: 0
+    }
+  },
   xaxis: {
     type: 'datetime'
-  },
+  }
 }
-import axios from 'axios'
 export default {
   mounted () {
     this.getAhus()
@@ -106,7 +110,7 @@ export default {
     return {
       ahuNo: { 'name': '그라시아스(AHU1)', 'value': 1 },
       ahuNos: [],
-      time: { 'name': '5분', 'value': 300 },
+      time: { 'name': '10분', 'value': 600 },
       times: [{ 'name': '5분', 'value': 300 }, { 'name': '10분', 'value': 600 }, { 'name': '1시간', 'value': 3600 }, { 'name': '하루', 'value': (3600 * 24) }],
       activeBtn: 0,
       datas: [],
@@ -134,7 +138,7 @@ export default {
         this.getTrend()
       }
     },
-    getSiteEnv() {
+    getSiteEnv () {
       axios.put(`${this.$apiRootPath}rooms/siteEnv`, { startTime: this.startTime, endTime: this.endTime, time: this.time.value })
         .then((r) => {
           this.envDatas = r.data
@@ -152,13 +156,13 @@ export default {
       for (var i = 0; i < this.datas.length; i++) {
         Tout = 0
         for (var j = 0; j < this.envDatas.length; j++) {
-          if (this.datas[i].m === this.envDatas[j].m){
+          if (this.datas[i].m === this.envDatas[j].m) {
             Tout = this.envDatas[j].fTout
-            break;
+            break
           }
         }
-        if( Tout > 50 || Tout < -50) Tout = 0;
-        this.mergeDatas.push({ 'ahu':this.datas[i], 'Tout':Tout });
+        if (Tout > 50 || Tout < -50) Tout = 0
+        this.mergeDatas.push({ 'ahu': this.datas[i], 'Tout': Tout })
       }
     },
     getAhuTrend () {
@@ -183,7 +187,7 @@ export default {
           var date = []
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].fData_damper_manual_set !== null) {
-              data0.push(this.mergeDatas[i].ahu.fData_damper_manual_set.toFixed(2))
+              data0.push((this.mergeDatas[i].ahu.fData_damper_manual_set / 100).toFixed(2))
             } else {
               data0.push(-1)
             }
@@ -267,9 +271,7 @@ export default {
             {
               name: '댐퍼설정값',
               data: data0
-            }
-          ]
-          this.series4 = [
+            },
             {
               name: '공급팬상태',
               data: data3
@@ -294,13 +296,8 @@ export default {
           this.chartOptionsLine1 = {
             chart: {
               id: 'ab',
-              group: 'social',
-            },
-            markers: {
-              size: this.pSize,
-              hover: {
-                size: this.phSize
-              }
+              width: '100%',
+              group: 'social'
             },
             xaxis: {
               type: 'datetime',
@@ -308,8 +305,8 @@ export default {
               labels: {
                 show: true,
                 rotate: 0,
-                //format: 'yy/MM/dd HH:mm',
-                formatter: function(value) {
+                // format: 'yy/MM/dd HH:mm',
+                formatter: function (value) {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
@@ -318,13 +315,8 @@ export default {
           this.chartOptionsLine2 = {
             chart: {
               id: 'bw',
-              group: 'social',
-            },
-            markers: {
-              size: this.pSize,
-              hover: {
-                size: this.phSize
-              }
+              width: '100%',
+              group: 'social'
             },
             xaxis: {
               type: 'datetime',
@@ -332,8 +324,8 @@ export default {
               labels: {
                 show: true,
                 rotate: 0,
-                //format: 'yy/MM/dd HH:mm',
-                formatter: function(value) {
+                // format: 'yy/MM/dd HH:mm',
+                formatter: function (value) {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
@@ -342,13 +334,7 @@ export default {
           this.chartOptionsLine3 = {
             chart: {
               id: 'cb',
-              group: 'social',
-            },
-            markers: {
-              size: this.pSize,
-              hover: {
-                size: this.phSize
-              }
+              group: 'social'
             },
             xaxis: {
               type: 'datetime',
@@ -356,32 +342,8 @@ export default {
               labels: {
                 show: true,
                 rotate: 0,
-                //format: 'yy/MM/dd HH:mm',
-                formatter: function(value) {
-                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
-                }
-              }
-            }
-          }
-          this.chartOptionsLine4 = {
-            chart: {
-              id: 'db',
-              group: 'social',
-            },
-            markers: {
-              size: this.pSize,
-              hover: {
-                size: this.phSize
-              }
-            },
-            xaxis: {
-              type: 'datetime',
-              categories: date,
-              labels: {
-                show: true,
-                rotate: 0,
-                //format: 'yy/MM/dd HH:mm',
-                formatter: function(value) {
+                // format: 'yy/MM/dd HH:mm',
+                formatter: function (value) {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
@@ -417,7 +379,7 @@ export default {
               data1.push(-1)
             }
             if (this.datas[i].Rdamp !== null) {
-              data2.push(this.datas[i].Rdamp.toFixed(2))
+              data2.push((this.datas[i].Rdamp / 100).toFixed(2))
             } else {
               data2.push(-1)
             }
@@ -462,9 +424,7 @@ export default {
             {
               name: '환기 수',
               data: data5
-            }
-          ]
-          this.series4 = [
+            },
             {
               name: '댐퍼설정값',
               data: data2
@@ -473,13 +433,7 @@ export default {
           this.chartOptionsLine1 = {
             chart: {
               id: 'ab',
-              group: 'social',
-            },
-            markers: {
-              size: this.pSize,
-              hover: {
-                size: this.phSize
-              }
+              group: 'social'
             },
             xaxis: {
               type: 'datetime',
@@ -487,8 +441,8 @@ export default {
               labels: {
                 show: true,
                 rotate: 0,
-                //format: 'yy/MM/dd HH:mm',
-                formatter: function(value) {
+                // format: 'yy/MM/dd HH:mm',
+                formatter: function (value) {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
@@ -497,13 +451,7 @@ export default {
           this.chartOptionsLine2 = {
             chart: {
               id: 'bw',
-              group: 'social',
-            },
-            markers: {
-              size: this.pSize,
-              hover: {
-                size: this.phSize
-              }
+              group: 'social'
             },
             xaxis: {
               type: 'datetime',
@@ -511,8 +459,8 @@ export default {
               labels: {
                 show: true,
                 rotate: 0,
-                //format: 'yy/MM/dd HH:mm',
-                formatter: function(value) {
+                // format: 'yy/MM/dd HH:mm',
+                formatter: function (value) {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
@@ -521,13 +469,7 @@ export default {
           this.chartOptionsLine3 = {
             chart: {
               id: 'cb',
-              group: 'social',
-            },
-            markers: {
-              size: this.pSize,
-              hover: {
-                size: this.phSize
-              }
+              group: 'social'
             },
             xaxis: {
               type: 'datetime',
@@ -535,32 +477,8 @@ export default {
               labels: {
                 show: true,
                 rotate: 0,
-                //format: 'yy/MM/dd HH:mm',
-                formatter: function(value) {
-                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
-                }
-              }
-            }
-          }
-          this.chartOptionsLine4 = {
-            chart: {
-              id: 'db',
-              group: 'social',
-            },
-            markers: {
-              size: this.pSize,
-              hover: {
-                size: this.phSize
-              }
-            },
-            xaxis: {
-              type: 'datetime',
-              categories: date,
-              labels: {
-                show: true,
-                rotate: 0,
-                //format: 'yy/MM/dd HH:mm',
-                formatter: function(value) {
+                // format: 'yy/MM/dd HH:mm',
+                formatter: function (value) {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
@@ -595,13 +513,6 @@ export default {
       this.getSiteEnv()
     },
     toggleTimes: function () {
-      if (this.time.value >= 3600) {
-        this.pSize = 1
-        this.phSize = 5
-      } else {
-        this.pSize = 0
-        this.phSize = 5
-      }
       if (this.activeBtn === 0) {
         this.getSiteEnv()
       } else {

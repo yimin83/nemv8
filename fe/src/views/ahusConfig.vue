@@ -4,23 +4,35 @@
       <template>
         <thead>
           <tr class="ma-0 pa-0">
-            <th class="text-center ma-0 pa-0 pt-5" style="width:200px;">구분</th>
-            <th class="text-center ma-0 pa-0 pt-3" style="">거주자<br>상태 보고</th>
-            <th class="text-center ma-0 pa-0 pt-0" style="">이코노<br>마이저<br>사용</th>
-            <th class="text-center ma-0 pa-0 pt-0" style="">외기온도<br>보상제어<br>사용</th>
-            <th class="text-center ma-0 pa-0 pt-3" style="">냉난방<br>모드</th>
-            <th class="text-center ma-0 pa-0 pt-0" style="">팬<br>자동/수동<br>설정</th>
-            <th class="text-center ma-0 pa-0 pt-0" style="">댐퍼<br>자동/수동<br>설정</th>
-            <th class="text-center ma-0 pa-0 pt-3" style="">내부<br>설정온도</th>
-            <th class="text-center ma-0 pa-0 pt-3" style="">댐퍼 수동<br>설정값</th>
-            <th class="text-center ma-0 pa-0 pt-3" style="">CO2 농도<br>기준 설정값</th>
-            <th class="text-center ma-0 pa-0 pt-5" style="">설명</th>
+            <th class="text-center black--text ma-0 pa-0 pt-5 config-column right-bold-border" style="width:200px;border-bottom:4px solid lightgrey;"><b>구분</b></th>
+            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">스케쥴러<br>사용</th>
+            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">거주자<br>상태 보고</th>
+            <th class="text-center black--text ma-0 pa-0 pt-0 config-column" style="border-bottom:4px solid lightgrey;">이코노<br>마이저<br>사용</th>
+            <th class="text-center black--text ma-0 pa-0 pt-0 config-column" style="border-bottom:4px solid lightgrey;">외기온도<br>보상제어<br>사용</th>
+            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">냉난방<br>모드</th>
+            <th class="text-center black--text ma-0 pa-0 pt-0 config-column" style="border-bottom:4px solid lightgrey;">팬<br>자동/수동<br>설정</th>
+            <th class="text-center black--text ma-0 pa-0 pt-0 config-column" style="border-bottom:4px solid lightgrey;">댐퍼<br>자동/수동<br>설정</th>
+            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">내부<br>설정온도</th>
+            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">댐퍼 수동<br>설정값</th>
+            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">CO2 농도<br>기준 설정값</th>
+            <th class="text-center black--text ma-0 pa-0 pt-5" style="width:140px;border-bottom:4px solid lightgrey;">설명</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="datas in ahuConfigs" class="ma-0 pa-0">
-            <td class="text-center ma-0 pa-0 pt-3 pb-2" style="">{{ahuNos[datas.AhuIndex-1].name}}</td>
-            <td class="text-center ma-0 pa-0" style="" >
+            <td class="text-center black--text font-weight-bold ma-0 pa-0 pt-3 pb-2 config-column right-bold-border" style="background-color:rgb(294, 294, 189)">{{ahuNos[datas.AhuIndex-1].name}}</td>
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
+              <v-select
+              v-model="datas.UseScheduler"
+              :items="useUnuses"
+              item-value="value"
+              item-text="name"
+              append-icon=""
+              menu-props="auto"
+              class="font-weight-bold black--text body-2 config-column-margin"
+              @change="saveAhuConfig()"
+            ></v-select></td>
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
               <v-select
               v-model="datas.NotifyOccupantsState"
               :items="useUnuses"
@@ -28,73 +40,96 @@
               item-text="name"
               append-icon=""
               menu-props="auto"
-              style="margin:-4px 0px -30px 0px;text-indent: 35px;"
-              class="grey--text caption"
+              class="font-weight-bold black--text body-2 config-column-margin"
+              @change="saveAhuConfig()"
             ></v-select></td>
-            <td class="text-center ma-0 pa-0" style="">
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
               <v-select
               v-model="datas.EconomizerCycle"
               :items="useUnuses"
               item-value="value"
               item-text="name"
               append-icon=""
-              style="margin:-4px 0px -30px 0px;text-indent: 35px;"
-              class="grey--text caption"></v-select>
+              class="font-weight-bold body-2 config-column-margin"
+              @change="saveAhuConfig()"></v-select>
             </td>
-            <td class="text-center ma-0 pa-0" style="">
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
               <v-select
               v-model="datas.VarTempControl"
               :items="useUnuses"
               item-value="value"
               item-text="name"
               append-icon=""
-              style="margin:-4px 0px -30px 0px;text-indent: 35px;"
-              class="grey--text caption"></v-select>
+              class="font-weight-bold body-2 config-column-margin"
+              @change="saveAhuConfig()"></v-select>
             </td>
-            <td class="text-center ma-0 pa-0" style="">
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
               <v-select
               v-model="datas.HCMode"
               :items="hcOnOffs"
               item-value="value"
               item-text="name"
               append-icon=""
-              style="margin:-4px 0px -30px 0px;text-indent: 35px;"
-              class="grey--text caption"></v-select>
+              class="font-weight-bold body-2 config-column-margin"
+              @change="saveAhuConfig()"></v-select>
             </td>
-            <td class="text-center ma-0 pa-0" style="">
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
               <v-select
               v-model="datas.FanAutoManual"
               :items="onOffs"
               item-value="value"
               item-text="name"
               append-icon=""
-              style="margin:-4px 0px -30px 0px;text-indent: 35px;"
-              class="grey--text caption"></v-select>
+              class="font-weight-bold body-2 config-column-margin centered-select"
+              @change="saveAhuConfig()"></v-select>
             </td>
-            <td class="text-center ma-0 pa-0" style="">
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
               <v-select
               v-model="datas.DamperAutoManual"
               :items="onOffs"
               item-value="value"
               item-text="name"
               append-icon=""
-              style="margin:-4px 0px -30px 0px;text-indent: 35px;"
-              class="grey--text caption"></v-select>
+              class="font-weight-bold body-2 config-column-margin"
+              @change="saveAhuConfig()"></v-select>
             </td>
-            <td class="text-center ma-0 pa-0" style=""><v-text-field class="centered-input text--darken-3" dense style="margin:-4px 0px -30px 0px;" v-model="datas.Tzone_set"></v-text-field></td>
-            <td class="text-center ma-0 pa-0" style=""><v-text-field class="centered-input text--darken-3" dense style="margin:-4px 0px -30px 0px;" v-model="datas.Rdamp_set"></v-text-field></td>
-            <td class="text-center ma-0 pa-0" style=""><v-text-field class="centered-input text--darken-3" dense style="margin:-4px 0px -30px 0px;" v-model="datas.PPMco2_set"></v-text-field></td>
-            <td class="text-center ma-0 pa-0" style=""><v-text-field class="centered-input text--darken-3" dense style="margin:-4px 0px -30px 0px;" v-model="datas.Desc"></v-text-field></td>
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Tzone_set" @change="saveAhuConfig()"></v-text-field></td>
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Rdamp_set" @change="saveAhuConfig()"></v-text-field></td>
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.PPMco2_set" @change="saveAhuConfig()"></v-text-field></td>
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)" ><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Desc" @change="saveAhuConfig()"></v-text-field></td>
           </tr>
         </tbody>
       </template>
     </v-simple-table>
-    <v-btn color='blue darken-1' right flat @click='saveAhuConfig()'>저장</v-btn>
+    <!-- <v-btn color='blue darken-1' right flat @click='saveAhuConfig()'>저장</v-btn> -->
   </v-container>
 </template>
 <style>
 .centered-input input {
   text-align: center
+}
+.centered-select select {
+  text-align: center
+}
+.td-right-border {
+  border-right: 1px solid lightgrey;
+}
+.config-column {
+  font-size: medium;
+  font-weight: bold;
+  border-right: 1px solid lightgrey;
+}
+.config-column-margin {
+  margin: -4px 0px -30px 0px;
+}
+.right-border {
+  border-right: 1px solid lightgrey;
+}
+.right-bold-border {
+  border-right: 4px solid lightgrey;
+}
+.bottom-border {
+  border-bottom:4px solid lightgrey;
 }
 </style>
 <script>
@@ -137,10 +172,14 @@ export default {
     },
     getAhuConfig () {
       // axios.get(`http://localhost:3000/api/rooms/ahusConfig/${ahuNo}`)
-      axios.get(`${this.$apiRootPath}rooms/ahusConfig/${1}`)
+      axios.get(`${this.$apiRootPath}rooms/ahusConfig/${255}`)
         .then((r) => {
-          this.ahuConfigs = r.data
-          this.tempAhuConfigs = JSON.parse(JSON.stringify(r.data))
+          this.ahuConfigs = JSON.parse(r.data)
+          this.tempAhuConfigs = JSON.parse(r.data)
+          for (var i = 0; i < this.ahuConfigs.length; i++) {
+            this.ahuConfigs[i].Tzone_set = this.ahuConfigs[i].Tzone_set.toFixed(1)
+            this.tempAhuConfigs[i].Tzone_set = this.tempAhuConfigs[i].Tzone_set.toFixed(1)
+          }
           // alert(JSON.stringify(this.tempAhuConfigs))
         })
         .catch((e) => {
@@ -151,7 +190,8 @@ export default {
     saveAhuConfig: function () {
       var ahuIdxs = []
       for (var i = 0; i < this.ahuConfigs.length; i++) {
-        if (!(this.ahuConfigs[i].NotifyOccupantsState === this.tempAhuConfigs[i].NotifyOccupantsState &&
+        if (!(this.ahuConfigs[i].UseScheduler === this.tempAhuConfigs[i].UseScheduler &&
+          this.ahuConfigs[i].NotifyOccupantsState === this.tempAhuConfigs[i].NotifyOccupantsState &&
           this.ahuConfigs[i].EconomizerCycle === this.tempAhuConfigs[i].EconomizerCycle &&
           this.ahuConfigs[i].VarTempControl === this.tempAhuConfigs[i].VarTempControl &&
           this.ahuConfigs[i].HCMode === this.tempAhuConfigs[i].HCMode &&

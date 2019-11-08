@@ -10,13 +10,13 @@
           >
             <v-tabs-slider></v-tabs-slider>
             <v-tab href="#tab-1">
-              Common Config
+              일반 설정
             </v-tab>
-            <v-tab href="#tab-2">
-              FloorRad Config
+            <v-tab v-if="configs.SiteInfo === 1" href="#tab-2">
+              바닥난방 설정
             </v-tab>
-            <v-tab href="#tab-3">
-              SolBeach Config
+            <v-tab v-if="configs.SiteInfo === 2" href="#tab-3">
+              공조기 설정
             </v-tab>
           </v-tabs>
           <v-tabs-items v-model="tab">
@@ -34,19 +34,19 @@
                       <v-list-item-content class="align-end"><v-text-field height=13 v-model="configs.SiteInfo" readonly></v-text-field></v-list-item-content>
                     </v-list-item>
                     <v-list-item>
-                      <v-list-item-content>System Local:</v-list-item-content>
+                      <v-list-item-content>시스템주소:</v-list-item-content>
                       <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" v-model="configs.tAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 v-model="configs.tAddr.PortNo"></v-text-field></v-list-item-content>
                     </v-list-item>
                     <v-list-item>
-                      <v-list-item-content>System Remote:</v-list-item-content>
+                      <v-list-item-content>원격지주소:</v-list-item-content>
                       <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" v-model="configs.tRemoteAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 v-model="configs.tRemoteAddr.PortNo"></v-text-field></v-list-item-content>
                     </v-list-item>
                     <v-list-item>
-                      <v-list-item-content>MinPktIntervalSec:</v-list-item-content>
+                      <v-list-item-content>최소패킷간격(초):</v-list-item-content>
                       <v-list-item-content class="align-end"><v-text-field height=13 v-model="configs.PacketMinIntervalSec"></v-text-field></v-list-item-content>
                     </v-list-item>
                     <v-list-item>
-                      <v-list-item-content>ControlPeriodSec:</v-list-item-content>
+                      <v-list-item-content>제어주기(초):</v-list-item-content>
                       <v-list-item-content class="align-end"><v-text-field height=13 v-model="configs.ControlPeriodSec"></v-text-field></v-list-item-content>
                     </v-list-item>
                   </v-list>
@@ -54,11 +54,11 @@
                 <v-col>
                   <v-list dense>
                     <v-list-item>
-                      <v-list-item-content>DB Server:</v-list-item-content>
+                      <v-list-item-content>DB 서버:</v-list-item-content>
                       <v-list-item-content class="align-end"><v-text-field height=13 label="IP Addr" v-model="configs.tDataBase.tAddr.IpAddress"></v-text-field><v-text-field label="PortNo" height=13 v-model="configs.tDataBase.tAddr.PortNo"></v-text-field></v-list-item-content>
                     </v-list-item>
                     <v-list-item>
-                      <v-list-item-content>DB Name:</v-list-item-content>
+                      <v-list-item-content>DB 이름:</v-list-item-content>
                       <v-list-item-content class="align-end"><v-text-field height=13 v-model="configs.tDataBase.Name"></v-text-field></v-list-item-content>
                     </v-list-item>
                     <v-list-item>
@@ -66,8 +66,8 @@
                       <v-list-item-content class="align-end"><v-text-field height=13 v-model="configs.tDataBase.ID"></v-text-field></v-list-item-content>
                     </v-list-item>
                     <v-list-item>
-                      <v-list-item-content>PassWd:</v-list-item-content>
-                      <v-list-item-content class="align-end"><v-text-field height=13 v-model="configs.tDataBase.PassWd"></v-text-field></v-list-item-content>
+                      <v-list-item-content>비밀번호:</v-list-item-content>
+                      <v-list-item-content class="align-end"><v-text-field password height=13 v-model="configs.tDataBase.PassWd"></v-text-field></v-list-item-content>
                     </v-list-item>
                   </v-list>
                 </v-col>
@@ -78,8 +78,8 @@
                       <v-list-item-content class="align-end"><v-text-field height=13 v-model="configs.tSMS.ID"></v-text-field></v-list-item-content>
                     </v-list-item>
                     <v-list-item>
-                      <v-list-item-content>SMS:</v-list-item-content>
-                      <v-list-item-content class="align-end"><v-text-field height=13 v-model="configs.tSMS.Key"></v-text-field></v-list-item-content>
+                      <v-list-item-content>SMS 키값:</v-list-item-content>
+                      <v-list-item-content class="align-end"><v-text-field passwd height=13 v-model="configs.tSMS.Key"></v-text-field></v-list-item-content>
                     </v-list-item>
                   </v-list>
                 </v-col>
@@ -95,7 +95,7 @@
                               max-width="400"
                               class="mx-auto">
                             <v-list>
-                              <v-card-title class="subheading font-weight-bold">FloorRad Config</v-card-title>
+                              <v-card-title class="subheading font-weight-bold">바닥난방</v-card-title>
                               <v-divider></v-divider>
                               <v-list-item>
                                 <v-textarea
@@ -109,47 +109,47 @@
                                 ></v-textarea>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>Option:</v-list-item-title>
+                                <v-list-item-title>제어옵션:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.ControlOption"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>RoomCnt:</v-list-item-title>
+                                <v-list-item-title>객실 수:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.RoomCnt"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>UseTsuf:</v-list-item-title>
+                                <v-list-item-title>바닥온도 사용:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.UseTsurf"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>Troom_set:</v-list-item-title>
-                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.Troom_set"></v-text-field></v-list-item-title>
-                              </v-list-item>
-                              <v-list-item>
-                                <v-list-item-title>Tsurf_set:</v-list-item-title>
+                                <v-list-item-title>바닥온도 설정값:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.Tsurf_set"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>Troom_cr:</v-list-item-title>
-                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.Troom_cr"></v-text-field></v-list-item-title>
-                              </v-list-item>
-                              <v-list-item>
-                                <v-list-item-title>Tsurf_cr:</v-list-item-title>
+                                <v-list-item-title>바닥온도 제어범위:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.Tsurf_cr"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>Tctrl_res:</v-list-item-title>
+                                <v-list-item-title>실내온도 설정값 :</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.Troom_set"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>실내온도 제어범위:</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.Troom_cr"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>제어온도 최소단위:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.Tctrl_res"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>Check In Hour:</v-list-item-title>
+                                <v-list-item-title>입실시간:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.CheckInHour"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>RR_StayHour:</v-list-item-title>
+                                <v-list-item-title>예비객실 거주시간:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.RR_StayHour"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>OperationOpt:</v-list-item-title>
+                                <v-list-item-title>구동옵션:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.OperationOption"></v-text-field></v-list-item-title>
                               </v-list-item>
                             </v-list>
@@ -159,39 +159,39 @@
                           <v-card
                           max-width="400"
                           class="mx-auto">
-                          <v-card-title class="subheading font-weight-bold">Control Para</v-card-title>
+                          <v-card-title class="subheading font-weight-bold">제어변수</v-card-title>
                           <v-divider></v-divider>
                           <v-list dense>
                             <v-list-item>
-                              <v-list-item-title>PD_MaxHR:</v-list-item-title>
+                              <v-list-item-title>최대주간 객실수:</v-list-item-title>
                               <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tFloorRadConf.tPeak.MaxHeatingRoom"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-title>PD_NMaxHR:</v-list-item-title>
+                              <v-list-item-title>최대야간 객실수:</v-list-item-title>
                               <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tFloorRadConf.tPeak.NightMaxHeatingRoom"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-title>VT_Thigh:</v-list-item-title>
+                              <v-list-item-title>외기보상온도 최고값:</v-list-item-title>
                               <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tFloorRadConf.tVariableTemp.HeatingHighTemp"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-title>VT_Tlow:</v-list-item-title>
+                              <v-list-item-title>외기보상온도 최저값:</v-list-item-title>
                               <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tFloorRadConf.tVariableTemp.HeatingLowTemp"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-title>VT_Tdelta:</v-list-item-title>
+                              <v-list-item-title>외기보상온도 제어폭:</v-list-item-title>
                               <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tFloorRadConf.tVariableTemp.HeatingDelatTemp"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-title>OS_TimeS:</v-list-item-title>
+                              <v-list-item-title>최적정지 시간(초):</v-list-item-title>
                               <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tFloorRadConf.tOptimalStop.OptimalStopTimeSec"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-title>DR_Temp:</v-list-item-title>
+                              <v-list-item-title>수요반응제어 온도:</v-list-item-title>
                               <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tFloorRadConf.tDemandResponse.DRTemp"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-title>DR_TimeH:</v-list-item-title>
+                              <v-list-item-title>수요반응제어 시간(시):</v-list-item-title>
                               <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tFloorRadConf.tDemandResponse.DRTimeHour"></v-text-field></v-list-item-title>
                             </v-list-item>
                           </v-list>
@@ -200,7 +200,7 @@
                         <v-card
                         max-width="400"
                         class="mx-auto">
-                          <v-card-title class="subheading font-weight-bold">Pre Heating Control</v-card-title>
+                          <v-card-title class="subheading font-weight-bold">예열제어</v-card-title>
                           <v-divider></v-divider>
                           <v-list dense>
                             <v-list-item>
@@ -254,42 +254,42 @@
                           max-width="400"
                           class="mx-auto">
                           <v-list>
-                            <v-card-title class="subheading font-weight-bold">User Telephones</v-card-title>
+                            <v-card-title class="subheading font-weight-bold">운용자 연락처</v-card-title>
                             <v-divider></v-divider>
                             <v-list-item>
-                              <v-list-item-title>TelNo_1:</v-list-item-title>
+                              <v-list-item-title>연락처 1:</v-list-item-title>
                               <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.TelNumber0"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-title>TelNo_2:</v-list-item-title>
+                              <v-list-item-title>연락처 2:</v-list-item-title>
                               <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.TelNumber1"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-title>TelNo_3:</v-list-item-title>
+                              <v-list-item-title>연락처 3:</v-list-item-title>
                               <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.TelNumber2"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-title>TelNo_4:</v-list-item-title>
+                              <v-list-item-title>연락처 4:</v-list-item-title>
                               <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.TelNumber3"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-title>TelNo_5:</v-list-item-title>
+                              <v-list-item-title>연락처 5:</v-list-item-title>
                               <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.TelNumber4"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-title>NtfyOption:</v-list-item-title>
+                              <v-list-item-title>문자알림 옵션:</v-list-item-title>
                               <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.tNotify.NotifyOption"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-title>NtfyInterval:</v-list-item-title>
+                              <v-list-item-title>문자알림 간격(초):</v-list-item-title>
                               <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.tNotify.NotifyIntervalSec"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-title>NtfyStartHour:</v-list-item-title>
+                              <v-list-item-title>문자알림 시작시간:</v-list-item-title>
                               <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.tNotify.NotifyStartHour"></v-text-field></v-list-item-title>
                             </v-list-item>
                             <v-list-item>
-                              <v-list-item-title>NtfyEndHour:</v-list-item-title>
+                              <v-list-item-title>문자알림 종료시간:</v-list-item-title>
                               <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.tNotify.NotifyEndHour"></v-text-field></v-list-item-title>
                             </v-list-item>
                           </v-list>
@@ -308,7 +308,7 @@
                             <v-col>
                               <v-card>
                               <v-list dense>
-                                <v-card-title class="subheading font-weight-bold">SolBeach Config</v-card-title>
+                                <v-card-title class="subheading font-weight-bold">기본설정</v-card-title>
                                 <v-divider></v-divider>
                                 <v-list-item>
                                   <v-textarea
@@ -322,43 +322,43 @@
                                   ></v-textarea>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>Option:</v-list-item-title>
+                                  <v-list-item-title>제어옵션:</v-list-item-title>
                                   <v-list-item-title class="align-end "><v-text-field height=13 v-model="configs.tSolBeachConf.ControlOption"></v-text-field></v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>ZoneCnt:</v-list-item-title>
+                                  <v-list-item-title>공조기 수:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.ZoneCnt"></v-text-field></v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>HCMode:</v-list-item-title>
+                                  <v-list-item-title>냉난방 모드:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.HCMode"></v-text-field></v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>Tzone_set:</v-list-item-title>
+                                  <v-list-item-title>실내 설정온도:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.Tzone_set"></v-text-field></v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>PPMco2_set:</v-list-item-title>
+                                  <v-list-item-title>CO2 설정값:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.PPMco2_set"></v-text-field></v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>Damper AM:</v-list-item-title>
+                                  <v-list-item-title>댐퍼 자/수동:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.DamperAutoManual"></v-text-field></v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>Tctrl_res:</v-list-item-title>
+                                  <v-list-item-title>제어온도 최소단위:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.Tctrl_res"></v-text-field></v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>CO2PeriodSec:</v-list-item-title>
+                                  <v-list-item-title>CO2 측정주기(초):</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.CO2LoadPeriodSec"></v-text-field></v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>NoCtrlOption:</v-list-item-title>
+                                  <v-list-item-title>비동작 옵션:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.NoControlOption"></v-text-field></v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>ScheduleOpt:</v-list-item-title>
+                                  <v-list-item-title>스케줄러 옵션:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.SchedulerOption"></v-text-field></v-list-item-title>
                                 </v-list-item>
                               </v-list>
@@ -366,7 +366,7 @@
                           </v-col>
                           <v-col>
                             <v-card>
-                              <v-card-title class="subheading font-weight-bold">Damper Control</v-card-title>
+                              <v-card-title class="subheading font-weight-bold">댐퍼제어</v-card-title>
                               <v-divider></v-divider>
                               <v-list dense>
                                 <v-list-item>
@@ -381,42 +381,41 @@
                                   ></v-textarea>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>Control Mode:</v-list-item-title>
+                                  <v-list-item-title>제어모드:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.DamperCtrlMode"></v-text-field></v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>Rdamp_set:</v-list-item-title>
+                                  <v-list-item-title>댐퍼설정값:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.Rdamp_set"></v-text-field></v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>Rdamp_min:</v-list-item-title>
+                                  <v-list-item-title>댐퍼제어 최소값:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.Rdamp_min"></v-text-field></v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>Rdamp_max:</v-list-item-title>
+                                  <v-list-item-title>댐퍼제어 최대값:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.Rdamp_max"></v-text-field></v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>Rdamp_res:</v-list-item-title>
+                                  <v-list-item-title>댐퍼제어 최소단위:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.Rdamp_ctrl_res"></v-text-field></v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                  <v-list-item-title>R_damp_noctrl:</v-list-item-title>
+                                  <v-list-item-title>댐퍼 비동작 옵션:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.Rdamp_noctrl_max"></v-text-field></v-list-item-title>
                                 </v-list-item>
                               </v-list>
                             </v-card>
                             <br>
-                            <center><v-btn color="primary" @click="openDamperSch(1)">DamperSch</v-btn></center>
                             <v-dialog v-model="damperSchModal" persistent max-width="1000px">
                               <v-card>
                                 <v-card-title>
-                                  <span class="headline">Damper Control Scheduler</span>
+                                  <span class="headline">스케쥴러</span>
                                 </v-card-title>
                                 <v-card-text>
                                   <v-row align="center">
                                     <v-col cols="3">
-                                      <v-subheader>AhuIndex : </v-subheader>
+                                      <v-subheader>공조기 번호 : </v-subheader>
                                     </v-col>
                                     <v-col cols="2">
                                       <v-select
@@ -466,15 +465,15 @@
                                 </v-card-text>
                                 <v-card-actions>
                                   <v-spacer></v-spacer>
-                                  <v-btn color="blue darken-1" flat @click="applyDamperSch(damperSchsConfig.AhuIndex)">Apply</v-btn>
-                                  <v-btn color="blue darken-1" flat @click="closeDamperSch()">Cancel</v-btn>
+                                  <v-btn color="blue darken-1" flat @click="applyDamperSch(damperSchsConfig.AhuIndex)">저장</v-btn>
+                                  <v-btn color="blue darken-1" flat @click="closeDamperSch()">취소</v-btn>
                                 </v-card-actions>
                               </v-card>
                             </v-dialog>
                           </v-col>
                           <v-col>
                             <v-card>
-                            <v-card-title class="subheading font-weight-bold">Occupant Control</v-card-title>
+                            <v-card-title class="subheading font-weight-bold">재실자 제어</v-card-title>
                             <v-divider></v-divider>
                             <v-list dense>
                               <v-list-item>
@@ -529,38 +528,38 @@
                         </v-col>
                         <v-col>
                           <v-card>
-                            <v-card-title class="subheading font-weight-bold">VarTemp Control</v-card-title>
+                            <v-card-title class="subheading font-weight-bold">외기온도 보상제어</v-card-title>
                             <v-divider></v-divider>
                             <v-list dense>
                               <v-list-item>
-                                <v-list-item-title>VTH_Thigh:</v-list-item-title>
+                                <v-list-item-title>난방온도범위 최고값:</v-list-item-title>
                                 <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tVariableTemp.HeatingHighTemp"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>VTH_Tlow:</v-list-item-title>
+                                <v-list-item-title>난방온도범위 최저값:</v-list-item-title>
                                 <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tVariableTemp.HeatingLowTemp"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>VTH_Tdelta:</v-list-item-title>
+                                <v-list-item-title>난방온도 제어폭:</v-list-item-title>
                                 <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tVariableTemp.HeatingDelatTemp"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>VTC_Thigh:</v-list-item-title>
+                                <v-list-item-title>냉방온도범위 최고값:</v-list-item-title>
                                 <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tVariableTemp.CoolingHighTemp"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>VTC_Tlow:</v-list-item-title>
+                                <v-list-item-title>냉방온도범위 최저값:</v-list-item-title>
                                 <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tVariableTemp.CoolingLowTemp"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>VTC_Tdelta:</v-list-item-title>
+                                <v-list-item-title>냉방온도 제어폭:</v-list-item-title>
                                 <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tVariableTemp.CoolingDelatTemp"></v-text-field></v-list-item-title>
                               </v-list-item>
                             </v-list>
                           </v-card>
                           <br>
                           <v-card>
-                            <v-card-title class="subheading font-weight-bold">PID Control</v-card-title>
+                            <v-card-title class="subheading font-weight-bold">PID 제어</v-card-title>
                             <v-divider></v-divider>
                             <v-list dense>
                               <v-list-item>
@@ -591,42 +590,42 @@
                             max-width="400"
                             class="mx-auto">
                             <v-list>
-                              <v-card-title class="subheading font-weight-bold">User Telephones</v-card-title>
+                              <v-card-title class="subheading font-weight-bold">운용자 연락처</v-card-title>
                               <v-divider></v-divider>
                               <v-list-item>
-                                <v-list-item-title>TelNo_1:</v-list-item-title>
+                                <v-list-item-title>연락처 1:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tSolBeachConf.TelNumber0"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>TelNo_2:</v-list-item-title>
+                                <v-list-item-title>연락처 2:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tSolBeachConf.TelNumber1"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>TelNo_3:</v-list-item-title>
+                                <v-list-item-title>연락처 3:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tSolBeachConf.TelNumber2"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>TelNo_4:</v-list-item-title>
+                                <v-list-item-title>연락처 4:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tSolBeachConf.TelNumber3"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>TelNo_5:</v-list-item-title>
+                                <v-list-item-title>연락처 5:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tSolBeachConf.TelNumber4"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>NtfyOption:</v-list-item-title>
+                                <v-list-item-title>문자알림 옵션:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tSolBeachConf.tNotify.NotifyOption"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>NtfyInterval:</v-list-item-title>
+                                <v-list-item-title>문자알림 간격(초):</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tSolBeachConf.tNotify.NotifyIntervalSec"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>NtfyStartHour:</v-list-item-title>
+                                <v-list-item-title>문자알림 시작시간:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tSolBeachConf.tNotify.NotifyStartHour"></v-text-field></v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>NtfyEndHour:</v-list-item-title>
+                                <v-list-item-title>문자알림 종료시간:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tSolBeachConf.tNotify.NotifyEndHour"></v-text-field></v-list-item-title>
                               </v-list-item>
                             </v-list>
@@ -639,8 +638,9 @@
                 </v-card>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" flat @click="applyEmsSysConfig()">Apply</v-btn>
-                  <v-btn color="blue darken-1" flat @click="getEmsSysConfig()">Cancel</v-btn>
+                  <v-btn color="primary" @click="openDamperSch(1)">스케쥴러</v-btn>
+                  <v-btn color="blue darken-1" flat @click="applyEmsSysConfig()">저장</v-btn>
+                  <v-btn color="blue darken-1" flat @click="getEmsSysConfig()">취소</v-btn>
                 </v-card-actions>
             </v-tab-item>
           </v-tabs-items>
@@ -701,31 +701,31 @@ export default {
         .then((r) => {
           // alert("emsSysConfig r.data : " + JSON.parse(r.data))
           this.configs = JSON.parse(r.data)
-          this.configs.tFloorRadConf.Troom_set = this.configs.tFloorRadConf.Troom_set.toFixed(2)
-          this.configs.tFloorRadConf.Tsurf_set = this.configs.tFloorRadConf.Tsurf_set.toFixed(2)
-          this.configs.tFloorRadConf.Troom_cr = this.configs.tFloorRadConf.Troom_cr.toFixed(2)
-          this.configs.tFloorRadConf.Tsurf_cr = this.configs.tFloorRadConf.Tsurf_cr.toFixed(2)
-          this.configs.tFloorRadConf.Tctrl_res = this.configs.tFloorRadConf.Tctrl_res.toFixed(2)
-          this.configs.tFloorRadConf.tVariableTemp.HeatingHighTemp = this.configs.tFloorRadConf.tVariableTemp.HeatingHighTemp.toFixed(2)
-          this.configs.tFloorRadConf.tVariableTemp.HeatingLowTemp = this.configs.tFloorRadConf.tVariableTemp.HeatingLowTemp.toFixed(2)
-          this.configs.tFloorRadConf.tVariableTemp.HeatingDelatTemp = this.configs.tFloorRadConf.tVariableTemp.HeatingDelatTemp.toFixed(2)
-          this.configs.tFloorRadConf.tDemandResponse.DRTemp = this.configs.tFloorRadConf.tDemandResponse.DRTemp.toFixed(2)
-          this.configs.tFloorRadConf.tPreHeating.Tout_avg = this.configs.tFloorRadConf.tPreHeating.Tout_avg.toFixed(2)
-          this.configs.tSolBeachConf.Tzone_set = this.configs.tSolBeachConf.Tzone_set.toFixed(2)
-          this.configs.tSolBeachConf.Tctrl_res = this.configs.tSolBeachConf.Tctrl_res.toFixed(2)
-          this.configs.tSolBeachConf.tRdamp.Rdamp_set = this.configs.tSolBeachConf.tRdamp.Rdamp_set.toFixed(2)
-          this.configs.tSolBeachConf.tRdamp.Rdamp_min = this.configs.tSolBeachConf.tRdamp.Rdamp_min.toFixed(2)
-          this.configs.tSolBeachConf.tRdamp.Rdamp_max = this.configs.tSolBeachConf.tRdamp.Rdamp_max.toFixed(2)
-          this.configs.tSolBeachConf.tRdamp.Rdamp_ctrl_res = this.configs.tSolBeachConf.tRdamp.Rdamp_ctrl_res.toFixed(2)
-          this.configs.tSolBeachConf.tVariableTemp.HeatingHighTemp = this.configs.tSolBeachConf.tVariableTemp.HeatingHighTemp.toFixed(2)
-          this.configs.tSolBeachConf.tVariableTemp.HeatingLowTemp = this.configs.tSolBeachConf.tVariableTemp.HeatingLowTemp.toFixed(2)
-          this.configs.tSolBeachConf.tVariableTemp.HeatingDelatTemp = this.configs.tSolBeachConf.tVariableTemp.HeatingDelatTemp.toFixed(2)
-          this.configs.tSolBeachConf.tVariableTemp.CoolingHighTemp = this.configs.tSolBeachConf.tVariableTemp.CoolingHighTemp.toFixed(2)
-          this.configs.tSolBeachConf.tVariableTemp.CoolingLowTemp = this.configs.tSolBeachConf.tVariableTemp.CoolingLowTemp.toFixed(2)
-          this.configs.tSolBeachConf.tVariableTemp.CoolingDelatTemp = this.configs.tSolBeachConf.tVariableTemp.CoolingDelatTemp.toFixed(2)
-          this.configs.tSolBeachConf.tPID.Kp = this.configs.tSolBeachConf.tPID.Kp.toFixed(2)
-          this.configs.tSolBeachConf.tPID.Ki = this.configs.tSolBeachConf.tPID.Ki.toFixed(2)
-          this.configs.tSolBeachConf.tPID.Kd = this.configs.tSolBeachConf.tPID.Kd.toFixed(2)
+          this.configs.tFloorRadConf.Troom_set = this.configs.tFloorRadConf.Troom_set.toFixed(1)
+          this.configs.tFloorRadConf.Tsurf_set = this.configs.tFloorRadConf.Tsurf_set.toFixed(1)
+          this.configs.tFloorRadConf.Troom_cr = this.configs.tFloorRadConf.Troom_cr.toFixed(1)
+          this.configs.tFloorRadConf.Tsurf_cr = this.configs.tFloorRadConf.Tsurf_cr.toFixed(1)
+          this.configs.tFloorRadConf.Tctrl_res = this.configs.tFloorRadConf.Tctrl_res.toFixed(1)
+          this.configs.tFloorRadConf.tVariableTemp.HeatingHighTemp = this.configs.tFloorRadConf.tVariableTemp.HeatingHighTemp.toFixed(1)
+          this.configs.tFloorRadConf.tVariableTemp.HeatingLowTemp = this.configs.tFloorRadConf.tVariableTemp.HeatingLowTemp.toFixed(1)
+          this.configs.tFloorRadConf.tVariableTemp.HeatingDelatTemp = this.configs.tFloorRadConf.tVariableTemp.HeatingDelatTemp.toFixed(1)
+          this.configs.tFloorRadConf.tDemandResponse.DRTemp = this.configs.tFloorRadConf.tDemandResponse.DRTemp.toFixed(1)
+          this.configs.tFloorRadConf.tPreHeating.Tout_avg = this.configs.tFloorRadConf.tPreHeating.Tout_avg.toFixed(1)
+          this.configs.tSolBeachConf.Tzone_set = this.configs.tSolBeachConf.Tzone_set.toFixed(1)
+          this.configs.tSolBeachConf.Tctrl_res = this.configs.tSolBeachConf.Tctrl_res.toFixed(1)
+          this.configs.tSolBeachConf.tRdamp.Rdamp_set = this.configs.tSolBeachConf.tRdamp.Rdamp_set.toFixed(1)
+          this.configs.tSolBeachConf.tRdamp.Rdamp_min = this.configs.tSolBeachConf.tRdamp.Rdamp_min.toFixed(1)
+          this.configs.tSolBeachConf.tRdamp.Rdamp_max = this.configs.tSolBeachConf.tRdamp.Rdamp_max.toFixed(1)
+          this.configs.tSolBeachConf.tRdamp.Rdamp_ctrl_res = this.configs.tSolBeachConf.tRdamp.Rdamp_ctrl_res.toFixed(1)
+          this.configs.tSolBeachConf.tVariableTemp.HeatingHighTemp = this.configs.tSolBeachConf.tVariableTemp.HeatingHighTemp.toFixed(1)
+          this.configs.tSolBeachConf.tVariableTemp.HeatingLowTemp = this.configs.tSolBeachConf.tVariableTemp.HeatingLowTemp.toFixed(1)
+          this.configs.tSolBeachConf.tVariableTemp.HeatingDelatTemp = this.configs.tSolBeachConf.tVariableTemp.HeatingDelatTemp.toFixed(1)
+          this.configs.tSolBeachConf.tVariableTemp.CoolingHighTemp = this.configs.tSolBeachConf.tVariableTemp.CoolingHighTemp.toFixed(1)
+          this.configs.tSolBeachConf.tVariableTemp.CoolingLowTemp = this.configs.tSolBeachConf.tVariableTemp.CoolingLowTemp.toFixed(1)
+          this.configs.tSolBeachConf.tVariableTemp.CoolingDelatTemp = this.configs.tSolBeachConf.tVariableTemp.CoolingDelatTemp.toFixed(1)
+          this.configs.tSolBeachConf.tPID.Kp = this.configs.tSolBeachConf.tPID.Kp.toFixed(1)
+          this.configs.tSolBeachConf.tPID.Ki = this.configs.tSolBeachConf.tPID.Ki.toFixed(1)
+          this.configs.tSolBeachConf.tPID.Kd = this.configs.tSolBeachConf.tPID.Kd.toFixed(1)
         })
         .catch((e) => {
           alert(e.message)
