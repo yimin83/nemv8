@@ -4,7 +4,8 @@
       <v-bottom-navigation
         :value="activeBtn"
         grow
-        color="teal"
+        dark
+        color="white"
         @change="changGraph()"
       >
         <v-btn @click="activeBtn = 0">
@@ -18,7 +19,7 @@
         <br>
         <v-row>
           <br>
-          <v-col class="d-flex" cols="12" sm="2" v-if="this.activeBtn === 0">
+          <v-col class="d-flex" cols="12" sm="1" v-if="this.activeBtn === 0">
             <v-select
               :items='roomNos'
               v-model='roomNo'
@@ -27,7 +28,7 @@
             ></v-select>
           </v-col>
             <br>
-          <v-col class="d-flex" sm="2">
+          <v-col class="d-flex" cols="12" sm="1">
             <br>
             <v-select
               v-model="time.value"
@@ -38,23 +39,39 @@
               class='ma-0 mt-1 pa-0 grey--text caption'
             ></v-select>
           </v-col>
-          <v-col class="d-flex" sm="3">
+          <v-col class="d-flex" cols="12" sm="2">
             <v-text-field label='시작일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='startTime'></v-text-field>
           </v-col>
-          <v-col class="d-flex" sm="3">
+          <v-col class="d-flex" cols="12" sm="2">
             <v-text-field label='종료일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='endTime'></v-text-field>
           </v-col>
-          <v-col class="d-flex" sm="1">
-            <v-btn @click="searchGraph()">
+          <v-col class="d-flex" cols="12" sm="1">
+            <v-btn class="d-flex" :loading="searchloading" :disabled="loading" @click="searchGraph()">
               <span>검색</span>
             </v-btn>
           </v-col>
         </v-row>
-        <div id="wrapper">
-          <div id="chart-line">
+        <div>
+          <div class="ma-0 pa-0 mb-n3">
+            <v-chip
+              class="ma-0 ml-5 mb-n3"
+              color="orange"
+              label
+              outlined
+            >
+            {{graphTitle1}}
+            </v-chip>
             <apexchart type=line width='1300px' height='400px' :options="chartOptionsLine1" :series="series1" />
           </div>
-          <div id="chart-line2">
+          <div class="ma-0 pa-0 mb-n3">
+            <v-chip
+              class="ma-0 ml-5 mb-n3"
+              color="orange"
+              label
+              outlined
+            >
+            {{graphTitle2}}
+            </v-chip>
             <apexchart type=line width='1300px' height='160px' :options="chartOptionsLine2" :series="series2" />
           </div>
         </div>
@@ -65,10 +82,6 @@
 <script>
 import axios from 'axios'
 Apex = {
-  animations: { enabled: false },
-  dataLabels: {
-    enabled: false
-  },
   stroke: {
     show: true,
     curve: 'smooth',
@@ -76,25 +89,8 @@ Apex = {
     width: 3,
     //dashArray: [0,10],
   },
-  toolbar: {
-    tools: {
-      selection: false
-    }
-  },
-  grid: {
-    clipMarkers: false
-  },
   yaxis: {
     tickAmount: 3
-  },
-  markers: {
-    size: 0,
-    hover: {
-      size: 0
-    }
-  },
-  xaxis: {
-    type: 'datetime'
   }
 }
 export default {
@@ -118,7 +114,11 @@ export default {
       roomNos: [],
       roomNo: 201,
       startTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 00:00'),
-      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 23:59')
+      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 23:59'),
+      searchloading: false,
+      loading: false,
+      graphTitle1: '온도 정보',
+      graphTitle2: '상태 정보'
     }
   },
   methods: {
@@ -130,6 +130,8 @@ export default {
       }
     },
     searchGraph () {
+      this.searchloading = true
+      this.loading = true
       if (this.activeBtn === 0) {
         this.getTrend(this.roomNo)
       } else {
@@ -147,6 +149,8 @@ export default {
           var data3 = []
           var data4 = []
           var date = []
+          this.graphTitle1 = '온도 정보'
+          this.graphTitle2 = '난방 정보'
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].HeatingCnt !== null) {
               data0.push(this.datas[i].HeatingCnt.toFixed(2))
@@ -207,7 +211,11 @@ export default {
           this.chartOptionsLine1 = {
             chart: {
               id: 'fb',
-              group: 'social'
+              width: '100%',
+              group: 'social',
+              toolbar: {
+                show: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -225,7 +233,11 @@ export default {
           this.chartOptionsLine2 = {
             chart: {
               id: 'tw',
-              group: 'social'
+              width: '100%',
+              group: 'social',
+              toolbar: {
+                show: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -240,6 +252,8 @@ export default {
               }
             }
           }
+          this.searchloading = false
+          this.loading = false
         })
         .catch((e) => {
           alert(e.message)
@@ -258,6 +272,8 @@ export default {
           var data4 = []
           var data5 = []
           var date = []
+          this.graphTitle1 = '온도 정보'
+          this.graphTitle2 = '상태 정보'
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].ucRoomState !== null) {
               data0.push(this.datas[i].ucRoomState.toFixed(2))
@@ -324,7 +340,11 @@ export default {
           this.chartOptionsLine1 = {
             chart: {
               id: 'fb',
-              group: 'social'
+              width: '100%',
+              group: 'social',
+              toolbar: {
+                show: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -342,7 +362,11 @@ export default {
           this.chartOptionsLine2 = {
             chart: {
               id: 'tw',
-              group: 'social'
+              width: '100%',
+              group: 'social',
+              toolbar: {
+                show: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -357,6 +381,8 @@ export default {
               }
             }
           }
+          this.searchloading = false
+          this.loading = false
         })
         .catch((e) => {
           alert(e.message)

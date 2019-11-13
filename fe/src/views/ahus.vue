@@ -45,8 +45,8 @@
         </tbody>
       </template>
     </v-simple-table>
-    <v-dialog v-model='ahuGraphModal'>
-      <v-card>
+    <v-dialog v-model='ahuGraphModal' persistent  height="950px">
+      <v-card height="900px">
         <v-toolbar dark icons-and-text>
           <v-toolbar-title>
             <span class='headline'>{{graphTitle}} 상태 그래프</span>
@@ -61,8 +61,7 @@
         <v-card-text>
           <div>
             <v-row>
-              <v-col class="d-flex" sm="1">
-                <br>
+              <v-col class="d-flex" cols="12" sm="1">
                 <v-select
                   v-model="time.value"
                   :items="this.times"
@@ -72,26 +71,50 @@
                   class='ma-0 mt-1 pa-0 grey--text caption'
                 ></v-select>
               </v-col>
-              <v-col class="d-flex" sm="2">
+              <v-col class="d-flex" cols="12" sm="2">
                 <v-text-field label='시작일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='startTime'></v-text-field>
               </v-col>
-              <v-col class="d-flex" sm="2">
+              <v-col class="d-flex" cols="12" sm="2">
                 <v-text-field label='종료일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='endTime'></v-text-field>
               </v-col>
-              <v-col class="d-flex" sm="1">
-                <v-btn @click="getSiteEnv(curAhuNo)">
+              <v-col class="d-flex" cols="12" sm="1">
+                <v-btn class="d-flex" :loading="searchloading" :disabled="loading" @click="getSiteEnv(curAhuNo)">
                   <span>검색</span>
                 </v-btn>
               </v-col>
             </v-row>
-            <div id="wrapper">
-              <div id="chart-line2">
+            <div>
+              <div class="ma-0 pa-0 mb-n3">
+                <v-chip
+                  class="ma-0 ml-5 mb-n3"
+                  color="orange"
+                  label
+                  outlined
+                >
+                {{graphTitle2}}
+                </v-chip>
                 <apexchart type=line height=200 :options="chartOptionsLine2" :series="series2" />
               </div>
-              <div id="chart-line">
+              <div class="ma-0 pa-0 mb-n3">
+                <v-chip
+                  class="ma-0 ml-5 mb-n5"
+                  color="orange"
+                  label
+                  outlined
+                >
+                {{graphTitle1}}
+                </v-chip>
                 <apexchart type=line height=200 :options="chartOptionsLine1" :series="series1" />
               </div>
-              <div id="chart-line3">
+              <div class="ma-0 pa-0 mb-n3">
+                <v-chip
+                  class="ma-0 ml-5 mb-n5"
+                  color="orange"
+                  label
+                  outlined
+                >
+                {{graphTitle3}}
+                </v-chip>
                 <apexchart type=line height=200 :options="chartOptionsLine3" :series="series3" />
               </div>
             </div>
@@ -124,36 +147,15 @@
 <script>
 import axios from 'axios'
 Apex = {
-  animations: { enabled: false },
-  dataLabels: {
-    enabled: false
-  },
   stroke: {
     show: true,
     curve: 'smooth',
     lineCap: 'butt',
-    width: 3
-    // dashArray: [0,10],
-  },
-  toolbar: {
-    tools: {
-      selection: false
-    }
-  },
-  grid: {
-    clipMarkers: false
+    width: 3,
+    //dashArray: [0,10],
   },
   yaxis: {
     tickAmount: 3
-  },
-  markers: {
-    size: 0,
-    hover: {
-      size: 0
-    }
-  },
-  xaxis: {
-    type: 'datetime'
   }
 }
 export default {
@@ -192,8 +194,13 @@ export default {
       pSize: 0,
       phSize: 0,
       curAhuNo: 0,
-      startTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 00:00'),
-      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 23:59')
+      startTime: this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY/MM/DD kk:mm'),
+      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD kk:mm'),
+      searchloading: false,
+      loading: false,
+      graphTitle1: '온도 정보',
+      graphTitle2: 'CO2 농도',
+      graphTitle3: '설정 및 상태 정보'
     }
   },
   methods: {
@@ -249,6 +256,8 @@ export default {
       this.getSiteEnv(ahuNo)
     },
     getSiteEnv (ahuNo) {
+      this.searchloading = true
+      this.loading = true
       axios.put(`${this.$apiRootPath}rooms/siteEnv`, { startTime: this.startTime, endTime: this.endTime, time: this.time.value })
         .then((r) => {
           this.envDatas = r.data
@@ -407,7 +416,10 @@ export default {
             chart: {
               id: 'ab',
               width: '100%',
-              group: 'social'
+              group: 'social',
+              toolbar: {
+                show: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -426,7 +438,10 @@ export default {
             chart: {
               id: 'bw',
               width: '100%',
-              group: 'social'
+              group: 'social',
+              toolbar: {
+                show: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -444,7 +459,11 @@ export default {
           this.chartOptionsLine3 = {
             chart: {
               id: 'cb',
-              group: 'social'
+              width: '100%',
+              group: 'social',
+              toolbar: {
+                show: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -459,6 +478,8 @@ export default {
               }
             }
           }
+          this.searchloading = false
+          this.loading = false
           this.ahuGraphModal = true
         })
         .catch((e) => {

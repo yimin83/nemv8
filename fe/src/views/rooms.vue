@@ -144,7 +144,7 @@
                       <div class="text--primary font-weight-bold title mb-1"
                       style="cursor: pointer"
                       @mousedown.left='openRoomGraph(room.usRoomNo)'
-                      @mousedown.right='openRoomStat(room.usRoomNo, room.ucCurStatus)'
+                      @mousedown.right='openRoomStat(room.usRoomNo)'
                       @contextmenu.prevent="handler">
                         {{room.usRoomNo}}호
                       </div>
@@ -223,7 +223,7 @@
                       <div class="text--primary font-weight-bold title mb-1"
                       style="cursor: pointer"
                       @mousedown.left='openRoomGraph(room.usRoomNo)'
-                      @mousedown.right='openRoomStat(room.usRoomNo, room.ucCurStatus)'
+                      @mousedown.right='openRoomStat(room.usRoomNo)'
                       @contextmenu.prevent="handler">
                         {{room.usRoomNo}}호
                       </div>
@@ -306,7 +306,7 @@
                   <div class="text--primary font-weight-bold title mb-1"
                   style="cursor: pointer"
                   @mousedown.left='openRoomGraph(room.usRoomNo)'
-                  @mousedown.right='openRoomStat(room.usRoomNo, room.ucCurStatus)'
+                  @mousedown.right='openRoomStat(room.usRoomNo)'
                   @contextmenu.prevent="handler">
                     {{room.usRoomNo}}호
                   </div>
@@ -468,11 +468,8 @@
         </v-toolbar>
         <v-card-text>
           <div>
-            <br>
             <v-row>
-              <br>
-              <v-col class="d-flex" sm="2">
-                <br>
+              <v-col class="d-flex" cols="12" sm="1">
                 <v-select
                   v-model="time.value"
                   :items="this.times"
@@ -482,23 +479,40 @@
                   class='ma-0 mt-1 pa-0 grey--text caption'
                 ></v-select>
               </v-col>
-              <v-col class="d-flex" sm="3">
+              <v-col class="d-flex" cols="12" sm="2">
                 <v-text-field label='시작일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='startTime'></v-text-field>
               </v-col>
-              <v-col class="d-flex" sm="3">
+              <v-col class="d-flex" cols="12" sm="2">
                 <v-text-field label='종료일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='endTime'></v-text-field>
               </v-col>
-              <v-col class="d-flex" sm="1">
-                <v-btn @click="openRoomGraph(roomNo)">
+              <v-col class="d-flex" cols="12" sm="1">
+                <v-btn class="d-flex" :loading="searchloading" :disabled="loading" @click="openRoomGraph(roomNo)">
                   <span>검색</span>
                 </v-btn>
               </v-col>
+              <v-col></v-col>
             </v-row>
-            <div id="wrapper">
-              <div id="chart-line">
+            <div>
+              <div class="ma-0 pa-0 mb-n3">
+                <v-chip
+                  class="ma-0 ml-5 mb-n3"
+                  color="orange"
+                  label
+                  outlined
+                >
+                {{graphTitle1}}
+                </v-chip>
                 <apexchart type=line height=400 :options="chartOptionsLine1" :series="series1" />
               </div>
-              <div id="chart-line2">
+              <div class="ma-0 pa-0 mb-n3">
+                <v-chip
+                  class="ma-0 ml-5 mb-n3"
+                  color="orange"
+                  label
+                  outlined
+                >
+                {{graphTitle2}}
+                </v-chip>
                 <apexchart type=line height=160 :options="chartOptionsLine2" :series="series2" />
               </div>
             </div>
@@ -895,8 +909,9 @@
               </v-card>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color='blue darken-1' flat @click='saveRoomStat()'>저장</v-btn>
-                <v-btn color='blue darken-1' flat @click='closeRoomStat()'>취소</v-btn>
+                <v-btn class="d-flex" :loading="reloading" :disabled="loading" @click='openRoomStat(roomNo)'>새로고침</v-btn>
+                <v-btn class="d-flex" :loading="saveloading" :disabled="loading"  @click='saveRoomStat()'>저장</v-btn>
+                <v-btn class="d-flex" :loading="closeloading" :disabled="loading"  @click='closeRoomStat()'>취소</v-btn>
               </v-card-actions>
             </v-col>
             </v-row>
@@ -918,36 +933,15 @@
 <script>
 import axios from 'axios'
 Apex = {
-  animations: { enabled: false },
-  dataLabels: {
-    enabled: false
-  },
   stroke: {
     show: true,
     curve: 'smooth',
     lineCap: 'butt',
     width: 3,
-    // dashArray: [0,10],
-  },
-  toolbar: {
-    tools: {
-      selection: false
-    }
-  },
-  grid: {
-    clipMarkers: false
+    //dashArray: [0,10],
   },
   yaxis: {
     tickAmount: 3
-  },
-  markers: {
-    size: 0,
-    hover: {
-      size: 0
-    }
-  },
-  xaxis: {
-    type: 'datetime'
   }
 }
 export default {
@@ -1010,7 +1004,14 @@ export default {
       roomHeatings: [ { name: '자동', value: 0 }, { name: '수동', value: 1 }, { name: '정지', value: 2 } ],
       heatings: [ { name: '자동', value: 0 }, { name: '수동', value: 1 }, { name: '정지', value: 2 } ],
       roomResevedType: [ { name: '상시', value: 0 }, { name: '매일', value: 1 }, { name: '오늘', value: 2 }, { name: '내일', value: 3 }, { name: '모레', value: 4 } ],
-      roomCurStat: '보일러 OFF'
+      roomCurStat: '보일러 OFF',
+      loading: false,
+      reloading: false,
+      saveloading: false,
+      closeloading: false,
+      searchloading: false,
+      graphTitle1: '온도 정보',
+      graphTitle2: '상태 정보'
     }
   },
   methods: {
@@ -1110,7 +1111,11 @@ export default {
           this.chartOptionsLine1 = {
             chart: {
               id: 'fb',
-              group: 'social'
+              width: '100%',
+              group: 'social',
+              toolbar: {
+                show: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -1128,7 +1133,11 @@ export default {
           this.chartOptionsLine2 = {
             chart: {
               id: 'tw',
-              group: 'social'
+              width: '100%',
+              group: 'social',
+              toolbar: {
+                show: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -1150,6 +1159,8 @@ export default {
         })
     },
     openRoomGraph: function (roomNo) {
+      this.searchloading = true
+      this.loading = true
       this.roomNo = roomNo
       axios.put(`${this.$apiRootPath}rooms/getRoomTrend`, { usRoomNo: roomNo, startTime: this.startTime, endTime: this.endTime, time: this.time.value })
         .then((r) => {
@@ -1260,17 +1271,23 @@ export default {
               }
             }
           }
+          this.searchloading = false
+          this.loading = false
+          this.roomGraphModal = true
         })
         .catch((e) => {
           alert(e.message)
           console.error(e.message)
         })
-      this.roomGraphModal = true
     },
     closeRoomStat: function () {
+      this.searchloading = false
+      this.loading = false
       this.settingRoomModal = false
     },
     openRoomStat: function (roomNo) {
+      this.reloading = true
+      this.loading = true
       this.roomNo = roomNo
       axios.get(`${this.$apiRootPath}rooms/roomPriority`)
         .then((r) => {
@@ -1365,15 +1382,20 @@ export default {
           hour = parseInt(this.roomStat.OptimalNeedTime / 60 / 60)
           min = parseInt((this.roomStat.OptimalNeedTime - (hour * 60 * 60)) / 60)
           this.trnOptimalNeedTime = hour + '시간 ' + min + '분'
+          this.saveloading = false
+          this.reloading = false
+          this.loading = false
+          this.settingRoomModal = true
           // this.getRoomPriority()
         })
         .catch((e) => {
           alert(e.message)
           console.error(e.message)
         })
-      this.settingRoomModal = true
     },
     saveRoomStat: function () {
+      this.saveloading = true
+      this.loading = true
       this.roomStat.MH_HeatingTimeSec = (this.trnMH_HeatingTimeHour * 60 * 60) + (this.trnMH_HeatingTimeMin * 60)
       this.roomStat.MH_HeatingStopTimeSec = (this.trnMH_HeatingStopTimeHour * 60 * 60) + (this.trnMH_HeatingStopTimeMin * 60)
       this.roomStat.MH_TotalHeatingTimeSec = (this.trnMH_TotalHeatingTimeHour * 60 * 60) + (this.trnMH_TotalHeatingTimeMin * 60)

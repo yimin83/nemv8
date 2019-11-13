@@ -410,70 +410,6 @@
                                 </v-list-item>
                               </v-list>
                             </v-card>
-                            <br>
-                            <v-dialog v-model="damperSchModal" persistent max-width="1000px">
-                              <v-card>
-                                <v-card-title>
-                                  <span class="headline">스케쥴러</span>
-                                </v-card-title>
-                                <v-card-text>
-                                  <v-row align="center">
-                                    <v-col cols="3">
-                                      <v-subheader>공조기 번호 : </v-subheader>
-                                    </v-col>
-                                    <v-col cols="2">
-                                      <v-select
-                                        v-model="select"
-                                        :items="AhuIndexs"
-                                        item-text="AhuIndex"
-                                        item-value="AhuIndex"
-                                        label="AhuIndex"
-                                        persistent-hint
-                                        return-object
-                                        single-line
-                                        width:10px
-                                        @change="openDamperSch(select.AhuIndex)"
-                                      ></v-select>
-                                    </v-col>
-                                  </v-row>
-                                  <v-simple-table>
-                                    <thead>
-                                      <tr>
-                                        <th class="text-left" width="60px">단계</th>
-                                        <th class="text-left">시</th>
-                                        <th class="text-left">분</th>
-                                        <th class="text-left">댐퍼 자/수동</th>
-                                        <th class="text-left">동작</th>
-                                        <th class="text-left">외기비율</th>
-                                        <th class="text-left">팬 자/수동</th>
-                                        <th class="text-left">동작</th>
-                                        <th class="text-left">설정온도</th>
-                                        <th class="text-left">Economizer</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      <tr v-for="(item, index) in damperSchsConfig.tSch" :key="item.idx">
-                                        <td>{{ index+1 }}</td>
-                                        <td><input type="text" v-model="item.Hour" size="3" maxlength="3" ></td>
-                                        <td><input type="text" v-model="item.Min" size="3" maxlength="3" ></td>
-                                        <td><input type="text" v-model="item.DamperAM" size="3" maxlength="3" ></td>
-                                        <td><input type="text" v-model="item.DamperRun" size="3" maxlength="3" ></td>
-                                        <td><input type="text" v-model="item.DamperRatio" size="3" maxlength="3" ></td>
-                                        <td><input type="text" v-model="item.FanAM" size="3" maxlength="3" ></td>
-                                        <td><input type="text" v-model="item.FanRun" size="3" maxlength="3" ></td>
-                                        <td><input type="text" v-model="item.Tset" size="3" maxlength="3" ></td>
-                                        <td><input type="text" v-model="item.Economizer" size="3" maxlength="3" ></td>
-                                      </tr>
-                                    </tbody>
-                                  </v-simple-table>
-                                </v-card-text>
-                                <v-card-actions>
-                                  <v-spacer></v-spacer>
-                                  <v-btn color="blue darken-1" flat @click="applyDamperSch(damperSchsConfig.AhuIndex)">저장</v-btn>
-                                  <v-btn color="blue darken-1" flat @click="closeDamperSch()">취소</v-btn>
-                                </v-card-actions>
-                              </v-card>
-                            </v-dialog>
                           </v-col>
                           <v-col>
                             <v-card>
@@ -642,16 +578,121 @@
                 </v-card>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="primary" @click="openDamperSch(1)">스케쥴러</v-btn>
-                  <v-btn color="blue darken-1" flat @click="applyEmsSysConfig()">저장</v-btn>
-                  <v-btn color="blue darken-1" flat @click="getEmsSysConfig()">취소</v-btn>
+                  <v-btn v-if="configs.SiteInfo === 2" :loading="openDampLoading" :disabled="loading" class="d-flex" @click="openDamperSch(1)">스케쥴러</v-btn>
+                  <v-btn :loading="saveLoading" :disabled="loading" class="d-flex" @click="applyEmsSysConfig()">저장</v-btn>
+                  <v-btn :loading="closeLoading" :disabled="loading" class="d-flex" @click="getEmsSysConfig()">취소</v-btn>
                 </v-card-actions>
             </v-tab-item>
           </v-tabs-items>
+          <v-dialog v-model="damperSchModal" dense persistent max-width="1000px">
+            <v-card>
+              <v-card-title>
+                <span class="headline ma-0 pa-0">스케쥴러</span>
+              </v-card-title>
+              <v-card-text>
+                <v-row align="center">
+                  <v-col cols="12" sm="2" class="ma-0 pa-0 mr-n12">
+                    <v-subheader>공조기 번호 : </v-subheader>
+                  </v-col>
+                  <v-col cols="12" sm="1" class="ma-0 pa-0 ml-n2">
+                    <v-select
+                      v-model="select"
+                      :items="AhuIndexs"
+                      item-text="AhuIndex"
+                      item-value="AhuIndex"
+                      label="AhuIndex"
+                      persistent-hint
+                      return-object
+                      single-line
+                      width:10px
+                      @change="openDamperSch(select.AhuIndex)"
+                    ></v-select>
+                  </v-col>
+                  <v-col></v-col>
+                </v-row>
+                <v-simple-table dense class="ma-0 pa-0">
+                  <thead>
+                    <tr class="text-center black--text ma-0 pa-0 pt-5 config-column right-border">
+                      <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:1px solid lightgrey;" width="60px">단계</th>
+                      <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:1px solid lightgrey;">시</th>
+                      <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:1px solid lightgrey;">분</th>
+                      <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:1px solid lightgrey;">댐퍼 자/수동</th>
+                      <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:1px solid lightgrey;">동작</th>
+                      <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:1px solid lightgrey;">외기비율</th>
+                      <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:1px solid lightgrey;">팬 자/수동</th>
+                      <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:1px solid lightgrey;">동작</th>
+                      <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:1px solid lightgrey;">설정온도</th>
+                      <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:1px solid lightgrey;">Economizer</th>
+                    </tr>
+                  </thead>
+                  <tbody dense class="ma-0 pa-0" height="100px">
+                    <tr v-for="(item, index) in damperSchsConfig.tSch" :key="item.idx" class="ma-0 pa-0">
+                      <td class="text-center black--text font-weight-bold body-2 config-column ma-0 pa-0">{{ index+1 }}</td>
+                      <td class="text-center ma-0 pa-0 config-column">
+                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.Hour"></v-text-field>
+                      </td>
+                      <td class="text-center ma-0 pa-0 config-column">
+                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.Min"></v-text-field>
+                      </td>
+                      <td class="text-center ma-0 pa-0 config-column">
+                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.DamperAM"></v-text-field>
+                      </td>
+                      <td class="text-center ma-0 pa-0 config-column">
+                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.DamperRun"></v-text-field>
+                      </td>
+                      <td class="text-center ma-0 pa-0 config-column">
+                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.DamperRatio"></v-text-field>
+                      </td>
+                      <td class="text-center ma-0 pa-0 config-column">
+                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.FanAM"></v-text-field>
+                      </td>
+                      <td class="text-center ma-0 pa-0 config-column">
+                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.FanRun"></v-text-field>
+                      </td>
+                      <td class="text-center ma-0 pa-0 config-column">
+                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.Tset"></v-text-field>
+                      </td>
+                      <td class="text-center ma-0 pa-0 config-column">
+                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.Economizer"></v-text-field>
+                      </td>
+                    </tr>
+                  </tbody>
+                </v-simple-table>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn :loading="dampSaveLoading" :disabled="loading" class="d-flex" @click="applyDamperSch(damperSchsConfig.AhuIndex)">저장</v-btn>
+                <v-btn :loading="dampCloseloading" :disabled="loading" class="d-flex" @click="closeDamperSch()">취소</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-card>
       </template>
   </v-container>
 </template>
+<style>
+.centered-input input {
+  text-align: center;
+  vertical-align: middle;
+}
+.td-right-border {
+  border-right: 1px solid lightgrey;
+}
+.config-column {
+  font-size: medium;
+  font-weight: bold;
+  border-right: 1px solid lightgrey;
+}
+.config-column-margin {
+  margin: -4px 0px -30px 0px;
+}
+.right-border {
+  border-right: 1px solid lightgrey;
+}
+.bottom-border {
+  border-bottom: 1px solid lightgrey;
+}
+</style>
 <script>
 import axios from 'axios'
 export default {
@@ -695,11 +736,18 @@ export default {
         //   const pattern = /^(([^<>()[\]\\.,:\s@"]+(\.[^<>()[\]\\.,:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.) +[a-zA-Z]{2,}))$/
         //   return pattern.test(value) || 'Invalid e-mail.'
         // },
-      ]
+      ],
+      openDampLoading: false,
+      saveDampLoading: false,
+      closeDampLoading: false,
+      saveLoading: false,
+      closeLoading: false,
+      loading: false
     }
   },
   methods: {
     getEmsSysConfig () {
+    this.loading = true
       // axios.get(`http://localhost:3000/api/rooms/emsSysConfig`)
       axios.get(`${this.$apiRootPath}rooms/emsSysConfig`)
         .then((r) => {
@@ -730,6 +778,9 @@ export default {
           this.configs.tSolBeachConf.tPID.Kp = this.configs.tSolBeachConf.tPID.Kp.toFixed(1)
           this.configs.tSolBeachConf.tPID.Ki = this.configs.tSolBeachConf.tPID.Ki.toFixed(1)
           this.configs.tSolBeachConf.tPID.Kd = this.configs.tSolBeachConf.tPID.Kd.toFixed(1)
+          this.openDampLoading = false
+          this.saveLoading = false
+          this.loading = false
         })
         .catch((e) => {
           alert(e.message)
@@ -737,6 +788,8 @@ export default {
         })
     },
     applyEmsSysConfig () {
+      this.saveLoading = true
+      this.loading = true
       // axios.put(`http://localhost:3000/api/rooms/emsSysConfig`, { configs: this.configs })
       axios.put(`${this.$apiRootPath}rooms/emsSysConfig`, { configs: this.configs })
         .then((r) => {
@@ -748,19 +801,26 @@ export default {
         })
     },
     openDamperSch: function (ahuIndex) {
+      this.openDampLoading = true
+      this.loading = true
       // axios.get(`http://localhost:3000/api/rooms/damperConfig/${ahuIndex}`)
       axios.get(`${this.$apiRootPath}rooms/damperConfig/${ahuIndex}`)
         .then((r) => {
           this.damperSchsConfig = JSON.parse(r.data)
           this.select = { AhuIndex: this.damperSchsConfig.AhuIndex }
+          this.saveDampLoading = false
+          this.openDampLoading = false
+          this.loading = false
+          this.damperSchModal = true
         })
         .catch((e) => {
           alert(e.message)
           // console.error(e.message)
         })
-      this.$data.damperSchModal = true
     },
     applyDamperSch: function (AhuIndex) {
+      this.saveDampLoading = true
+      this.loading = true
       // alert(JSON.stringify(this.damperSchsConfig))
       // axios.put(`http://localhost:3000/api/rooms/damperConfig`, { damperConfig: this.damperSchsConfig })
       axios.put(`${this.$apiRootPath}rooms/damperConfig`, { damperConfig: this.damperSchsConfig })
@@ -774,7 +834,10 @@ export default {
     },
     closeDamperSch: function () {
       // alert("closeDamperSch")
-      this.$data.damperSchModal = false
+      this.saveDampLoading = false
+      this.openDampLoading = false
+      this.loading = false
+      this.damperSchModal = false
     }
   }
 }

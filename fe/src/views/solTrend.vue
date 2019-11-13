@@ -4,7 +4,8 @@
       <v-bottom-navigation
         :value="activeBtn"
         grow
-        color="teal"
+        dark
+        color="white"
         @change="changGraph()"
       >
         <v-btn @click="activeBtn = 0">
@@ -46,19 +47,43 @@
             <v-text-field label='종료일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='endTime'></v-text-field>
           </v-col>
           <v-col class="d-flex" sm="1">
-            <v-btn @click="searchGraph()">
+            <v-btn :loading="searchloading" :disabled="loading" @click="searchGraph()">
               <span>검색</span>
             </v-btn>
           </v-col>
         </v-row>
-        <div id="wrapper">
-          <div id="chart-line2">
+        <div>
+          <div class="ma-0 pa-0 mb-n3">
+            <v-chip
+              class="ma-0 ml-5 mb-n3"
+              color="orange"
+              label
+              outlined
+            >
+            {{graphTitle2}}
+            </v-chip>
             <apexchart type=line height=200 width='1300' :options="chartOptionsLine2" :series="series2" />
           </div>
-          <div id="chart-line">
-            <apexchart type=line height=200 width='1300' :options="chartOptionsLine1" :series="series1" />
+          <div class="ma-0 pa-0 mb-n3">
+            <v-chip
+              class="ma-0 ml-5 mb-n5"
+              color="orange"
+              label
+              outlined
+            >
+            {{graphTitle1}}
+            </v-chip>
+            <apexchart type=line height=300 width='1300' :options="chartOptionsLine1" :series="series1" />
           </div>
-          <div id="chart-line3">
+          <div class="ma-0 pa-0 mb-n3">
+            <v-chip
+              class="ma-0 ml-5 mb-n5"
+              color="orange"
+              label
+              outlined
+            >
+            {{graphTitle3}}
+            </v-chip>
             <apexchart type=line height=200 width='1300' :options="chartOptionsLine3" :series="series3" />
           </div>
         </div>
@@ -69,10 +94,6 @@
 <script>
 import axios from 'axios'
 Apex = {
-  animations: { enabled: false },
-  dataLabels: {
-    enabled: false
-  },
   stroke: {
     show: true,
     curve: 'smooth',
@@ -80,25 +101,8 @@ Apex = {
     width: 3,
     //dashArray: [0,10],
   },
-  toolbar: {
-    tools: {
-      selection: false
-    }
-  },
-  grid: {
-    clipMarkers: false
-  },
   yaxis: {
     tickAmount: 3
-  },
-  markers: {
-    size: 0,
-    hover: {
-      size: 0
-    }
-  },
-  xaxis: {
-    type: 'datetime'
   }
 }
 export default {
@@ -122,12 +126,15 @@ export default {
       chartOptionsLine2: [],
       series3: [],
       chartOptionsLine3: [],
-      series4: [],
-      chartOptionsLine4: [],
       pSize: 0,
       phSize: 0,
       startTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 00:00'),
-      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 23:59')
+      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 23:59'),
+      searchloading: false,
+      loading: false,
+      graphTitle1: '온도 정보',
+      graphTitle2: 'CO2 농도',
+      graphTitle3: '설정 및 상태 정보'
     }
   },
   methods: {
@@ -185,6 +192,12 @@ export default {
           var data9 = []
           var data10 = []
           var date = []
+          this.chartOptionsLine1 = {}
+          this.chartOptionsLine2 = {}
+          this.chartOptionsLine3 = {}
+          this.graphTitle1 = '온도 정보'
+          this.graphTitle2 = 'CO2 농도'
+          this.graphTitle3 = '설정 및 상태 정보'
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].fData_damper_manual_set !== null) {
               data0.push(this.mergeDatas[i].ahu.fData_damper_manual_set.toFixed(2))
@@ -295,9 +308,12 @@ export default {
           ]
           this.chartOptionsLine1 = {
             chart: {
-              id: 'ab',
+              id: 'chartOpt1',
               width: '100%',
-              group: 'social'
+              group: 'social',
+              toolbar: {
+                show: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -314,9 +330,12 @@ export default {
           }
           this.chartOptionsLine2 = {
             chart: {
-              id: 'bw',
+              id: 'chartOpt2',
               width: '100%',
-              group: 'social'
+              group: 'social',
+              toolbar: {
+                show: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -333,8 +352,12 @@ export default {
           }
           this.chartOptionsLine3 = {
             chart: {
-              id: 'cb',
-              group: 'social'
+              id: 'chartOpt3',
+              width: '100%',
+              group: 'social',
+              toolbar: {
+                show: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -349,6 +372,8 @@ export default {
               }
             }
           }
+          this.searchloading = false
+          this.loading = false
         })
         .catch((e) => {
           alert(e.message)
@@ -367,6 +392,12 @@ export default {
           var data4 = []
           var data5 = []
           var date = []
+          this.chartOptionsLine1 = {}
+          this.chartOptionsLine2 = {}
+          this.chartOptionsLine3 = {}
+          this.graphTitle1 = '실내온도'
+          this.graphTitle2 = 'CO2 농도'
+          this.graphTitle3 = '동작 및 설정'
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].HCOnCnt !== null) {
               data0.push(this.datas[i].HCOnCnt.toFixed(2))
@@ -432,8 +463,12 @@ export default {
           ]
           this.chartOptionsLine1 = {
             chart: {
-              id: 'ab',
-              group: 'social'
+              id: 'chartOpt4',
+              width: '100%',
+              group: 'social',
+              toolbar: {
+                show: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -450,8 +485,12 @@ export default {
           }
           this.chartOptionsLine2 = {
             chart: {
-              id: 'bw',
-              group: 'social'
+              id: 'chartOpt5',
+              width: '100%',
+              group: 'social',
+              toolbar: {
+                show: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -468,8 +507,12 @@ export default {
           }
           this.chartOptionsLine3 = {
             chart: {
-              id: 'cb',
-              group: 'social'
+              id: 'chartOpt6',
+              width: '100%',
+              group: 'social',
+              toolbar: {
+                show: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -484,6 +527,8 @@ export default {
               }
             }
           }
+          this.searchloading = false
+          this.loading = false
         })
         .catch((e) => {
           alert(e.message)
@@ -520,6 +565,8 @@ export default {
       }
     },
     searchGraph: function () {
+      this.searchloading = true
+      this.loading = true
       if (this.activeBtn === 0) {
         this.getSiteEnv()
       } else {

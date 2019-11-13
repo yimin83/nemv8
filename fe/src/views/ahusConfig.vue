@@ -150,9 +150,9 @@ export default {
       curAhuId: 1,
       ahuConfigs: [],
       tempAhuConfigs: [],
-      onOffs: [ {'name': '사용안함', 'value': -1}, {'name': '자동', 'value': 0}, {'name': '수동', 'value': 1}],
-      hcOnOffs: [ {'name': '사용안함', 'value': -1}, {'name': '난방', 'value': 0}, {'name': '냉방', 'value': 1}],
-      useUnuses: [{'name': '사용안함', 'value': 0}, {'name': '사용', 'value': 1}]
+      onOffs: [{ 'name': '사용안함', 'value': -1 }, { 'name': '자동', 'value': 0 }, { 'name': '수동', 'value': 1 }],
+      hcOnOffs: [{ 'name': '사용안함', 'value': -1 }, { 'name': '난방', 'value': 0 }, { 'name': '냉방', 'value': 1 }],
+      useUnuses: [{ 'name': '사용안함', 'value': 0 }, { 'name': '사용', 'value': 1 }]
     }
   },
   methods: {
@@ -163,7 +163,7 @@ export default {
           this.ahuNos = []
           for (var key in r.data) {
             if (r.data.hasOwnProperty(key)) {
-              this.ahuNos.push({ 'name': r.data[key].ahu_desc , 'value': r.data[key].ahu_id, 'beChecked': (r.data[key].ahu_id === this.curAhuId) })
+              this.ahuNos.push({ 'name': r.data[key].ahu_desc, 'value': r.data[key].ahu_id, 'beChecked': (r.data[key].ahu_id === this.curAhuId) })
             }
           }
           this.getAhuConfig()
