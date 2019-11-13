@@ -187,7 +187,7 @@ export default {
           var date = []
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].fData_damper_manual_set !== null) {
-              data0.push((this.mergeDatas[i].ahu.fData_damper_manual_set / 100).toFixed(2))
+              data0.push(this.mergeDatas[i].ahu.fData_damper_manual_set.toFixed(2))
             } else {
               data0.push(-1)
             }

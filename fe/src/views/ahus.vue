@@ -47,9 +47,17 @@
     </v-simple-table>
     <v-dialog v-model='ahuGraphModal'>
       <v-card>
-        <v-card-title>
-          <span class='headline'>{{graphTitle}} 상태 그래프</span>
-        </v-card-title>
+        <v-toolbar dark icons-and-text>
+          <v-toolbar-title>
+            <span class='headline'>{{graphTitle}} 상태 그래프</span>
+          </v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-toolbar-items>
+            <v-btn icon dark @click="ahuGraphModal = false">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-toolbar-items>
+        </v-toolbar>
         <v-card-text>
           <div>
             <v-row>
@@ -71,20 +79,20 @@
                 <v-text-field label='종료일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='endTime'></v-text-field>
               </v-col>
               <v-col class="d-flex" sm="1">
-                <v-btn @click="searchGraph()">
+                <v-btn @click="getSiteEnv(curAhuNo)">
                   <span>검색</span>
                 </v-btn>
               </v-col>
             </v-row>
             <div id="wrapper">
               <div id="chart-line2">
-                <apexchart type=line height=200 width='1300' :options="chartOptionsLine2" :series="series2" />
+                <apexchart type=line height=200 :options="chartOptionsLine2" :series="series2" />
               </div>
               <div id="chart-line">
-                <apexchart type=line height=200 width='1300' :options="chartOptionsLine1" :series="series1" />
+                <apexchart type=line height=200 :options="chartOptionsLine1" :series="series1" />
               </div>
               <div id="chart-line3">
-                <apexchart type=line height=200 width='1300' :options="chartOptionsLine3" :series="series3" />
+                <apexchart type=line height=200 :options="chartOptionsLine3" :series="series3" />
               </div>
             </div>
           </div>
@@ -124,8 +132,8 @@ Apex = {
     show: true,
     curve: 'smooth',
     lineCap: 'butt',
-    width: 3,
-    //dashArray: [0,10],
+    width: 3
+    // dashArray: [0,10],
   },
   toolbar: {
     tools: {
@@ -183,6 +191,7 @@ export default {
       chartOptionsLine4: [],
       pSize: 0,
       phSize: 0,
+      curAhuNo: 0,
       startTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 00:00'),
       endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 23:59')
     }
@@ -230,7 +239,7 @@ export default {
       }
     },
     openAhuGraph (ahuNo) {
-
+      this.curAhuNo = ahuNo
       for (var i = 0; i < this.mergezones.length; i++) {
         if (this.mergezones[i].zone.nZoneIdx === ahuNo) {
           this.graphTitle = this.mergezones[i].ahu.ahu_desc + '(' + this.mergezones[i].ahu.ahu_name + ')'
@@ -288,7 +297,7 @@ export default {
           var date = []
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].fData_damper_manual_set !== null) {
-              data0.push((this.mergeDatas[i].ahu.fData_damper_manual_set / 100).toFixed(2))
+              data0.push(this.mergeDatas[i].ahu.fData_damper_manual_set.toFixed(2))
             } else {
               data0.push(-1)
             }

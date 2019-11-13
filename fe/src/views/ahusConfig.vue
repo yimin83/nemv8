@@ -4,7 +4,7 @@
       <template>
         <thead>
           <tr class="ma-0 pa-0">
-            <th class="text-center black--text ma-0 pa-0 pt-5 config-column right-bold-border" style="width:200px;border-bottom:4px solid lightgrey;"><b>구분</b></th>
+            <th class="text-center black--text ma-0 pa-0 pt-5 config-column right-bold-border" style="width:190px;border-bottom:4px solid lightgrey;"><b>구분</b></th>
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">스케쥴러<br>사용</th>
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">거주자<br>상태 보고</th>
             <th class="text-center black--text ma-0 pa-0 pt-0 config-column" style="border-bottom:4px solid lightgrey;">이코노<br>마이저<br>사용</th>
@@ -80,7 +80,7 @@
               item-value="value"
               item-text="name"
               append-icon=""
-              class="font-weight-bold body-2 config-column-margin centered-select"
+              class="font-weight-bold body-2 config-column-margin"
               @change="saveAhuConfig()"></v-select>
             </td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
@@ -108,9 +108,6 @@
 .centered-input input {
   text-align: center
 }
-.centered-select select {
-  text-align: center
-}
 .td-right-border {
   border-right: 1px solid lightgrey;
 }
@@ -119,8 +116,14 @@
   font-weight: bold;
   border-right: 1px solid lightgrey;
 }
+.v-select__selection {
+    width: 100%;
+    text-align-last: center;
+    justify-content: center;
+    margin-left: 6px;
+}
 .config-column-margin {
-  margin: -4px 0px -30px 0px;
+  margin: -4px 0px -24px 0px;
 }
 .right-border {
   border-right: 1px solid lightgrey;

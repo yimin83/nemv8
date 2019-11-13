@@ -22,7 +22,7 @@
             <v-select
               :items='roomNos'
               v-model='roomNo'
-              label='room number'
+              label='방번호'
               class='ma-0 mt-1 pa-0 grey--text caption'
             ></v-select>
           </v-col>
@@ -52,10 +52,10 @@
         </v-row>
         <div id="wrapper">
           <div id="chart-line">
-            <apexchart type=line height=400 :options="chartOptionsLine1" :series="series1" />
+            <apexchart type=line width='1300px' height='400px' :options="chartOptionsLine1" :series="series1" />
           </div>
           <div id="chart-line2">
-            <apexchart type=line height=160 :options="chartOptionsLine2" :series="series2" />
+            <apexchart type=line width='1300px' height='160px' :options="chartOptionsLine2" :series="series2" />
           </div>
         </div>
       </div>
@@ -260,17 +260,17 @@ export default {
           var date = []
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].ucRoomState !== null) {
-              data0.push((this.datas[i].ucRoomState * 5).toFixed(2))
+              data0.push(this.datas[i].ucRoomState.toFixed(2))
             } else {
               data0.push(-1)
             }
             if (this.datas[i].ucSetStatus !== null) {
-              data1.push((this.datas[i].ucSetStatus * 5).toFixed(2))
+              data1.push(this.datas[i].ucSetStatus.toFixed(2))
             } else {
               data1.push(-1)
             }
             if (this.datas[i].ucCurStatus !== null) {
-              data2.push((this.datas[i].ucCurStatus * 5).toFixed(2))
+              data2.push(this.datas[i].ucCurStatus.toFixed(2))
             } else {
               data2.push(-1)
             }

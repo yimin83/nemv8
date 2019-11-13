@@ -218,12 +218,13 @@ router.get('/roomPriority', (req, res, next) => { // 수정
 })
 
 router.put('/roomStat', (req, res, next) => { // 수정
-	// console.log("############ put roomStat values : " + JSON.stringify(req.body))
+	console.log("############ put roomStat values : " + JSON.stringify(req.body))
 	var dataBuffer = new Buffer(net.getSizeFloorRadRoomState())
 	for (var key in req.body.roomNos) {
 		dataBuffer = net.makeFloorRadRoomState_t(
 			req.body.roomNos[key],
 			req.body.config.HeatingMode,
+			req.body.config.UseTsurf,
 			req.body.config.RoomState,
 			req.body.config.ReservedRoomType,
 			req.body.config.ReservedRoomHour,
@@ -235,7 +236,6 @@ router.put('/roomStat', (req, res, next) => { // 수정
 			req.body.config.Troom_set,
 			req.body.config.Troom_cr,
 			req.body.config.MH_SchedulerUsed,
-			req.body.config.reserved,
 			req.body.config.MH_HeatingTimeSec,
 			req.body.config.MH_HeatingStopTimeSec,
 			req.body.config.MH_TotalHeatingTimeSec,
@@ -244,6 +244,8 @@ router.put('/roomStat', (req, res, next) => { // 수정
 			req.body.config.MH_Tsurf_cr,
 			req.body.config.MH_Troom_set,
 			req.body.config.MH_Troom_cr,
+			req.body.config.HeatingSetState,
+			req.body.config.HeatingCurState,
 			req.body.config.PreHeatingOption,
 			req.body.config.OptimalNeedTime,
 			req.body.config.PreHeatingStartTime,
@@ -255,7 +257,9 @@ router.put('/roomStat', (req, res, next) => { // 수정
 			req.body.config.Troom_inc,
 			req.body.config.Troom_dec,
 			req.body.config.Troom_cur,
-			req.body.config.Tsurf_cur)
+			req.body.config.Tsurf_cur,
+			req.body.config.LastControlTime,
+			req.body.config.reserved)
 		dataLen = net.getSizeFloorRadRoomState()
 	  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_floorRad_room_state, dataLen, null)
 	  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
@@ -394,7 +398,7 @@ router.put('/getRoomTrend', (req, res, next) => { // 수정
 	var beforeTime = new Date().getTime();
   // console.log("######################### getRoomConfig ######################### ")
 	mysqlDB.query(
-		"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m, AVG(ucRoomState) AS ucRoomState, AVG(ucSetStatus) AS ucSetStatus, AVG(ucCurStatus) AS ucCurStatus, AVG(fTset) AS fTset, AVG(fTsurf_cur) AS fTsurf_cur, AVG(fTroom_cur) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
+		"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m, ucRoomState, ucSetStatus, ucCurStatus, AVG(fTset) AS fTset, AVG(fTsurf_cur) AS fTsurf_cur, AVG(fTroom_cur) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
 		if(err) {
 			console.log("############ put /getRoomTrend error : " + err)
 		}
@@ -451,7 +455,7 @@ console.log("############ put /solAhuTrend req.body : " + JSON.stringify(req.bod
 	const endTime = req.body.endTime
 	const time = req.body.time
 	var beforeTime = new Date().getTime();
-	mysqlDB.query("SELECT * FROM ( SELECT  nLastUpdateTime DIV ? AS m, AVG(fData_damper_manual_set) AS fData_damper_manual_set, AVG(fData_temp_supply) AS fData_temp_supply, AVG(cState_supplay_fan) AS cState_supplay_fan, AVG(fData_hc_set_temp) AS fData_hc_set_temp, AVG(fData_temp_return) AS fData_temp_return, AVG(cMode_damper_auto_manual) AS cMode_damper_auto_manual, AVG(nPPMco2_cur) AS nPPMco2_cur, AVG(cMode_manual_mode) AS cMode_manual_mode, AVG(cMode_auto_mode) AS cMode_auto_mode, AVG(cMode_auto_manual) AS cMode_auto_manual FROM solbeach_zone_record WHERE nZoneIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, ahuNo, startTime, endTime], function(err, result, fields) {
+	mysqlDB.query("SELECT * FROM ( SELECT nLastUpdateTime DIV ? AS m, AVG(fData_damper_manual_set) AS fData_damper_manual_set, AVG(fData_temp_supply) AS fData_temp_supply, AVG(cState_supplay_fan) AS cState_supplay_fan, AVG(fData_hc_set_temp) AS fData_hc_set_temp, AVG(fData_temp_return) AS fData_temp_return, cMode_damper_auto_manual, AVG(nPPMco2_cur) AS nPPMco2_cur, cMode_manual_mode, cMode_auto_mode, cMode_auto_manual FROM solbeach_zone_record WHERE nZoneIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, ahuNo, startTime, endTime], function(err, result, fields) {
 		if(err) {
 			console.log("############ put /solAhuTrend error : " + err)
 		}
@@ -528,6 +532,7 @@ router.put('/emsSysConfig', (req, res, next) => { // 수정
 			TelNumber3:req.body.configs.tFloorRadConf.TelNumber3,
 			TelNumber4:req.body.configs.tFloorRadConf.TelNumber4,
 			OperationOption:req.body.configs.tFloorRadConf.OperationOption,
+			MinStateChagneTimeSec:req.body.configs.tFloorRadConf.MinStateChagneTimeSec,
 			Reserved1:req.body.configs.tFloorRadConf.Reserved1,
 			Reserved2:req.body.configs.tFloorRadConf.Reserved2,
 			tVariableTemp:{
