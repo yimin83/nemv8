@@ -450,7 +450,7 @@
                   item-value="value"
                   item-text="name"
                   label='시간단위'
-                  class='ma-0 mt-1 pa-0 grey--text caption'
+                  class='ma-0 mt-1 pa-0 grey--text caption roomSel'
                 ></v-select>
               </v-col>
               <v-col class="d-flex" cols="12" sm="2">
@@ -503,7 +503,7 @@
               <v-select
                   :items='roomNos'
                   v-model='roomNo'
-                  class="grey--text headline"
+                  class="grey--text headline roomSel"
                   style="max-width:73px;"
                   @change='openRoomStat(roomNo)'
                 ></v-select>
@@ -521,8 +521,8 @@
         <v-card-text>
           <div>
             <br>
-              <v-row>
-                <v-col cols="12" sm="1" class="ma-0 pa-0 ml-10 pl-5">
+              <v-row class="ma-0 pa-0 pl-12">
+                <v-col cols="12" sm="1" class="ma-0 pa-0">
                   난방 모드:
                   <v-select
                     v-model="roomStat.HeatingMode"
@@ -531,10 +531,10 @@
                     item-text="name"
                     style="max-width:65px"
                     hide-details
-                    class="text-sm-left pa-0"
+                    class="pa-0 font-weight-bold black--text body-2 roomSel"
                   ></v-select>
                 </v-col>
-                <v-col class="ma-0 pa-0">
+                <v-col class="ma-0 pa-0 ml-n5">
                   난방 기준:
                   <v-select
                     v-model="roomStat.UseTsurf"
@@ -543,7 +543,7 @@
                     item-text="name"
                     hide-details
                     style="max-width:100px"
-                    class="text-sm-left pa-0"
+                    class="pa-0 font-weight-bold black--text body-2 roomSel"
                   ></v-select>
                 </v-col>
                 <v-col></v-col>
@@ -620,7 +620,7 @@
                           item-value="value"
                           item-text="name"
                           hide-details
-                          class="pa-0 font-weight-bold black--text body-2 config-column-margin"
+                          class="pa-0 font-weight-bold black--text body-2 roomSel"
                         ></v-select>
                         <v-select
                           v-if="this.roomStat.HeatingMode !== 0"
@@ -630,7 +630,7 @@
                           item-value="value"
                           item-text="name"
                           hide-details
-                          class="pa-0 font-weight-bold black--text body-2 config-column-margin"
+                          class="pa-0 font-weight-bold black--text body-2 roomSel"
                         ></v-select>
                       </v-list-item-title>
                     </v-list-item>
@@ -645,7 +645,7 @@
                           item-text="name"
                           hide-details
                           height=12
-                          class="pa-0 font-weight-bold black--text body-2 config-column-margin"
+                          class="pa-0 font-weight-bold black--text body-2 roomSel"
                         ></v-select>
                         <v-select
                           v-if="this.roomStat.HeatingMode !== 0"
@@ -656,15 +656,15 @@
                           item-text="name"
                           hide-details
                           height=12
-                          class="pa-0 font-weight-bold black--text body-2 config-column-margin"
+                          class="pa-0 font-weight-bold black--text body-2 roomSel"
                         ></v-select>
                       </v-list-item-title>
                     </v-list-item>
                     <v-list-item>
                       <v-list-item-title>예상 재실시간:</v-list-item-title>
                       <v-list-item-title>
-                        <v-text-field v-if="this.roomStat.HeatingMode === 0" class="text-center ma-0 pa-0 pt-3 config-column" height=13 v-model="roomStat.ReservedRoomHour"></v-text-field>
-                        <v-text-field v-if="this.roomStat.HeatingMode !== 0" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 v-model="roomStat.ReservedRoomHour"></v-text-field>
+                        <v-text-field v-if="this.roomStat.HeatingMode === 0" class="text-center ma-0 pa-0 pt-3" height=13 v-model="roomStat.ReservedRoomHour"></v-text-field>
+                        <v-text-field v-if="this.roomStat.HeatingMode !== 0" class="text-center ma-0 pa-0 pt-3" disabled height=13 v-model="roomStat.ReservedRoomHour"></v-text-field>
                       </v-list-item-title>
                     </v-list-item>
                     <v-list-item>
@@ -672,12 +672,12 @@
                       <v-list-item-title class="align-end">
                         <v-row>
                           <v-col>
-                            <v-text-field v-if="this.roomStat.HeatingMode === 0" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="설정온도" v-model="roomStat.Tsurf_set"></v-text-field>
-                            <v-text-field v-if="this.roomStat.HeatingMode !== 0" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="설정온도" v-model="roomStat.Tsurf_set"></v-text-field>
+                            <v-text-field v-if="this.roomStat.HeatingMode === 0" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="설정온도" v-model="roomStat.Tsurf_set"></v-text-field>
+                            <v-text-field v-if="this.roomStat.HeatingMode !== 0" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="설정온도" v-model="roomStat.Tsurf_set"></v-text-field>
                           </v-col>
                           <v-col>
-                            <v-text-field v-if="this.roomStat.HeatingMode === 0" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="제어범위" v-model="roomStat.Tsurf_cr"></v-text-field>
-                            <v-text-field v-if="this.roomStat.HeatingMode !== 0" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="제어범위" v-model="roomStat.Tsurf_cr"></v-text-field>
+                            <v-text-field v-if="this.roomStat.HeatingMode === 0" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="제어범위" v-model="roomStat.Tsurf_cr"></v-text-field>
+                            <v-text-field v-if="this.roomStat.HeatingMode !== 0" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="제어범위" v-model="roomStat.Tsurf_cr"></v-text-field>
                           </v-col>
                         </v-row>
                       </v-list-item-title>
@@ -687,12 +687,12 @@
                       <v-list-item-title class="align-end">
                         <v-row>
                           <v-col>
-                            <v-text-field v-if="this.roomStat.HeatingMode === 0" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="설정온도" v-model="roomStat.Troom_set"></v-text-field>
-                            <v-text-field v-if="this.roomStat.HeatingMode !== 0" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="설정온도" v-model="roomStat.Troom_set"></v-text-field>
+                            <v-text-field v-if="this.roomStat.HeatingMode === 0" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="설정온도" v-model="roomStat.Troom_set"></v-text-field>
+                            <v-text-field v-if="this.roomStat.HeatingMode !== 0" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="설정온도" v-model="roomStat.Troom_set"></v-text-field>
                           </v-col>
                           <v-col>
-                            <v-text-field v-if="this.roomStat.HeatingMode === 0" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="제어범위" v-model="roomStat.Troom_cr"></v-text-field>
-                            <v-text-field v-if="this.roomStat.HeatingMode !== 0" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="제어범위" v-model="roomStat.Troom_cr"></v-text-field>
+                            <v-text-field v-if="this.roomStat.HeatingMode === 0" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="제어범위" v-model="roomStat.Troom_cr"></v-text-field>
+                            <v-text-field v-if="this.roomStat.HeatingMode !== 0" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="제어범위" v-model="roomStat.Troom_cr"></v-text-field>
                           </v-col>
                         </v-row>
                       </v-list-item-title>
@@ -719,7 +719,7 @@
                           item-value="value"
                           item-text="name"
                           hide-details
-                          class="pa-0 font-weight-bold black--text body-2 config-column-margin"
+                          class="pa-0 font-weight-bold black--text body-2 roomSel"
                         ></v-select>
                         <v-select
                           v-if="this.roomStat.HeatingMode !== 1"
@@ -729,7 +729,7 @@
                           item-value="value"
                           item-text="name"
                           hide-details
-                          class="pa-0 font-weight-bold black--text body-2 config-column-margin"
+                          class="pa-0 font-weight-bold black--text body-2 roomSel"
                         ></v-select>
                       </v-list-item-title>
                     </v-list-item-title>
@@ -739,12 +739,12 @@
                     <v-list-item-title class="align-end">
                       <v-row>
                         <v-col>
-                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingTimeHour"></v-text-field>
-                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingTimeHour"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingTimeHour"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingTimeHour"></v-text-field>
                         </v-col>
                         <v-col>
-                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingTimeMin"></v-text-field>
-                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingTimeMin"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingTimeMin"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingTimeMin"></v-text-field>
                         </v-col>
                       </v-row>
                     </v-list-item-title>
@@ -754,12 +754,12 @@
                     <v-list-item-title class="align-end">
                       <v-row>
                         <v-col>
-                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingStopTimeHour"></v-text-field>
-                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingStopTimeHour"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingStopTimeHour"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingStopTimeHour"></v-text-field>
                         </v-col>
                         <v-col>
-                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingStopTimeMin"></v-text-field>
-                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingStopTimeMin"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingStopTimeMin"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingStopTimeMin"></v-text-field>
                         </v-col>
                       </v-row>
                     </v-list-item-title>
@@ -769,12 +769,12 @@
                     <v-list-item-title class="align-end">
                       <v-row>
                         <v-col>
-                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="시" v-model="this.trnMH_TodayStartTimeHour"></v-text-field>
-                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="시" v-model="this.trnMH_TodayStartTimeHour"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="시" v-model="this.trnMH_TodayStartTimeHour"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="시" v-model="this.trnMH_TodayStartTimeHour"></v-text-field>
                         </v-col>
                         <v-col>
-                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="분" v-model="this.trnMH_TodayStartTimeMin"></v-text-field>
-                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="분" v-model="this.trnMH_TodayStartTimeMin"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="분" v-model="this.trnMH_TodayStartTimeMin"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="분" v-model="this.trnMH_TodayStartTimeMin"></v-text-field>
                         </v-col>
                       </v-row>
                     </v-list-item-title>
@@ -784,12 +784,12 @@
                     <v-list-item-title class="align-end">
                       <v-row>
                         <v-col>
-                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="시간" v-model="this.trnMH_TotalHeatingTimeHour"></v-text-field>
-                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="시간" v-model="this.trnMH_TotalHeatingTimeHour"></v-text-field>
+                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="시간" v-model="this.trnMH_TotalHeatingTimeHour"></v-text-field>
+                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="시간" v-model="this.trnMH_TotalHeatingTimeHour"></v-text-field>
                         </v-col>
                         <v-col>
-                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="분" v-model="this.trnMH_TotalHeatingTimeMin"></v-text-field>
-                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="분" v-model="this.trnMH_TotalHeatingTimeMin"></v-text-field>
+                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="분" v-model="this.trnMH_TotalHeatingTimeMin"></v-text-field>
+                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="분" v-model="this.trnMH_TotalHeatingTimeMin"></v-text-field>
                         </v-col>
                       </v-row>
                     </v-list-item-title>
@@ -799,12 +799,12 @@
                     <v-list-item-title class="align-end">
                       <v-row>
                         <v-col>
-                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="설정온도" v-model="roomStat.MH_Tsurf_set"></v-text-field>
-                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="설정온도" v-model="roomStat.MH_Tsurf_set"></v-text-field>
+                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="설정온도" v-model="roomStat.MH_Tsurf_set"></v-text-field>
+                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="설정온도" v-model="roomStat.MH_Tsurf_set"></v-text-field>
                         </v-col>
                         <v-col>
-                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="제어범위" v-model="roomStat.MH_Tsurf_cr"></v-text-field>
-                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="제어범위" v-model="roomStat.MH_Tsurf_cr"></v-text-field>
+                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="제어범위" v-model="roomStat.MH_Tsurf_cr"></v-text-field>
+                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="제어범위" v-model="roomStat.MH_Tsurf_cr"></v-text-field>
                         </v-col>
                       </v-row>
                     </v-list-item-title>
@@ -814,12 +814,12 @@
                     <v-list-item-title class="align-end">
                       <v-row>
                         <v-col>
-                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="설정온도" v-model="roomStat.MH_Troom_set"></v-text-field>
-                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="설정온도" v-model="roomStat.MH_Troom_set"></v-text-field>
+                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="설정온도" v-model="roomStat.MH_Troom_set"></v-text-field>
+                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="설정온도" v-model="roomStat.MH_Troom_set"></v-text-field>
                         </v-col>
                         <v-col>
-                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="제어범위" v-model="roomStat.MH_Troom_cr"></v-text-field>
-                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="제어범위" v-model="roomStat.MH_Troom_cr"></v-text-field>
+                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="제어범위" v-model="roomStat.MH_Troom_cr"></v-text-field>
+                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="제어범위" v-model="roomStat.MH_Troom_cr"></v-text-field>
                         </v-col>
                       </v-row>
                     </v-list-item-title>
@@ -896,12 +896,8 @@
   </v-container>
 </template>
 <style>
-.config-column-margin {
-  margin: 4px 0px 0px 0px;
-}
-.config-column {
-  font-size: medium;
-  font-weight: bold;
+.roomSel .v-select__selection{
+    text-align-last: center;
 }
 </style>
 <script>
