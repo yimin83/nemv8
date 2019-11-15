@@ -4,7 +4,7 @@
       <template>
         <thead>
           <tr class="ma-0 pa-0">
-            <th class="text-center black--text ma-0 pa-0 pt-5 config-column right-bold-border" style="width:190px;border-bottom:4px solid lightgrey;"><b>구분</b></th>
+            <th class="text-center black--text ma-0 pa-0 pt-5 config-column right-bold-border" style="width:200px;border-bottom:4px solid lightgrey;"><b>구분</b></th>
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">스케쥴러<br>사용</th>
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">거주자<br>상태 보고</th>
             <th class="text-center black--text ma-0 pa-0 pt-0 config-column" style="border-bottom:4px solid lightgrey;">이코노<br>마이저<br>사용</th>
@@ -15,62 +15,137 @@
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">내부<br>설정온도</th>
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">댐퍼 수동<br>설정값</th>
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">CO2 농도<br>기준 설정값</th>
-            <th class="text-center black--text ma-0 pa-0 pt-5" style="width:140px;border-bottom:4px solid lightgrey;">설명</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="datas in ahuConfigs" class="ma-0 pa-0">
-            <td class="text-center black--text font-weight-bold ma-0 pa-0 pt-3 pb-2 config-column right-bold-border" style="background-color:rgb(294, 294, 189)">{{ahuNos[datas.AhuIndex-1].name}}</td>
+            <td class="text-center black--text font-weight-bold ma-0 pa-0 pt-3 pb-2 config-column right-bold-border" style="background-color:rgb(294, 294, 189)">{{ahuNos[datas.AhuIndex-1].name}}({{ahuNos[datas.AhuIndex-1].desc}})</td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
               <v-select
+              v-if="datas.UseScheduler !== 1"
               v-model="datas.UseScheduler"
               :items="useUnuses"
               item-value="value"
               item-text="name"
               append-icon=""
               menu-props="auto"
-              class="font-weight-bold black--text body-2 config-column-margin"
+              class="font-weight-bold body-2 config-column-margin blackSel"
+              style="text-indent: 15px;"
+              @change="saveAhuConfig()"
+            ></v-select>
+              <v-select
+              v-if="datas.UseScheduler === 1"
+              v-model="datas.UseScheduler"
+              :items="useUnuses"
+              :color="red"
+              item-value="value"
+              item-text="name"
+              append-icon=""
+              menu-props="auto"
+              class="font-weight-bold body-2 config-column-margin redSel"
+              item-color="red"
+              style="text-indent: 15px;"
               @change="saveAhuConfig()"
             ></v-select></td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
               <v-select
+              v-if="datas.NotifyOccupantsState !== 1"
               v-model="datas.NotifyOccupantsState"
               :items="useUnuses"
               item-value="value"
               item-text="name"
               append-icon=""
               menu-props="auto"
-              class="font-weight-bold black--text body-2 config-column-margin"
+              class="font-weight-bold body-2 config-column-margin blackSel"
+              style="text-indent: 15px;"
+              @change="saveAhuConfig()"
+            ></v-select>
+              <v-select
+              v-if="datas.NotifyOccupantsState === 1"
+              v-model="datas.NotifyOccupantsState"
+              :items="useUnuses"
+              item-value="value"
+              item-text="name"
+              append-icon=""
+              menu-props="auto"
+              class="font-weight-bold body-2 config-column-margin redSel"
+              style="text-indent: 15px;"
               @change="saveAhuConfig()"
             ></v-select></td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
               <v-select
+              v-if="datas.EconomizerCycle !== 1"
               v-model="datas.EconomizerCycle"
               :items="useUnuses"
               item-value="value"
               item-text="name"
               append-icon=""
-              class="font-weight-bold body-2 config-column-margin"
+              class="font-weight-bold body-2 config-column-margin blackSel"
+              style="text-indent: 15px;"
+              @change="saveAhuConfig()"></v-select>
+              <v-select
+              v-if="datas.EconomizerCycle === 1"
+              v-model="datas.EconomizerCycle"
+              :items="useUnuses"
+              item-value="value"
+              item-text="name"
+              append-icon=""
+              class="font-weight-bold body-2 config-column-margin redSel"
+              style="text-indent: 15px;"
               @change="saveAhuConfig()"></v-select>
             </td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
               <v-select
+              v-if="datas.VarTempControl !== 1"
               v-model="datas.VarTempControl"
               :items="useUnuses"
               item-value="value"
               item-text="name"
               append-icon=""
-              class="font-weight-bold body-2 config-column-margin"
+              class="font-weight-bold body-2 config-column-margin blackSel"
+              style="text-indent: 15px;"
+              @change="saveAhuConfig()"></v-select>
+              <v-select
+              v-if="datas.VarTempControl === 1"
+              v-model="datas.VarTempControl"
+              :items="useUnuses"
+              item-value="value"
+              item-text="name"
+              append-icon=""
+              class="font-weight-bold body-2 config-column-margin redSel"
+              style="text-indent: 15px;"
               @change="saveAhuConfig()"></v-select>
             </td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
               <v-select
+              v-if="!(datas.HCMode === 0 || datas.HCMode === 1)"
               v-model="datas.HCMode"
               :items="hcOnOffs"
               item-value="value"
               item-text="name"
               append-icon=""
-              class="font-weight-bold body-2 config-column-margin"
+              class="font-weight-bold body-2 config-column-margin blackSel"
+              style="text-indent: 15px;"
+              @change="saveAhuConfig()"></v-select>
+              <v-select
+              v-if="datas.HCMode === 0"
+              v-model="datas.HCMode"
+              :items="hcOnOffs"
+              item-value="value"
+              item-text="name"
+              append-icon=""
+              class="font-weight-bold body-2 config-column-margin redSel"
+              style="text-indent: 15px;"
+              @change="saveAhuConfig()"></v-select>
+              <v-select
+              v-if="datas.HCMode === 1"
+              v-model="datas.HCMode"
+              :items="hcOnOffs"
+              item-value="value"
+              item-text="name"
+              append-icon=""
+              class="font-weight-bold body-2 config-column-margin blueSel"
+              style="text-indent: 15px;"
               @change="saveAhuConfig()"></v-select>
             </td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
@@ -81,6 +156,7 @@
               item-text="name"
               append-icon=""
               class="font-weight-bold body-2 config-column-margin"
+              style="text-indent: 15px;"
               @change="saveAhuConfig()"></v-select>
             </td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
@@ -91,12 +167,12 @@
               item-text="name"
               append-icon=""
               class="font-weight-bold body-2 config-column-margin"
+              style="text-indent: 15px;"
               @change="saveAhuConfig()"></v-select>
             </td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Tzone_set" @change="saveAhuConfig()"></v-text-field></td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Rdamp_set" @change="saveAhuConfig()"></v-text-field></td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.PPMco2_set" @change="saveAhuConfig()"></v-text-field></td>
-            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)" ><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Desc" @change="saveAhuConfig()"></v-text-field></td>
           </tr>
         </tbody>
       </template>
@@ -116,11 +192,19 @@
   font-weight: bold;
   border-right: 1px solid lightgrey;
 }
-.v-select__selection {
+.v-select__selection{
     width: 100%;
     text-align-last: center;
     justify-content: center;
-    margin-left: 6px;
+}
+.blackSel .v-select__selection {
+    color:black;
+}
+.redSel .v-select__selection {
+    color:red;
+}
+.blueSel .v-select__selection {
+    color:blue;
 }
 .config-column-margin {
   margin: -4px 0px -24px 0px;
@@ -163,7 +247,7 @@ export default {
           this.ahuNos = []
           for (var key in r.data) {
             if (r.data.hasOwnProperty(key)) {
-              this.ahuNos.push({ 'name': r.data[key].ahu_desc, 'value': r.data[key].ahu_id, 'beChecked': (r.data[key].ahu_id === this.curAhuId) })
+              this.ahuNos.push({ 'desc': r.data[key].ahu_desc, 'name': r.data[key].ahu_name,  'value': r.data[key].ahu_id, 'beChecked': (r.data[key].ahu_id === this.curAhuId) })
             }
           }
           this.getAhuConfig()

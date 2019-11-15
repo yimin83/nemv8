@@ -4,8 +4,8 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 // import axios from 'axios'
-// var Path = './views/rooms.vue'
-var Path = './views/ahus.vue'
+var Path = './views/rooms.vue'
+// var Path = './views/ahus.vue'
 export default new Router({
   mode: 'history',
   base: process.env.BASE_URL,

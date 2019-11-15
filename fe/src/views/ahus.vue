@@ -26,20 +26,26 @@
         </thead>
         <tbody>
           <tr v-for="zone in mergezones">
-            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-bold-border " style="cursor: pointer;background-color:rgb(294, 294, 189)" @mousedown.left='openAhuGraph(zone.zone.nZoneIdx)'>{{zone.ahu.ahu_desc}}({{zone.ahu.ahu_name}})</td>
-            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border indigo--text text--darken-4" style="background-color:rgb(240, 240, 240)">{{zone.hc_mode}}</td>
-            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border deep-orange--text text--darken-4" style="background-color:rgb(240, 240, 240)">{{zone.nHCState}}</td>
-            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border orange--text text--darken-2" style="background-color:rgb(240, 240, 240)">{{zone.zone.fData_hc_set_temp}} <sup>o</sup>C</td>
-            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-bold-border deep-orange--text text--darken-4" style="background-color:rgb(240, 240, 240)">{{zone.zone.fData_temp_return}} <sup>o</sup>C</td>
-            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border indigo--text text--darken-4" style="background-color:rgb(240, 240, 240)">{{zone.manual_mode}}</td>
-            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-bold-border deep-orange--text text--darken-4" style="background-color:rgb(240, 240, 240)">{{zone.supplay_fan}}</td>
-            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border indigo--text text--darken-4" style="background-color:rgb(240, 240, 240)">{{zone.damper_auto_manual}}</td>
-            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border orange--text text--darken-2" style="background-color:rgb(240, 240, 240)">{{zone.zone.nRdamp_set}}</td>
-            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-bold-border deep-orange--text text--darken-4" style="background-color:rgb(240, 240, 240)">{{zone.zone.fData_damper_manual_set}}</td>
-            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border orange--text text--darken-2" style="background-color:rgb(240, 240, 240)">{{zone.zone.nPPMco2_set}}</td>
-            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-bold-border deep-orange--text text--darken-4" style="background-color:rgb(240, 240, 240)">
-              <span v-if="zone.zone.nPPMco2_set < zone.zone.nPPMco2_cur" style="color:red">{{zone.zone.nPPMco2_cur}}</span>
-              <span v-if="zone.zone.nPPMco2_set >= zone.zone.nPPMco2_cur">{{zone.zone.nPPMco2_cur}}</span>
+            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-bold-border " style="cursor: pointer;background-color:rgb(294, 294, 189)" @mousedown.left='openAhuGraph(zone.zone.nZoneIdx)'>{{zone.ahu.ahu_name}}({{zone.ahu.ahu_desc}})</td>
+            <td v-if="!(zone.zone.cMode_hc_mode === 1 || zone.zone.cMode_hc_mode === 0)" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.hc_mode}}</td>
+            <td v-if="zone.zone.cMode_hc_mode === 0" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold red--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.hc_mode}}</td>
+            <td v-if="zone.zone.cMode_hc_mode === 1" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold blue--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.hc_mode}}</td>
+            <td v-if="!(zone.zone.nHCState === 1 || zone.zone.nHCState === 0)" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.nHCState}}</td>
+            <td v-if="zone.zone.nHCState === 0" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold red--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.nHCState}}</td>
+            <td v-if="zone.zone.nHCState === 1" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold blue--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.nHCState}}</td>
+            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{(zone.zone.fData_hc_set_temp === -1)? '-' : zone.zone.fData_hc_set_temp}} <sup>o</sup>C</td>
+            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-bold-border" style="background-color:rgb(240, 240, 240)">{{(zone.zone.fData_temp_return === -1)? '-' : zone.zone.fData_temp_return}} <sup>o</sup>C</td>
+            <td v-if="zone.zone.cMode_manual_mode !== 1" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.manual_mode}}</td>
+            <td v-if="zone.zone.cMode_manual_mode === 1" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold red--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.manual_mode}}</td>
+            <td v-if="zone.zone.cState_supplay_fan !== 1" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.supplay_fan}}</td>
+            <td v-if="zone.zone.cState_supplay_fan === 1" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold red--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.supplay_fan}}</td>
+            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.damper_auto_manual}}</td>
+            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{(zone.zone.nRdamp_set === -1)? '-' : zone.zone.nRdamp_set}}</td>
+            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-bold-border" style="background-color:rgb(240, 240, 240)">{{(zone.zone.fData_damper_manual_set === -1)? '-' : zone.zone.fData_damper_manual_set}}</td>
+            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{(zone.zone.nPPMco2_set === -1)? '-' : zone.zone.nPPMco2_set}}</td>
+            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-bold-border" style="background-color:rgb(240, 240, 240)">
+              <span v-if="zone.zone.nPPMco2_set < zone.zone.nPPMco2_cur" style="color:red">{{(zone.zone.nPPMco2_cur === -1)? '-' : zone.zone.nPPMco2_cur}}</span>
+              <span v-if="zone.zone.nPPMco2_set >= zone.zone.nPPMco2_cur">{{(zone.zone.nPPMco2_cur === -1)? '-' : zone.zone.nPPMco2_cur}}</span>
             </td>
           </tr>
         </tbody>
@@ -61,7 +67,7 @@
         <v-card-text>
           <div>
             <v-row>
-              <v-col class="d-flex" cols="12" sm="1">
+              <v-col class="d-flex pa-0 ma-0 mt-3 ml-3" cols="12" sm="1">
                 <v-select
                   v-model="time.value"
                   :items="this.times"
@@ -71,13 +77,13 @@
                   class='ma-0 mt-1 pa-0 grey--text caption'
                 ></v-select>
               </v-col>
-              <v-col class="d-flex" cols="12" sm="2">
+              <v-col class="d-flex pa-0 ma-0 mt-3 ml-3" cols="12" sm="2">
                 <v-text-field label='시작일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='startTime'></v-text-field>
               </v-col>
-              <v-col class="d-flex" cols="12" sm="2">
+              <v-col class="d-flex pa-0 ma-0 mt-3 ml-3" cols="12" sm="2">
                 <v-text-field label='종료일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='endTime'></v-text-field>
               </v-col>
-              <v-col class="d-flex" cols="12" sm="1">
+              <v-col class="d-flex pa-0 ma-0 mt-3 ml-3" cols="12" sm="1">
                 <v-btn class="d-flex" :loading="searchloading" :disabled="loading" @click="getSiteEnv(curAhuNo)">
                   <span>검색</span>
                 </v-btn>

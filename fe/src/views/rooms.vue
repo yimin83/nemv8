@@ -1,88 +1,62 @@
 <template>
   <v-container grid-list-md>
-    <v-divider class='my-3 mt-0'></v-divider>
-      <div class="text--primary ma-0">
+    <v-divider class='my-3 mt-0 mb-3'></v-divider>
+      <div class="text--primary">
       난방(보일러 on) : {{this.SetStatus}}({{this.CurStatus}})
       </div>
-    <v-divider class='my-3 mt-0'></v-divider>
-    <v-layout row wrap >
+    <v-divider class='my-3'></v-divider>
+    <v-layout row wrap class='ml-0'>
+      재실모드(&nbsp;
       <v-chip
         class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
         color="blue-grey lighten-4"
         small>공실
       </v-chip>
-      <div class="text--primary">
-         &nbsp;:&nbsp;공실&nbsp;
-      </div>
       <v-chip
         class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
         color="orange lighten-3"
         small>
         예비
       </v-chip>
-      <div class="text--primary">
-         &nbsp;:&nbsp;예비난방&nbsp;
-      </div>
       <v-chip
         class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
         color="pink lighten-2"
         small
       >
         재실
-      </v-chip>
-      <div class="text--primary">
-         &nbsp;:&nbsp;재실&nbsp;&nbsp;|&nbsp;&nbsp;
-      </div>
+      </v-chip>)&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;난방모드(&nbsp;
       <v-chip
         class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
         color="light-green accent-2"
         small
-      >
-        자동
+      >자동
       </v-chip>
-      <div class="text--primary">
-         &nbsp;:&nbsp;난방모드 자동&nbsp;
-      </div>
       <v-chip
         class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
         color="indigo lighten-2"
         small
-      >
-        수동
+      >수동
       </v-chip>
-      <div class="text--primary">
-         &nbsp;:&nbsp;난방모드 수동&nbsp;
-      </div>
       <v-chip
         class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
         color="blue-grey lighten-4"
         small
-      >
-        정지
-      </v-chip>
-      <div class="text--primary">
-         &nbsp;:&nbsp;난방모드 정지 &nbsp;&nbsp;|&nbsp;&nbsp;
-      </div>
+      >정지
+    </v-chip>)&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;보일러상태(&nbsp;
+      &nbsp;가동:
       <v-chip
         class="d-inline-flex ma-0 mr-1 ml-1 pa-1 font-weight-bold"
         color="deep-orange lighten-4"
         small
-      >
-        &nbsp;
+      >&nbsp;
       </v-chip>
-      <div class="text--primary">
-         &nbsp;:&nbsp;보일러 가동&nbsp;
-      </div>
+      &nbsp;중지:
       <v-chip
         class="d-inline-flex ma-0 mr-1 ml-1 pa-1 font-weight-bold"
         color="blue-grey lighten-5"
         small
-      >
-        &nbsp;
-      </v-chip>
-      <div class="text--primary">
-         &nbsp;:&nbsp;보일러 중지&nbsp;|&nbsp;&nbsp;
-      </div>
+      >&nbsp;
+      </v-chip>)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
       <v-card
         class="d-inline-flex ma-0 pa-0 font-weight-bold"
         color="blue lighten-4"
@@ -119,12 +93,12 @@
                     class='ma-0 pa-0 font-weight-bold'
                     outlined
                     width='94px'
-                    height='118px'
+                    height='104px'
                     lg=12
                     md=12
                     sm=3
                     xs=3>
-                    <v-card-text class="text-center font-weight-bold display-1 mt-6" >
+                    <v-card-text class="text-center font-weight-bold display-1 mt-4" >
                       {{(room.usRoomNo+'').substr(0, 1)}}F
                     </v-card-text>
                   </v-card>
@@ -140,7 +114,7 @@
                     md=12
                     sm=3
                     xs=3>
-                    <v-card-text class="text-center">
+                    <v-card-text class="text-center ma-0 mt-1 mb-3 pa-0">
                       <div class="text--primary font-weight-bold title mb-1"
                       style="cursor: pointer"
                       @mousedown.left='openRoomGraph(room.usRoomNo)'
@@ -197,14 +171,14 @@
                           color="blue lighten-4"
                           label="실내온도"
                           small>
-                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{(!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
                         </v-card>
                         <v-card
                           class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
                           color="brown lighten-4"
                           label="바닥온도"
                           small>
-                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ?room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
                         </v-card>
                       </div>
                     </v-card-text>
@@ -219,7 +193,7 @@
                     md=12
                     sm=3
                     xs=3>
-                    <v-card-text class="text-center">
+                    <v-card-text class="text-center ma-0 mt-1 mb-3 pa-0">
                       <div class="text--primary font-weight-bold title mb-1"
                       style="cursor: pointer"
                       @mousedown.left='openRoomGraph(room.usRoomNo)'
@@ -276,14 +250,14 @@
                           color="blue lighten-4"
                           label="실내온도"
                           small>
-                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTroom_cur === 255 || room.fTroom_cur === -1 ) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
                         </v-card>
                         <v-card
                           class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
                           color="brown lighten-4"
                           label="바닥온도"
                           small>
-                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
                         </v-card>
                       </div>
                     </v-card-text>
@@ -302,7 +276,7 @@
                 md=12
                 sm=3
                 xs=3>
-                <v-card-text class="text-center">
+                <v-card-text class="text-center ma-0 mt-1 mb-3 pa-0">
                   <div class="text--primary font-weight-bold title mb-1"
                   style="cursor: pointer"
                   @mousedown.left='openRoomGraph(room.usRoomNo)'
@@ -359,14 +333,14 @@
                       color="blue lighten-4"
                       label="실내온도"
                       small>
-                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTroom_cur === 255 || room.fTroom_cur === -1 ) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
                     </v-card>
                     <v-card
                       class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
                       color="brown lighten-4"
                       label="바닥온도"
                       small>
-                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
                     </v-card>
                   </div>
                 </v-card-text>
@@ -381,7 +355,7 @@
                 md=12
                 sm=3
                 xs=3>
-                <v-card-text class="text-center">
+                <v-card-text class="text-center ma-0 mt-1 mb-3 pa-0">
                   <div class="text--primary font-weight-bold title mb-1"
                   style="cursor: pointer"
                   @mousedown.left='openRoomGraph(room.usRoomNo)'
@@ -438,14 +412,14 @@
                       color="blue lighten-4"
                       label="실내온도"
                       small>
-                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTroom_cur !== 255) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTroom_cur === 255 || room.fTroom_cur === -1 ) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
                     </v-card>
                     <v-card
                       class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
                       color="brown lighten-4"
                       label="바닥온도"
                       small>
-                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{(room.fTsurf_cur !== 255) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}</div>
+                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
                     </v-card>
                   </div>
                 </v-card-text>
@@ -637,7 +611,7 @@
                       <v-list-item-title width=100>{{trnCheckInTime}} ~ {{trnCheckOutTime}}</v-list-item-title>
                     </v-list-item>
                     <v-list-item>
-                      <v-list-item-title>방상태:</v-list-item-title>
+                      <v-list-item-title>재실모드:</v-list-item-title>
                       <v-list-item-title>
                         <v-select
                           v-if="this.roomStat.HeatingMode === 0"
@@ -765,12 +739,12 @@
                     <v-list-item-title class="align-end">
                       <v-row>
                         <v-col>
-                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingTimeHour"></v-text-field>
-                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingTimeHour"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingTimeHour"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingTimeHour"></v-text-field>
                         </v-col>
                         <v-col>
-                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingTimeMin"></v-text-field>
-                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingTimeMin"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingTimeMin"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingTimeMin"></v-text-field>
                         </v-col>
                       </v-row>
                     </v-list-item-title>
@@ -780,12 +754,12 @@
                     <v-list-item-title class="align-end">
                       <v-row>
                         <v-col>
-                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingStopTimeHour"></v-text-field>
-                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingStopTimeHour"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingStopTimeHour"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="시간" v-model="this.trnMH_HeatingStopTimeHour"></v-text-field>
                         </v-col>
                         <v-col>
-                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingStopTimeMin"></v-text-field>
-                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingStopTimeMin"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingStopTimeMin"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="분" v-model="this.trnMH_HeatingStopTimeMin"></v-text-field>
                         </v-col>
                       </v-row>
                     </v-list-item-title>
@@ -795,12 +769,12 @@
                     <v-list-item-title class="align-end">
                       <v-row>
                         <v-col>
-                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="시" v-model="this.trnMH_TodayStartTimeHour"></v-text-field>
-                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="시" v-model="this.trnMH_TodayStartTimeHour"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="시" v-model="this.trnMH_TodayStartTimeHour"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="시" v-model="this.trnMH_TodayStartTimeHour"></v-text-field>
                         </v-col>
                         <v-col>
-                          <v-text-field v-if="this.roomStat.HeatingMode === 1" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="분" v-model="this.trnMH_TodayStartTimeMin"></v-text-field>
-                          <v-text-field v-if="this.roomStat.HeatingMode !== 1" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="분" v-model="this.trnMH_TodayStartTimeMin"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3 config-column" height=13 :rules="rules" label="분" v-model="this.trnMH_TodayStartTimeMin"></v-text-field>
+                          <v-text-field v-if="(this.roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3 config-column" disabled height=13 :rules="rules" label="분" v-model="this.trnMH_TodayStartTimeMin"></v-text-field>
                         </v-col>
                       </v-row>
                     </v-list-item-title>
@@ -856,7 +830,7 @@
             <v-col>
               <v-card
                 dense
-                max-width="330px"
+                max-width="350px"
                 class="mx-auto">
                 <v-card-title class="subheading font-weight-bold">현재 상태</v-card-title>
                 <v-divider class='my-0'>></v-divider>
@@ -1096,7 +1070,7 @@ export default {
           ]
           this.series2 = [
             {
-              name: '방상태',
+              name: '재실정보',
               data: data0
             },
             {
@@ -1223,7 +1197,7 @@ export default {
           ]
           this.series2 = [
             {
-              name: '방상태',
+              name: '재실정보',
               data: data0
             },
             {

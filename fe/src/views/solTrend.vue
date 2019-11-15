@@ -17,8 +17,7 @@
       </v-bottom-navigation>
       <div>
         <v-row>
-          <br>
-          <v-col v-if="this.activeBtn === 0" class="d-flex" cols="4" sm="2">
+          <v-col v-if="this.activeBtn === 0" class="d-flex pa-0 ma-0 mt-3 ml-3" cols="12" sm="2">
             <v-select
               v-model="ahuNo.value"
               :items="this.ahuNos"
@@ -28,9 +27,7 @@
               class='ma-0 mt-1 pa-0 grey--text caption'
             ></v-select>
           </v-col>
-            <br>
-          <v-col class="d-flex" sm="1">
-            <br>
+          <v-col class="d-flex ma-0 pa-0 mt-3 ml-3" cols="12" sm="1">
             <v-select
               v-model="time.value"
               :items="this.times"
@@ -40,13 +37,13 @@
               class='ma-0 mt-1 pa-0 grey--text caption'
             ></v-select>
           </v-col>
-          <v-col class="d-flex" sm="2">
+          <v-col class="d-flex ma-0 pa-0 mt-3 ml-3" cols="12" sm="2">
             <v-text-field label='시작일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='startTime'></v-text-field>
           </v-col>
-          <v-col class="d-flex" sm="2">
+          <v-col class="d-flex ma-0 pa-0 mt-3 ml-3" cols="12" sm="2">
             <v-text-field label='종료일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='endTime'></v-text-field>
           </v-col>
-          <v-col class="d-flex" sm="1">
+          <v-col class="d-flex ma-0 pa-0 mt-3 ml-3" cols="12" sm="1">
             <v-btn :loading="searchloading" :disabled="loading" @click="searchGraph()">
               <span>검색</span>
             </v-btn>
@@ -91,6 +88,37 @@
     </v-layout>
   </v-container>
 </template>
+<style>
+.centered-input input {
+  text-align: center
+}
+.td-right-border {
+  border-right: 1px solid lightgrey;
+}
+.config-column {
+  font-size: medium;
+  font-weight: bold;
+  border-right: 1px solid lightgrey;
+}
+.v-select__selection {
+    width: 100%;
+    text-align-last: center;
+    justify-content: center;
+    margin-left: 0px;
+}
+.config-column-margin {
+  margin: -4px 0px -24px 0px;
+}
+.right-border {
+  border-right: 1px solid lightgrey;
+}
+.right-bold-border {
+  border-right: 4px solid lightgrey;
+}
+.bottom-border {
+  border-bottom:4px solid lightgrey;
+}
+</style>
 <script>
 import axios from 'axios'
 Apex = {

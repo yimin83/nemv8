@@ -61,7 +61,7 @@
             >
             {{graphTitle1}}
             </v-chip>
-            <apexchart type=line width='1300px' height='400px' :options="chartOptionsLine1" :series="series1" />
+            <apexchart width='1300px' height='400px' :options="chartOptionsLine1" :series="series1" />
           </div>
           <div class="ma-0 pa-0 mb-n3">
             <v-chip
@@ -72,7 +72,7 @@
             >
             {{graphTitle2}}
             </v-chip>
-            <apexchart type=line width='1300px' height='160px' :options="chartOptionsLine2" :series="series2" />
+            <apexchart width='1300px' height='160px' :options="chartOptionsLine2" :series="series2" />
           </div>
         </div>
       </div>
@@ -81,18 +81,6 @@
 </template>
 <script>
 import axios from 'axios'
-Apex = {
-  stroke: {
-    show: true,
-    curve: 'smooth',
-    lineCap: 'butt',
-    width: 3,
-    //dashArray: [0,10],
-  },
-  yaxis: {
-    tickAmount: 3
-  }
-}
 export default {
   mounted () {
     this.getRooms()
@@ -179,38 +167,38 @@ export default {
             }
             date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
           }
+          this.series1 = [];
+          this.series2 = [];
+          this.chartOptionsLine1 = [];
+          this.chartOptionsLine2 = [];
           this.series1 = [
             {
               name: '평균바닥온도',
-              type: 'line',
               data: data2
             },
             {
               name: '평균실내온도',
-              type: 'line',
               data: data3
             },
             {
               name: '외기온도',
-              type: 'line',
               data: data4
             }
-          ]
+          ];
           this.series2 = [
             {
               name: '난방 가동 수',
-              type: 'line',
               data: data0
             },
             {
               name: '난방 설정 수',
-              type: 'line',
               data: data1
             }
-          ]
+          ];
           this.chartOptionsLine1 = {
             chart: {
-              id: 'fb',
+              type: 'line',
+              id: 'ch1',
               width: '100%',
               group: 'social',
               toolbar: {
@@ -228,11 +216,22 @@ export default {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
+            },
+            stroke: {
+              show: true,
+              curve: 'smooth',
+              lineCap: 'butt',
+              width: 3,
+              //dashArray: [0,10],
+            },
+            yaxis: {
+              tickAmount: 3
             }
-          }
+          };
           this.chartOptionsLine2 = {
             chart: {
-              id: 'tw',
+              id: 'ch2',
+              type: 'line',
               width: '100%',
               group: 'social',
               toolbar: {
@@ -250,8 +249,18 @@ export default {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
+            },
+            stroke: {
+              show: true,
+              curve: 'smooth',
+              lineCap: 'butt',
+              width: 3,
+              //dashArray: [0,10],
+            },
+            yaxis: {
+              tickAmount: 3
             }
-          }
+          };
           this.searchloading = false
           this.loading = false
         })
@@ -259,8 +268,11 @@ export default {
           alert(e.message)
           console.error(e.message)
         })
-    },
-    getTrend (usRoomNo) {
+    },getTrend (usRoomNo) {
+      this.series1 = [];
+      this.series2 = [];
+      this.chartOptionsLine1 = [];
+      this.chartOptionsLine2 = [];
       // axios.put(`http://localhost:3000/api/rooms/getRoomTrend`, { usRoomNo: usRoomNo, startTime: this.startTime, endTime: this.endTime, time: this.time.value })
       axios.put(`${this.$apiRootPath}rooms/getRoomTrend`, { usRoomNo: usRoomNo, startTime: this.startTime, endTime: this.endTime, time: this.time.value })
         .then((r) => {
@@ -272,8 +284,12 @@ export default {
           var data4 = []
           var data5 = []
           var date = []
+          var heatData1 = []
+          var heatData2 = []
+          var heatData3 = []
           this.graphTitle1 = '온도 정보'
           this.graphTitle2 = '상태 정보'
+          // this.graphTitle4 = '상태 정보'
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].ucRoomState !== null) {
               data0.push(this.datas[i].ucRoomState.toFixed(2))
@@ -305,10 +321,13 @@ export default {
             } else {
               data5.push(-1)
             }
-            // if(i === 0) alert(new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(0, 10) + ' ' + new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(11, 5))
-            // date.push(new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(0, 10) + ' ' + new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(11, 5) )
             date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
           }
+          for(var i = 0; i< date.length; i++){
+            heatData1.push({ x: date[i], y: (parseInt(data0[i])+4) })
+            heatData2.push({ x: date[i], y: (parseInt(data1[i])+2) })
+            heatData3.push({ x: date[i], y: data2[i] })
+          };
           this.series1 = [
             {
               name: '설정온도',
@@ -322,24 +341,31 @@ export default {
               name: '현재실내온도',
               data: data5
             }
-          ]
+          ];
           this.series2 = [
             {
-              name: '방상태',
-              data: data0
+              name: '난방가동상태',
+              id: 'a3',
+              group: 'social',
+              data: heatData3
             },
             {
               name: '난방설정상태',
-              data: data1
+              id: 'a2',
+              group: 'social',
+              data: heatData2
             },
             {
-              name: '난방가동상태',
-              data: data2
+              name: '재실정보',
+              id: 'a3',
+              group: 'social',
+              data: heatData1
             }
-          ]
+          ];
           this.chartOptionsLine1 = {
             chart: {
-              id: 'fb',
+              id: 'ch3',
+              type: 'line',
               width: '100%',
               group: 'social',
               toolbar: {
@@ -357,20 +383,106 @@ export default {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
+            },
+            stroke: {
+              show: true,
+              curve: 'smooth',
+              lineCap: 'butt',
+              width: 3,
+              //dashArray: [0,10],
+            },
+            yaxis: {
+              tickAmount: 3
             }
-          }
+          };
           this.chartOptionsLine2 = {
             chart: {
-              id: 'tw',
+              id: 'ch4',
+              type: 'heatmap',
               width: '100%',
               group: 'social',
               toolbar: {
                 show: false
+              },
+              animations: {
+                enabled: false
               }
+            },
+            stroke: {
+              show: false,
+              curve: 'straight',
+              lineCap: 'square',
+              height: 0,
+              width: 0,
+              style: {
+                color: '#777',
+                padding: {
+                  left: 0,
+                  right: 0,
+                  top: 2,
+                  bottom: 2
+                }
+              }
+            },
+            plotOptions: {
+              heatmap: {
+                radius: 0,
+                enableShades: false,
+                shadeIntensity: 1,
+                reverseNegativeShade: true,
+                distributed: true,
+                colorScale: {
+                  ranges: [{
+                      from: 1,
+                      to: 1,
+                      name: '설정',
+                      color: '#E53935'
+                    },
+                    {
+                      from: 0,
+                      to: 0,
+                      name: '해제&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;',
+                      color: '#ECEFF1'
+                    },
+                    {
+                      from: 3,
+                      to: 3,
+                      name: '가동',
+                      color: '#EC407A'
+                    },
+                    {
+                      from: 2,
+                      to: 2,
+                      name: '중지&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;',
+                      color: '#ECEFF1'
+                    },
+                    {
+                      from: 6,
+                      to: 6,
+                      name: '재실',
+                      color: '#8E24AA'
+                    },
+                    {
+                      from:5,
+                      to: 5,
+                      name: '예비',
+                      color: '#CE93D8'
+                    },
+                    {
+                      from: 4,
+                      to: 4,
+                      name: '공실',
+                      color: '#ECEFF1'
+                    }
+                  ]
+                }
+              }
+            },
+            dataLabels: {
+              enabled: false
             },
             xaxis: {
               type: 'datetime',
-              categories: date,
               labels: {
                 show: true,
                 rotate: 0,
@@ -379,8 +491,25 @@ export default {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
+            },
+            stroke: {
+              show: true,
+              curve: 'smooth',
+              lineCap: 'butt',
+              width: 0,
+              //dashArray: [0,10],
+            },
+            yaxis: {
+              tickAmount: 3
+            },
+            stroke: {
+              show: true,
+              curve: 'smooth',
+              lineCap: 'butt',
+              width: 0,
+              //dashArray: [0,10],
             }
-          }
+          };
           this.searchloading = false
           this.loading = false
         })
