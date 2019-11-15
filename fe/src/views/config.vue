@@ -629,31 +629,31 @@
                     <tr v-for="(item, index) in damperSchsConfig.tSch" :key="item.idx" class="ma-0 pa-0">
                       <td class="text-center black--text font-weight-bold body-2 config-column ma-0 pa-0">{{ index+1 }}</td>
                       <td class="text-center ma-0 pa-0 config-column">
-                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.Hour"></v-text-field>
+                        <v-text-field class="centered-input font-weight-bold body-2 config-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.Hour"></v-text-field>
                       </td>
                       <td class="text-center ma-0 pa-0 config-column">
-                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.Min"></v-text-field>
+                        <v-text-field class="centered-input font-weight-bold body-2 config-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.Min"></v-text-field>
                       </td>
                       <td class="text-center ma-0 pa-0 config-column">
-                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.DamperAM"></v-text-field>
+                        <v-text-field class="centered-input font-weight-bold body-2 config-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.DamperAM"></v-text-field>
                       </td>
                       <td class="text-center ma-0 pa-0 config-column">
-                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.DamperRun"></v-text-field>
+                        <v-text-field class="centered-input font-weight-bold body-2 config-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.DamperRun"></v-text-field>
                       </td>
                       <td class="text-center ma-0 pa-0 config-column">
-                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.DamperRatio"></v-text-field>
+                        <v-text-field class="centered-input font-weight-bold body-2 config-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.DamperRatio"></v-text-field>
                       </td>
                       <td class="text-center ma-0 pa-0 config-column">
-                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.FanAM"></v-text-field>
+                        <v-text-field class="centered-input font-weight-bold body-2 config-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.FanAM"></v-text-field>
                       </td>
                       <td class="text-center ma-0 pa-0 config-column">
-                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.FanRun"></v-text-field>
+                        <v-text-field class="centered-input font-weight-bold body-2 config-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.FanRun"></v-text-field>
                       </td>
                       <td class="text-center ma-0 pa-0 config-column">
-                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.Tset"></v-text-field>
+                        <v-text-field class="centered-input font-weight-bold body-2 config-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.Tset"></v-text-field>
                       </td>
                       <td class="text-center ma-0 pa-0 config-column">
-                        <v-text-field class="centered-input font-weight-bold body-2 config-column-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.Economizer"></v-text-field>
+                        <v-text-field class="centered-input font-weight-bold body-2 config-margin ma-0 pa-0 mt-n1 mb-n5" v-model="item.Economizer"></v-text-field>
                       </td>
                     </tr>
                   </tbody>
@@ -683,7 +683,7 @@
   font-weight: bold;
   border-right: 1px solid lightgrey;
 }
-.config-column-margin {
+.config-margin {
   margin: -4px 0px -30px 0px;
 }
 .right-border {

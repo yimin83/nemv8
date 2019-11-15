@@ -100,12 +100,6 @@
   font-weight: bold;
   border-right: 1px solid lightgrey;
 }
-.v-select__selection {
-    width: 100%;
-    text-align-last: center;
-    justify-content: center;
-    margin-left: 0px;
-}
 .config-column-margin {
   margin: -4px 0px -24px 0px;
 }

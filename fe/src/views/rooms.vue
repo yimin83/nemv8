@@ -529,7 +529,7 @@
                     :items="this.roomHeatingModes"
                     item-value="value"
                     item-text="name"
-                    style="max-width:65px"
+                    style="max-width:75px "
                     hide-details
                     class="pa-0 font-weight-bold black--text body-2 roomSel"
                   ></v-select>
@@ -895,11 +895,6 @@
     </v-dialog>
   </v-container>
 </template>
-<style>
-.roomSel .v-select__selection{
-    text-align-last: center;
-}
-</style>
 <script>
 import axios from 'axios'
 Apex = {

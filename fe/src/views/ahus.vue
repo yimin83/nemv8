@@ -134,9 +134,6 @@
 .centered-input input {
   text-align: center
 }
-.centered-select select {
-  text-align: center
-}
 .right-border {
   border-right: 1px solid lightgrey;
 }
