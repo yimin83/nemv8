@@ -149,18 +149,6 @@
 </style>
 <script>
 import axios from 'axios'
-Apex = {
-  stroke: {
-    show: true,
-    curve: 'smooth',
-    lineCap: 'butt',
-    width: 3,
-    //dashArray: [0,10],
-  },
-  yaxis: {
-    tickAmount: 3
-  }
-}
 export default {
   created () {
     this.getAhus()
@@ -197,8 +185,8 @@ export default {
       pSize: 0,
       phSize: 0,
       curAhuNo: 0,
-      startTime: this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY/MM/DD kk:mm'),
-      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD kk:mm'),
+      startTime: this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY/MM/DD HH:mm'),
+      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD HH:mm'),
       searchloading: false,
       loading: false,
       graphTitle1: '온도 정보',
@@ -422,6 +410,9 @@ export default {
               group: 'social',
               toolbar: {
                 show: false
+              },
+              animations: {
+                enabled: false
               }
             },
             xaxis: {
@@ -444,6 +435,9 @@ export default {
               group: 'social',
               toolbar: {
                 show: false
+              },
+              animations: {
+                enabled: false
               }
             },
             xaxis: {
@@ -466,6 +460,9 @@ export default {
               group: 'social',
               toolbar: {
                 show: false
+              },
+              animations: {
+                enabled: false
               }
             },
             xaxis: {

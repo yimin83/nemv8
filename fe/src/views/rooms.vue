@@ -476,7 +476,7 @@
                 >
                 {{graphTitle1}}
                 </v-chip>
-                <apexchart type=line height=400 :options="chartOptionsLine1" :series="series1" />
+                <apexchart type='line' height='400' :options='this.chartOptionsLine1' :series='this.series1'/>
               </div>
               <div class="ma-0 pa-0 mb-n3">
                 <v-chip
@@ -487,7 +487,7 @@
                 >
                 {{graphTitle2}}
                 </v-chip>
-                <apexchart type=line height=160 :options="chartOptionsLine2" :series="series2" />
+                <apexchart type='heatmap' height='160' :options='this.chartOptionsLine2' :series='this.series2'/>
               </div>
             </div>
           </div>
@@ -897,18 +897,6 @@
 </template>
 <script>
 import axios from 'axios'
-Apex = {
-  stroke: {
-    show: true,
-    curve: 'smooth',
-    lineCap: 'butt',
-    width: 3,
-    //dashArray: [0,10],
-  },
-  yaxis: {
-    tickAmount: 3
-  }
-}
 export default {
   created () {
     this.getRooms()
@@ -931,8 +919,8 @@ export default {
       settingRoomModal: false,
       time: { 'name': '10분', 'value': 600 },
       times: [{ 'name': '5분', 'value': 300 }, { 'name': '10분', 'value': 600 }, { 'name': '1시간', 'value': 3600 }, { 'name': '하루', 'value': (3600 * 24) }],
-      startTime: this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY/MM/DD kk:mm'),
-      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD kk:mm'),
+      startTime: this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY/MM/DD HH:mm'),
+      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD HH:mm'),
       bePriShow: false,
       beAll: false,
       settingTitle: '',
@@ -1010,6 +998,10 @@ export default {
           var data4 = []
           var data5 = []
           var date = []
+          this.series1 = [];
+          this.series2 = [];
+          this.chartOptionsLine1 = [];
+          this.chartOptionsLine2 = [];
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].ucRoomState !== null) {
               data0.push(this.datas[i].ucRoomState.toFixed(2))
@@ -1041,45 +1033,54 @@ export default {
             } else {
               data5.push(-1)
             }
-            // if(i === 0) alert(new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(0, 10) + ' ' + new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(11, 5))
-            // date.push(new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(0, 10) + ' ' + new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(11, 5) )
             date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
           }
+          for(var i = 0; i< date.length; i++){
+            heatData1.push({ x: date[i], y: (parseInt(data0[i])+4) })
+            heatData2.push({ x: date[i], y: (parseInt(data1[i])+2) })
+            heatData3.push({ x: date[i], y: data2[i] })
+          };
           this.series1 = [
             {
               name: '설정온도',
+              type: 'line',
               data: data3
             },
             {
               name: '현재바닥온도',
+              type: 'line',
               data: data4
             },
             {
               name: '현재실내온도',
+              type: 'line',
               data: data5
             }
-          ]
+          ];
           this.series2 = [
             {
-              name: '재실정보',
-              data: data0
+              name: '난방가동상태',
+              data: heatData3
             },
             {
               name: '난방설정상태',
-              data: data1
+              data: heatData2
             },
             {
-              name: '난방가동상태',
-              data: data2
+              name: '재실정보',
+              data: heatData1
             }
-          ]
+          ];
           this.chartOptionsLine1 = {
             chart: {
-              id: 'fb',
               width: '100%',
-              group: 'social',
+              id: 'lineCh1',
+              group: 'state',
               toolbar: {
                 show: false
+              },
+              animations: {
+                enabled: false
               }
             },
             xaxis: {
@@ -1093,16 +1094,82 @@ export default {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
+            },
+            stroke: {
+              width: 1,
+              //dashArray: [0,10],
             }
-          }
+          };
           this.chartOptionsLine2 = {
             chart: {
-              id: 'tw',
               width: '100%',
-              group: 'social',
+              id: 'heatCh2',
+              group: 'state',
               toolbar: {
                 show: false
+              },
+              animations: {
+                enabled: false
               }
+            },
+            stroke: {
+              width: 1,
+              //dashArray: [0,10],
+            },
+            plotOptions: {
+              heatmap: {
+                radius: 0,
+                enableShades: false,
+                shadeIntensity: 0,
+                colorScale: {
+                  ranges: [{
+                      from: 1,
+                      to: 1,
+                      name: '설정',
+                      color: '#E53935'
+                    },
+                    {
+                      from: 0,
+                      to: 0,
+                      name: '해제&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;',
+                      color: '#ECEFF1'
+                    },
+                    {
+                      from: 3,
+                      to: 3,
+                      name: '가동',
+                      color: '#EC407A'
+                    },
+                    {
+                      from: 2,
+                      to: 2,
+                      name: '중지&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;',
+                      color: '#ECEFF1'
+                    },
+                    {
+                      from: 6,
+                      to: 6,
+                      name: '재실',
+                      color: '#8E24AA'
+                    },
+                    {
+                      from:5,
+                      to: 5,
+                      name: '예비',
+                      color: '#CE93D8'
+                    },
+                    {
+                      from: 4,
+                      to: 4,
+                      name: '공실',
+                      color: '#ECEFF1'
+                    }
+                  ]
+                }
+              }
+            },
+            dataLabels: {
+              enabled: false
             },
             xaxis: {
               type: 'datetime',
@@ -1116,7 +1183,9 @@ export default {
                 }
               }
             }
-          }
+          };
+          this.searchloading = false
+          this.loading = false
         })
         .catch((e) => {
           alert(e.message)
@@ -1137,6 +1206,13 @@ export default {
           var data4 = []
           var data5 = []
           var date = []
+          var heatData1 = []
+          var heatData2 = []
+          var heatData3 = []
+          this.series1 = [];
+          this.series2 = [];
+          this.chartOptionsLine1 = [];
+          this.chartOptionsLine2 = [];
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].ucRoomState !== null) {
               data0.push(this.datas[i].ucRoomState.toFixed(2))
@@ -1172,38 +1248,53 @@ export default {
             // date.push(new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(0, 10) + ' ' + new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(11, 5) )
             date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
           }
+          for(var i = 0; i< date.length; i++){
+            heatData1.push({ x: date[i], y: (parseInt(data0[i])+4) })
+            heatData2.push({ x: date[i], y: (parseInt(data1[i])+2) })
+            heatData3.push({ x: date[i], y: data2[i] })
+          };
           this.series1 = [
             {
               name: '설정온도',
+              type: 'line',
               data: data3
             },
             {
               name: '현재바닥온도',
+              type: 'line',
               data: data4
             },
             {
               name: '현재실내온도',
+              type: 'line',
               data: data5
             }
-          ]
+          ];
           this.series2 = [
             {
-              name: '재실정보',
-              data: data0
+              name: '난방가동상태',
+              data: heatData3
             },
             {
               name: '난방설정상태',
-              data: data1
+              data: heatData2
             },
             {
-              name: '난방가동상태',
-              data: data2
+              name: '재실정보',
+              data: heatData1
             }
-          ]
+          ];
           this.chartOptionsLine1 = {
             chart: {
-              id: 'fb',
-              group: 'social'
+              width: '100%',
+              id: 'lineCh1',
+              group: 'state',
+              toolbar: {
+                show: false
+              },
+              animations: {
+                enabled: false
+              }
             },
             xaxis: {
               type: 'datetime',
@@ -1216,12 +1307,82 @@ export default {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
+            },
+            stroke: {
+              width: 1,
+              //dashArray: [0,10],
             }
-          }
+          };
           this.chartOptionsLine2 = {
             chart: {
-              id: 'tw',
-              group: 'social'
+              width: '100%',
+              id: 'heatCh2',
+              group: 'state',
+              toolbar: {
+                show: false
+              },
+              animations: {
+                enabled: false
+              }
+            },
+            stroke: {
+              width: 1,
+              //dashArray: [0,10],
+            },
+            plotOptions: {
+              heatmap: {
+                radius: 0,
+                enableShades: false,
+                shadeIntensity: 0,
+                colorScale: {
+                  ranges: [{
+                      from: 1,
+                      to: 1,
+                      name: '설정',
+                      color: '#E53935'
+                    },
+                    {
+                      from: 0,
+                      to: 0,
+                      name: '해제&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;',
+                      color: '#ECEFF1'
+                    },
+                    {
+                      from: 3,
+                      to: 3,
+                      name: '가동',
+                      color: '#EC407A'
+                    },
+                    {
+                      from: 2,
+                      to: 2,
+                      name: '중지&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;',
+                      color: '#ECEFF1'
+                    },
+                    {
+                      from: 6,
+                      to: 6,
+                      name: '재실',
+                      color: '#8E24AA'
+                    },
+                    {
+                      from:5,
+                      to: 5,
+                      name: '예비',
+                      color: '#CE93D8'
+                    },
+                    {
+                      from: 4,
+                      to: 4,
+                      name: '공실',
+                      color: '#ECEFF1'
+                    }
+                  ]
+                }
+              }
+            },
+            dataLabels: {
+              enabled: false
             },
             xaxis: {
               type: 'datetime',
@@ -1235,7 +1396,7 @@ export default {
                 }
               }
             }
-          }
+          };
           this.searchloading = false
           this.loading = false
           this.roomGraphModal = true
@@ -1325,13 +1486,13 @@ export default {
           this.trnTroom_cur = (this.roomStat.Troom_cur >= 255 || this.roomStat.Troom_cur === -1) ? ' - ' : this.roomStat.Troom_cur
           this.trnCheckInTime = this.$moment(new Date(this.roomStat.CheckInTime * 1000).toISOString()).format('MM/DD/HH')
           this.trnCheckOutTime = this.$moment(new Date(this.roomStat.CheckOutTime * 1000).toISOString()).format('MM/DD/HH')
-          this.trnMH_StartTime = this.roomStat.MH_StartTime !== 0 ? this.$moment(new Date(this.roomStat.MH_StartTime * 1000).toISOString()).format('YYYY/MM/DD kk') : '00/00/00 00'
-          this.trnMH_EndTime = this.roomStat.MH_EndTime !== 0 ? this.$moment(new Date(this.roomStat.MH_EndTime * 1000).toISOString()).format('YYYY/MM/DD kk') : '00/00/00 00'
-          this.trnLastControlTime = this.roomStat.LastControlTime !== 0 ? this.$moment(new Date(this.roomStat.LastControlTime * 1000).toISOString()).format('YYYY/MM/DD kk:mm:ss') : '00/00/00 00:00:00'
+          this.trnMH_StartTime = this.roomStat.MH_StartTime !== 0 ? this.$moment(new Date(this.roomStat.MH_StartTime * 1000).toISOString()).format('YYYY/MM/DD HH') : '00/00/00 00'
+          this.trnMH_EndTime = this.roomStat.MH_EndTime !== 0 ? this.$moment(new Date(this.roomStat.MH_EndTime * 1000).toISOString()).format('YYYY/MM/DD HH') : '00/00/00 00'
+          this.trnLastControlTime = this.roomStat.LastControlTime !== 0 ? this.$moment(new Date(this.roomStat.LastControlTime * 1000).toISOString()).format('YYYY/MM/DD HH:mm:ss') : '00/00/00 00:00:00'
           var hour = parseInt(this.roomStat.MH_HeatingLeftTime / 60 / 60)
           var min = parseInt((this.roomStat.MH_HeatingLeftTime - (hour * 60 * 60)) / 60)
           this.trnMH_HeatingLeftTime = hour + '시간 ' + min + '분'
-          this.trnPreHeatingStartTime = this.roomStat.PreHeatingStartTime !== 0 ? this.$moment(new Date(this.roomStat.PreHeatingStartTime * 1000).toISOString()).format('YYYY/MM/DD kk') : '00/00/00 00'
+          this.trnPreHeatingStartTime = this.roomStat.PreHeatingStartTime !== 0 ? this.$moment(new Date(this.roomStat.PreHeatingStartTime * 1000).toISOString()).format('YYYY/MM/DD HH') : '00/00/00 00'
           this.trnMH_HeatingTimeSec = this.roomStat.MH_HeatingTimeSec !== 0 ? (this.roomStat.MH_HeatingTimeSec / 60 / 60) : this.roomStat.MH_HeatingTimeSec
           this.trnMH_HeatingTimeHour = parseInt(this.roomStat.MH_HeatingTimeSec / 60 / 60)
           this.trnMH_HeatingTimeMin = parseInt((this.roomStat.MH_HeatingTimeSec - (this.trnMH_HeatingTimeHour * 60 * 60)) / 60)

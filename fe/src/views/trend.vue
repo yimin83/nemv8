@@ -6,7 +6,7 @@
         grow
         dark
         color="white"
-        @change="changGraph()"
+        @change="changeGraph()"
       >
         <v-btn @click="activeBtn = 0">
           <span>객실 상태 그래프</span>
@@ -52,27 +52,51 @@
           </v-col>
         </v-row>
         <div>
-          <div class="ma-0 pa-0 mb-n3">
+          <div id="chart1" v-if="this.activeBtn === 0" class="ma-0 pa-0 mb-n3">
             <v-chip
               class="ma-0 ml-5 mb-n3"
               color="orange"
               label
               outlined
             >
-            {{graphTitle1}}
+            {{this.graphTitle1}}
             </v-chip>
-            <apexchart width='1300px' height='400px' :options="chartOptionsLine1" :series="series1" />
+            <apexchart type='line' width='1300px' height='400px' :options="this.chartOptionsLine1" :series="this.series1" />
           </div>
-          <div class="ma-0 pa-0 mb-n3">
+          <div id="chart2" v-if="this.activeBtn === 0" class="ma-0 pa-0 mb-n3">
             <v-chip
               class="ma-0 ml-5 mb-n3"
               color="orange"
               label
               outlined
             >
-            {{graphTitle2}}
+            {{this.graphTitle2}}
             </v-chip>
-            <apexchart width='1300px' height='160px' :options="chartOptionsLine2" :series="series2" />
+            <apexchart type='heatmap' width='1300px' height='160px' :options="this.chartOptionsLine2" :series="this.series2" />
+          </div>
+        </div>
+        <div>
+          <div id="chart3" v-if="this.activeBtn === 1" class="ma-0 pa-0 mb-n3">
+            <v-chip
+              class="ma-0 ml-5 mb-n3"
+              color="orange"
+              label
+              outlined
+            >
+            {{this.graphTitle1}}
+            </v-chip>
+            <apexchart type='line' width='1300px' height='400px' :options="this.chartOptionsLine3" :series="this.series3" />
+          </div>
+          <div id="chart4" v-if="this.activeBtn === 1" class="ma-0 pa-0 mb-n3">
+            <v-chip
+              class="ma-0 ml-5 mb-n3"
+              color="orange"
+              label
+              outlined
+            >
+            {{this.graphTitle2}}
+            </v-chip>
+            <apexchart type='line' width='1300px' height='160px' :options="this.chartOptionsLine4" :series="this.series4" />
           </div>
         </div>
       </div>
@@ -84,25 +108,28 @@ import axios from 'axios'
 export default {
   mounted () {
     this.getRooms()
-    // this.changGraph()
   },
-  name: 'LineExample',
   data: function () {
     return {
       activeBtn: 0,
       time: { 'name': '10분', 'value': 600 },
       times: [{ 'name': '5분', 'value': 300 }, { 'name': '10분', 'value': 600 }, { 'name': '1시간', 'value': 3600 }, { 'name': '하루', 'value': (3600 * 24) }],
-      datas: [],
+      statDatas: [],
+      trandDatas: [],
       series1: [],
       chartOptionsLine1: [],
       series2: [],
       chartOptionsLine2: [],
+      series3: [],
+      chartOptionsLine3: [],
+      series4: [],
+      chartOptionsLine4: [],
       pSize: 0,
       phSize: 0,
       roomNos: [],
       roomNo: 201,
-      startTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 00:00'),
-      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 23:59'),
+      startTime: this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY/MM/DD HH:mm'),
+      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD HH:mm'),
       searchloading: false,
       loading: false,
       graphTitle1: '온도 정보',
@@ -110,7 +137,11 @@ export default {
     }
   },
   methods: {
-    changGraph () {
+    changeGraph () {
+      this.time = { 'name': '10분', 'value': 600 }
+      this.roomNo = 201
+      this.startTime = this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY/MM/DD HH:mm')
+      this.endTime = this.$moment(new Date().toISOString()).format('YYYY/MM/DD HH:mm')
       if (this.activeBtn === 0) {
         this.getTrend(this.roomNo)
       } else {
@@ -130,7 +161,13 @@ export default {
       // axios.put(`http://localhost:3000/api/rooms/roomStatTrend`, { startTime: this.startTime, endTime: this.endTime, time: this.time.value })
       axios.put(`${this.$apiRootPath}rooms/roomStatTrend`, { startTime: this.startTime, endTime: this.endTime, time: this.time.value })
         .then((r) => {
-          this.datas = r.data
+          this.trandDatas = []
+          this.statDatas = []
+          this.series3 = [];
+          this.series4 = [];
+          this.chartOptionsLine3 = [];
+          this.chartOptionsLine4 = [];
+          this.statDatas = r.data
           var data0 = []
           var data1 = []
           var data2 = []
@@ -139,39 +176,35 @@ export default {
           var date = []
           this.graphTitle1 = '온도 정보'
           this.graphTitle2 = '난방 정보'
-          for (var i = 0; i < this.datas.length; i++) {
-            if (this.datas[i].HeatingCnt !== null) {
-              data0.push(this.datas[i].HeatingCnt.toFixed(2))
+          for (var i = 0; i < this.statDatas.length; i++) {
+            if (this.statDatas[i].HeatingCnt !== null) {
+              data0.push(this.statDatas[i].HeatingCnt.toFixed(2))
             } else {
               data0.push(-1)
             }
-            if (this.datas[i].HeatingRoomCnt !== null) {
-              data1.push(this.datas[i].HeatingRoomCnt.toFixed(2))
+            if (this.statDatas[i].HeatingRoomCnt !== null) {
+              data1.push(this.statDatas[i].HeatingRoomCnt.toFixed(2))
             } else {
               data1.push(-1)
             }
-            if (this.datas[i].Tsurf_avg < 50) {
-              (this.datas[i].Tsurf_avg !== null) ? data2.push(this.datas[i].Tsurf_avg.toFixed(2)) : data2.push(-1)
+            if (this.statDatas[i].Tsurf_avg < 50) {
+              (this.statDatas[i].Tsurf_avg !== null) ? data2.push(this.statDatas[i].Tsurf_avg.toFixed(2)) : data2.push(-1)
             } else {
               data2.push(-1)
             }
-            if (this.datas[i].Troom_avg < 50) {
-              (this.datas[i].Troom_avg !== null) ? data3.push(this.datas[i].Troom_avg.toFixed(2)) : data3.push(-1)
+            if (this.statDatas[i].Troom_avg < 50) {
+              (this.statDatas[i].Troom_avg !== null) ? data3.push(this.statDatas[i].Troom_avg.toFixed(2)) : data3.push(-1)
             } else {
               data3.push(-1)
             }
-            if (this.datas[i].Tout < 50) {
-              (this.datas[i].Tout !== null) ? data4.push(this.datas[i].Tout.toFixed(2)) : data4.push(-1)
+            if (this.statDatas[i].Tout < 50) {
+              (this.statDatas[i].Tout !== null) ? data4.push(this.statDatas[i].Tout.toFixed(2)) : data4.push(-1)
             } else {
               data4.push(-1)
             }
-            date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
+            date.push(new Date((this.statDatas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
           }
-          this.series1 = [];
-          this.series2 = [];
-          this.chartOptionsLine1 = [];
-          this.chartOptionsLine2 = [];
-          this.series1 = [
+          this.series3 = [
             {
               name: '평균바닥온도',
               data: data2
@@ -185,24 +218,26 @@ export default {
               data: data4
             }
           ];
-          this.series2 = [
-            {
-              name: '난방 가동 수',
-              data: data0
-            },
+          this.series4 = [
             {
               name: '난방 설정 수',
               data: data1
+            },
+            {
+              name: '난방 가동 수',
+              data: data0
             }
           ];
-          this.chartOptionsLine1 = {
+          this.chartOptionsLine3 = {
             chart: {
-              type: 'line',
-              id: 'ch1',
+              id: 'statCh1',
+              group: 'stat',
               width: '100%',
-              group: 'social',
               toolbar: {
                 show: false
+              },
+              animations: {
+                enabled: false
               }
             },
             xaxis: {
@@ -228,15 +263,25 @@ export default {
               tickAmount: 3
             }
           };
-          this.chartOptionsLine2 = {
+          this.chartOptionsLine4 = {
             chart: {
-              id: 'ch2',
-              type: 'line',
+              id: 'statCh2',
+              group: 'stat',
               width: '100%',
-              group: 'social',
               toolbar: {
                 show: false
+              },
+              animations: {
+                enabled: false
               }
+            },
+            stroke: {
+              show: true,
+              curve: 'smooth',
+              lineCap: 'butt',
+              colors: [ "#259ffb", "#25e6a5"],
+              width: 3,
+              //dashArray: [0,10],
             },
             xaxis: {
               type: 'datetime',
@@ -249,13 +294,6 @@ export default {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
-            },
-            stroke: {
-              show: true,
-              curve: 'smooth',
-              lineCap: 'butt',
-              width: 3,
-              //dashArray: [0,10],
             },
             yaxis: {
               tickAmount: 3
@@ -268,15 +306,18 @@ export default {
           alert(e.message)
           console.error(e.message)
         })
-    },getTrend (usRoomNo) {
-      this.series1 = [];
-      this.series2 = [];
-      this.chartOptionsLine1 = [];
-      this.chartOptionsLine2 = [];
+    },
+    getTrend (usRoomNo) {
       // axios.put(`http://localhost:3000/api/rooms/getRoomTrend`, { usRoomNo: usRoomNo, startTime: this.startTime, endTime: this.endTime, time: this.time.value })
       axios.put(`${this.$apiRootPath}rooms/getRoomTrend`, { usRoomNo: usRoomNo, startTime: this.startTime, endTime: this.endTime, time: this.time.value })
         .then((r) => {
-          this.datas = r.data
+          this.trandDatas = []
+          this.trandDatas = r.data
+          this.statDatas = []
+          this.series1 = [];
+          this.series2 = [];
+          this.chartOptionsLine1 = [];
+          this.chartOptionsLine2 = [];
           var data0 = []
           var data1 = []
           var data2 = []
@@ -290,38 +331,38 @@ export default {
           this.graphTitle1 = '온도 정보'
           this.graphTitle2 = '상태 정보'
           // this.graphTitle4 = '상태 정보'
-          for (var i = 0; i < this.datas.length; i++) {
-            if (this.datas[i].ucRoomState !== null) {
-              data0.push(this.datas[i].ucRoomState.toFixed(2))
+          for (var i = 0; i < this.trandDatas.length; i++) {
+            if (this.trandDatas[i].ucRoomState !== null) {
+              data0.push(this.trandDatas[i].ucRoomState.toFixed(2))
             } else {
               data0.push(-1)
             }
-            if (this.datas[i].ucSetStatus !== null) {
-              data1.push(this.datas[i].ucSetStatus.toFixed(2))
+            if (this.trandDatas[i].ucSetStatus !== null) {
+              data1.push(this.trandDatas[i].ucSetStatus.toFixed(2))
             } else {
               data1.push(-1)
             }
-            if (this.datas[i].ucCurStatus !== null) {
-              data2.push(this.datas[i].ucCurStatus.toFixed(2))
+            if (this.trandDatas[i].ucCurStatus !== null) {
+              data2.push(this.trandDatas[i].ucCurStatus.toFixed(2))
             } else {
               data2.push(-1)
             }
-            if (this.datas[i].fTset !== null && this.datas[i].fTset < 50) {
-              data3.push((this.datas[i].fTset).toFixed(2))
+            if (this.trandDatas[i].fTset !== null && this.trandDatas[i].fTset < 50) {
+              data3.push((this.trandDatas[i].fTset).toFixed(2))
             } else {
               data3.push(-1)
             }
-            if (this.datas[i].fTsurf_cur !== null && this.datas[i].fTsurf_cur < 50) {
-              data4.push((this.datas[i].fTsurf_cur).toFixed(2))
+            if (this.trandDatas[i].fTsurf_cur !== null && this.trandDatas[i].fTsurf_cur < 50) {
+              data4.push((this.trandDatas[i].fTsurf_cur).toFixed(2))
             } else {
               data4.push(-1)
             }
-            if (this.datas[i].fTroom_cur !== null && this.datas[i].fTroom_cur < 50) {
-              data5.push((this.datas[i].fTroom_cur).toFixed(2))
+            if (this.trandDatas[i].fTroom_cur !== null && this.trandDatas[i].fTroom_cur < 50) {
+              data5.push((this.trandDatas[i].fTroom_cur).toFixed(2))
             } else {
               data5.push(-1)
             }
-            date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
+            date.push(new Date((this.trandDatas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
           }
           for(var i = 0; i< date.length; i++){
             heatData1.push({ x: date[i], y: (parseInt(data0[i])+4) })
@@ -331,45 +372,44 @@ export default {
           this.series1 = [
             {
               name: '설정온도',
+              type: 'line',
               data: data3
             },
             {
               name: '현재바닥온도',
+              type: 'line',
               data: data4
             },
             {
               name: '현재실내온도',
+              type: 'line',
               data: data5
             }
           ];
           this.series2 = [
             {
               name: '난방가동상태',
-              id: 'a3',
-              group: 'social',
               data: heatData3
             },
             {
               name: '난방설정상태',
-              id: 'a2',
-              group: 'social',
               data: heatData2
             },
             {
               name: '재실정보',
-              id: 'a3',
-              group: 'social',
               data: heatData1
             }
           ];
           this.chartOptionsLine1 = {
             chart: {
-              id: 'ch3',
-              type: 'line',
               width: '100%',
-              group: 'social',
+              id: 'lineCh1',
+              group: 'trend',
               toolbar: {
                 show: false
+              },
+              animations: {
+                enabled: false
               }
             },
             xaxis: {
@@ -385,22 +425,15 @@ export default {
               }
             },
             stroke: {
-              show: true,
-              curve: 'smooth',
-              lineCap: 'butt',
-              width: 3,
+              width: 1,
               //dashArray: [0,10],
-            },
-            yaxis: {
-              tickAmount: 3
             }
           };
           this.chartOptionsLine2 = {
             chart: {
-              id: 'ch4',
-              type: 'heatmap',
               width: '100%',
-              group: 'social',
+              id: 'trendCh2',
+              group: 'trend',
               toolbar: {
                 show: false
               },
@@ -409,28 +442,14 @@ export default {
               }
             },
             stroke: {
-              show: false,
-              curve: 'straight',
-              lineCap: 'square',
-              height: 0,
-              width: 0,
-              style: {
-                color: '#777',
-                padding: {
-                  left: 0,
-                  right: 0,
-                  top: 2,
-                  bottom: 2
-                }
-              }
+              width: 1,
+              //dashArray: [0,10],
             },
             plotOptions: {
               heatmap: {
                 radius: 0,
                 enableShades: false,
-                shadeIntensity: 1,
-                reverseNegativeShade: true,
-                distributed: true,
+                shadeIntensity: 0,
                 colorScale: {
                   ranges: [{
                       from: 1,
@@ -483,6 +502,7 @@ export default {
             },
             xaxis: {
               type: 'datetime',
+              categories: date,
               labels: {
                 show: true,
                 rotate: 0,
@@ -491,23 +511,6 @@ export default {
                   return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
                 }
               }
-            },
-            stroke: {
-              show: true,
-              curve: 'smooth',
-              lineCap: 'butt',
-              width: 0,
-              //dashArray: [0,10],
-            },
-            yaxis: {
-              tickAmount: 3
-            },
-            stroke: {
-              show: true,
-              curve: 'smooth',
-              lineCap: 'butt',
-              width: 0,
-              //dashArray: [0,10],
             }
           };
           this.searchloading = false
@@ -533,20 +536,6 @@ export default {
           alert(e.message)
           console.error(e.message)
         })
-    },
-    toggleRoomNos: function () {
-      if (this.activeBtn === 0) {
-        this.getTrend(this.roomNo)
-      } else {
-        this.getStatTrend()
-      }
-    },
-    toggleTimes: function () {
-      if (this.activeBtn === 0) {
-        this.getTrend(this.roomNo)
-      } else {
-        this.getStatTrend()
-      }
     }
   }
 }

@@ -6,7 +6,7 @@
         grow
         dark
         color="white"
-        @change="changGraph()"
+        @change="changeGraph()"
       >
         <v-btn @click="activeBtn = 0">
           <span>공조기 상태 그래프</span>
@@ -52,17 +52,6 @@
         <div>
           <div class="ma-0 pa-0 mb-n3">
             <v-chip
-              class="ma-0 ml-5 mb-n3"
-              color="orange"
-              label
-              outlined
-            >
-            {{graphTitle2}}
-            </v-chip>
-            <apexchart type=line height=200 width='1300' :options="chartOptionsLine2" :series="series2" />
-          </div>
-          <div class="ma-0 pa-0 mb-n3">
-            <v-chip
               class="ma-0 ml-5 mb-n5"
               color="orange"
               label
@@ -71,6 +60,17 @@
             {{graphTitle1}}
             </v-chip>
             <apexchart type=line height=300 width='1300' :options="chartOptionsLine1" :series="series1" />
+          </div>
+          <div class="ma-0 pa-0 mb-n3">
+            <v-chip
+              class="ma-0 ml-5 mb-n3"
+              color="orange"
+              label
+              outlined
+            >
+            {{graphTitle2}}
+            </v-chip>
+            <apexchart type=line height=200 width='1300' :options="chartOptionsLine2" :series="series2" />
           </div>
           <div class="ma-0 pa-0 mb-n3">
             <v-chip
@@ -115,18 +115,6 @@
 </style>
 <script>
 import axios from 'axios'
-Apex = {
-  stroke: {
-    show: true,
-    curve: 'smooth',
-    lineCap: 'butt',
-    width: 3,
-    //dashArray: [0,10],
-  },
-  yaxis: {
-    tickAmount: 3
-  }
-}
 export default {
   mounted () {
     this.getAhus()
@@ -150,8 +138,8 @@ export default {
       chartOptionsLine3: [],
       pSize: 0,
       phSize: 0,
-      startTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 00:00'),
-      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD 23:59'),
+      startTime: this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY/MM/DD HH:mm'),
+      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD HH:mm'),
       searchloading: false,
       loading: false,
       graphTitle1: '온도 정보',
@@ -160,7 +148,11 @@ export default {
     }
   },
   methods: {
-    changGraph () {
+    changeGraph () {
+      this.time = { 'name': '10분', 'value': 600 }
+      this.ahuNo = { 'name': '그라시아스(AHU1)', 'value': 1 }
+      this.startTime = this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY/MM/DD HH:mm')
+      this.endTime = this.$moment(new Date().toISOString()).format('YYYY/MM/DD HH:mm')
       if (this.activeBtn === 0) {
         this.getAhuTrend()
       } else {
@@ -300,13 +292,13 @@ export default {
             {
               name: 'CO2',
               data: data6
-            }
-          ]
-          this.series3 = [
+            },
             {
               name: '댐퍼설정값',
               data: data0
-            },
+            }
+          ]
+          this.series3 = [
             {
               name: '공급팬상태',
               data: data3
@@ -335,8 +327,16 @@ export default {
               group: 'social',
               toolbar: {
                 show: false
+              },
+              animations: {
+                enabled: false
               }
             },
+            stroke: {
+              width: 1,
+              //dashArray: [0,10],
+            },
+            yaxis: {},
             xaxis: {
               type: 'datetime',
               categories: date,
@@ -354,11 +354,23 @@ export default {
             chart: {
               id: 'chartOpt2',
               width: '100%',
-              group: 'social',
               toolbar: {
                 show: false
+              },
+              animations: {
+                enabled: false
               }
             },
+            stroke: {
+              width: 1,
+              //dashArray: [0,10],
+            },
+            yaxis: [{
+              },
+              {
+                opposite: true,
+              },
+            ],
             xaxis: {
               type: 'datetime',
               categories: date,
@@ -379,8 +391,16 @@ export default {
               group: 'social',
               toolbar: {
                 show: false
+              },
+              animations: {
+                enabled: false
               }
             },
+            stroke: {
+              width: 1,
+              //dashArray: [0,10],
+            },
+            yaxis: {},
             xaxis: {
               type: 'datetime',
               categories: date,
@@ -432,7 +452,7 @@ export default {
               data1.push(-1)
             }
             if (this.datas[i].Rdamp !== null) {
-              data2.push((this.datas[i].Rdamp / 100).toFixed(2))
+              data2.push(this.datas[i].Rdamp.toFixed(2))
             } else {
               data2.push(-1)
             }
@@ -463,6 +483,10 @@ export default {
             {
               name: 'CO2',
               data: data3
+            },
+            {
+              name: '댐퍼설정값',
+              data: data2
             }
           ]
           this.series3 = [
@@ -477,10 +501,6 @@ export default {
             {
               name: '환기 수',
               data: data5
-            },
-            {
-              name: '댐퍼설정값',
-              data: data2
             }
           ]
           this.chartOptionsLine1 = {
@@ -490,8 +510,16 @@ export default {
               group: 'social',
               toolbar: {
                 show: false
+              },
+              animations: {
+                enabled: false
               }
             },
+            stroke: {
+              width: 1,
+              //dashArray: [0,10],
+            },
+            yaxis: {},
             xaxis: {
               type: 'datetime',
               categories: date,
@@ -509,11 +537,23 @@ export default {
             chart: {
               id: 'chartOpt5',
               width: '100%',
-              group: 'social',
               toolbar: {
                 show: false
+              },
+              animations: {
+                enabled: false
               }
             },
+            stroke: {
+              width: 1,
+              //dashArray: [0,10],
+            },
+            yaxis: [{
+              },
+              {
+                opposite: true,
+              },
+            ],
             xaxis: {
               type: 'datetime',
               categories: date,
@@ -534,8 +574,16 @@ export default {
               group: 'social',
               toolbar: {
                 show: false
+              },
+              animations: {
+                enabled: false
               }
             },
+            stroke: {
+              width: 1,
+              //dashArray: [0,10],
+            },
+            yaxis: {},
             xaxis: {
               type: 'datetime',
               categories: date,
