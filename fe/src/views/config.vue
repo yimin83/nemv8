@@ -156,6 +156,10 @@
                                 <v-list-item-title>난방상태변화 최소시간(초):</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.MinStateChagneTimeSec"></v-text-field></v-list-item-title>
                               </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>온도증가통계 사용:</v-list-item-title>
+                                <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.CalTempInc"></v-text-field></v-list-item-title>
+                              </v-list-item>
                             </v-list>
                           </v-card>
                         </v-col>

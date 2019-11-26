@@ -31,6 +31,16 @@
               </v-list-tile-content>
             </v-list-item-title>
           </v-list-item>
+          <v-list-item
+            v-for="subitem in subItems"
+            :to="subitem.to"
+          >
+            <v-list-item-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>{{ subitem.title }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
         </v-list-item-group>
       </v-list>
     </v-navigation-drawer>
@@ -131,6 +141,7 @@ export default {
       timer: '',
       alram: {},
       items: [],
+      subItems: [],
       miniVariant: false,
       right: true,
       rightDrawer: false,
@@ -164,7 +175,29 @@ export default {
               {
                 icon: 'help',
                 title: '트랜드',
-                to: { path: '/trend' }
+                to: { path: '/roomTrend' }
+              }
+            ]
+            this.subItems = [
+              {
+                icon: 'help',
+                title: '객실상태그래프',
+                to: { path: '/roomTrend' }
+              },
+              {
+                icon: 'help',
+                title: '평균그래프',
+                to: { path: '/roomAvgTrend' }
+              },
+              {
+                icon: 'help',
+                title: '공조기상태그래프',
+                to: { path: '/ahuTrend' }
+              },
+              {
+                icon: 'help',
+                title: '평균그래프',
+                to: { path: '/ahuAvgTrend' }
               }
             ]
           } else {
@@ -186,8 +219,20 @@ export default {
               },
               {
                 icon: 'help',
-                title: '쏠트랜드',
-                to: { path: '/solTrend' }
+                title: '트랜드',
+                to: { path: '/ahuTrend' }
+              }
+            ]
+            this.subItems = [
+              {
+                icon: 'help',
+                title: '공조기상태그래프',
+                to: { path: '/ahuTrend' }
+              },
+              {
+                icon: 'help',
+                title: '평균그래프',
+                to: { path: '/ahuAvgTrend' }
               }
             ]
           }

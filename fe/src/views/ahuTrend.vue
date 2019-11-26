@@ -6,14 +6,8 @@
         grow
         dark
         color="white"
-        @change="changeGraph()"
       >
-        <v-btn @click="activeBtn = 0">
-          <span>공조기 상태 그래프</span>
-        </v-btn>
-        <v-btn @click="activeBtn = 1">
-          <span>평균 그래프</span>
-        </v-btn>
+      <span class="mt-3">공조기 상태 그래프</span>
       </v-bottom-navigation>
       <div>
         <v-row>
@@ -59,7 +53,7 @@
             >
             {{graphTitle1}}
             </v-chip>
-            <apexchart type=line height=300 width='1300' :options="chartOptionsLine1" :series="series1" />
+            <apexchart type=line width='1300px' height=300 :options="chartOptionsLine1" :series="series1" />
           </div>
           <div class="ma-0 pa-0 mb-n3">
             <v-chip
@@ -70,7 +64,7 @@
             >
             {{graphTitle2}}
             </v-chip>
-            <apexchart type=line height=200 width='1300' :options="chartOptionsLine2" :series="series2" />
+            <apexchart type=line width='1430px' height=200 :options="chartOptionsLine2" :series="series2" />
           </div>
           <div class="ma-0 pa-0 mb-n3">
             <v-chip
@@ -81,7 +75,7 @@
             >
             {{graphTitle3}}
             </v-chip>
-            <apexchart type=line height=200 width='1300' :options="chartOptionsLine3" :series="series3" />
+            <apexchart type=line width='1300px' height=200 class='ml-3' :options="chartOptionsLine3" :series="series3" />
           </div>
         </div>
       </div>
@@ -115,6 +109,18 @@
 </style>
 <script>
 import axios from 'axios'
+Apex = {
+  stroke: {
+    show: true,
+    curve: 'smooth',
+    lineCap: 'butt',
+    width: 3,
+    //dashArray: [0,10],
+  },
+  yaxis: {
+    tickAmount: 3
+  }
+}
 export default {
   mounted () {
     this.getAhus()
@@ -148,17 +154,6 @@ export default {
     }
   },
   methods: {
-    changeGraph () {
-      this.time = { 'name': '10분', 'value': 600 }
-      this.ahuNo = { 'name': '그라시아스(AHU1)', 'value': 1 }
-      this.startTime = this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY/MM/DD HH:mm')
-      this.endTime = this.$moment(new Date().toISOString()).format('YYYY/MM/DD HH:mm')
-      if (this.activeBtn === 0) {
-        this.getAhuTrend()
-      } else {
-        this.getTrend()
-      }
-    },
     getSiteEnv () {
       axios.put(`${this.$apiRootPath}rooms/siteEnv`, { startTime: this.startTime, endTime: this.endTime, time: this.time.value })
         .then((r) => {
@@ -205,6 +200,7 @@ export default {
           var data8 = []
           var data9 = []
           var data10 = []
+          var data11 = []
           var date = []
           this.chartOptionsLine1 = {}
           this.chartOptionsLine2 = {}
@@ -229,12 +225,12 @@ export default {
               data2.push(-1)
             }
             if (this.datas[i].cState_supplay_fan !== null) {
-              data3.push(this.mergeDatas[i].ahu.cState_supplay_fan.toFixed(2))
+              data3.push(parseInt(this.mergeDatas[i].ahu.cState_supplay_fan)+12)
             } else {
               data3.push(-1)
             }
             if (this.datas[i].cMode_damper_auto_manual !== null) {
-              data4.push(this.mergeDatas[i].ahu.cMode_damper_auto_manual.toFixed(2))
+              data4.push(parseInt(this.mergeDatas[i].ahu.cMode_damper_auto_manual)+9)
             } else {
               data4.push(-1)
             }
@@ -249,17 +245,17 @@ export default {
               data6.push(-1)
             }
             if (this.datas[i].cMode_manual_mode !== null) {
-              data7.push(this.mergeDatas[i].ahu.cMode_manual_mode.toFixed(2))
+              data7.push(parseInt(this.mergeDatas[i].ahu.cMode_manual_mode)+6)
             } else {
               data7.push(-1)
             }
             if (this.datas[i].cMode_auto_mode !== null) {
-              data8.push(this.mergeDatas[i].ahu.cMode_auto_mode.toFixed(2))
+              data8.push(parseInt(this.mergeDatas[i].ahu.cMode_auto_mode)+3)
             } else {
               data8.push(-1)
             }
             if (this.datas[i].cMode_auto_manual !== null) {
-              data9.push(this.mergeDatas[i].ahu.cMode_auto_manual.toFixed(2))
+              data9.push(parseInt(this.mergeDatas[i].ahu.cMode_auto_manual))
             } else {
               data9.push(-1)
             }
@@ -267,6 +263,11 @@ export default {
               data10.push(this.mergeDatas[i].Tout.toFixed(2))
             } else {
               data10.push(-1)
+            }
+            if (this.datas[i].fData_damper_outer_set !== null) {
+              data11.push(this.mergeDatas[i].ahu.fData_damper_outer_set.toFixed(2))
+            } else {
+              data11.push(-1)
             }
             date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
           }
@@ -294,8 +295,12 @@ export default {
               data: data6
             },
             {
-              name: '댐퍼설정값',
+              name: '외기설정값',
               data: data0
+            },
+            {
+              name: '외기현재값',
+              data: data11
             }
           ]
           this.series3 = [
@@ -322,9 +327,8 @@ export default {
           ]
           this.chartOptionsLine1 = {
             chart: {
-              id: 'chartOpt1',
-              width: '100%',
-              group: 'social',
+              id: 'ahuChart1',
+              group: 'ahuChart',
               toolbar: {
                 show: false
               },
@@ -336,9 +340,17 @@ export default {
               width: 1,
               //dashArray: [0,10],
             },
-            yaxis: {},
+            yaxis: {
+                labels: {
+                  show: true,
+                  align: 'right',
+                  minWidth: 50,
+                  maxWidth: 200,
+              }
+            },
             xaxis: {
               type: 'datetime',
+              width: '100%',
               categories: date,
               labels: {
                 show: true,
@@ -352,7 +364,8 @@ export default {
           }
           this.chartOptionsLine2 = {
             chart: {
-              id: 'chartOpt2',
+              id: 'ahuChart2',
+              group: 'ahuChart',
               width: '100%',
               toolbar: {
                 show: false
@@ -365,14 +378,56 @@ export default {
               width: 1,
               //dashArray: [0,10],
             },
-            yaxis: [{
+            yaxis: [
+              {
+                opposite: false,
+                title: {
+                  text: 'CO2'
+                },
+                labels: {
+                  show: true,
+                  align: 'right',
+                  style: {
+                      color: "#0000FF",
+                  },
+                  minWidth: 50,
+                  maxWidth: 200,
+                },
               },
               {
                 opposite: true,
+                title: {
+                  text: '외기설정값'
+                },
+                labels: {
+                  show: true,
+                  align: 'right',
+                  style: {
+                      color: "#FF0000",
+                  },
+                  minWidth: 50,
+                  maxWidth: 200,
+                },
+              },
+              {
+                opposite: true,
+                title: {
+                  text: '외기현재값'
+                },
+                labels: {
+                  show: true,
+                  align: 'right',
+                  style: {
+                      color: "#00FF00",
+                  },
+                  minWidth: 50,
+                  maxWidth: 200,
+                },
               },
             ],
             xaxis: {
               type: 'datetime',
+              width: '100%',
               categories: date,
               labels: {
                 show: true,
@@ -386,156 +441,8 @@ export default {
           }
           this.chartOptionsLine3 = {
             chart: {
-              id: 'chartOpt3',
-              width: '100%',
-              group: 'social',
-              toolbar: {
-                show: false
-              },
-              animations: {
-                enabled: false
-              }
-            },
-            stroke: {
-              width: 1,
-              //dashArray: [0,10],
-            },
-            yaxis: {},
-            xaxis: {
-              type: 'datetime',
-              categories: date,
-              labels: {
-                show: true,
-                rotate: 0,
-                // format: 'yy/MM/dd HH:mm',
-                formatter: function (value) {
-                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
-                }
-              }
-            }
-          }
-          this.searchloading = false
-          this.loading = false
-        })
-        .catch((e) => {
-          alert(e.message)
-          console.error(e.message)
-        })
-    },
-    getTrend () {
-      // axios.put(`http://localhost:3000/api/rooms/solTrend`, { startTime: this.startTime, endTime: this.endTime, time: this.time.value })
-      axios.put(`${this.$apiRootPath}rooms/solTrend`, { startTime: this.startTime, endTime: this.endTime, time: this.time.value })
-        .then((r) => {
-          this.datas = r.data
-          var data0 = []
-          var data1 = []
-          var data2 = []
-          var data3 = []
-          var data4 = []
-          var data5 = []
-          var date = []
-          this.chartOptionsLine1 = {}
-          this.chartOptionsLine2 = {}
-          this.chartOptionsLine3 = {}
-          this.graphTitle1 = '실내온도'
-          this.graphTitle2 = 'CO2 농도'
-          this.graphTitle3 = '동작 및 설정'
-          for (var i = 0; i < this.datas.length; i++) {
-            if (this.datas[i].HCOnCnt !== null) {
-              data0.push(this.datas[i].HCOnCnt.toFixed(2))
-            } else {
-              data0.push(-1)
-            }
-            if (this.datas[i].Tzone !== null) {
-              data1.push(this.datas[i].Tzone.toFixed(2))
-            } else {
-              data1.push(-1)
-            }
-            if (this.datas[i].Rdamp !== null) {
-              data2.push(this.datas[i].Rdamp.toFixed(2))
-            } else {
-              data2.push(-1)
-            }
-            if (this.datas[i].PPMco2 !== null) {
-              data3.push(this.datas[i].PPMco2.toFixed(2))
-            } else {
-              data3.push(-1)
-            }
-            if (this.datas[i].HCOffCnt !== null) {
-              data4.push(this.datas[i].HCOffCnt.toFixed(2))
-            } else {
-              data4.push(-1)
-            }
-            if (this.datas[i].VentilationCnt !== null) {
-              data5.push(this.datas[i].VentilationCnt.toFixed(2))
-            } else {
-              data5.push(-1)
-            }
-            date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
-          }
-          this.series1 = [
-            {
-              name: '실내온도',
-              data: data1
-            }
-          ]
-          this.series2 = [
-            {
-              name: 'CO2',
-              data: data3
-            },
-            {
-              name: '댐퍼설정값',
-              data: data2
-            }
-          ]
-          this.series3 = [
-            {
-              name: '냉난방 on 수',
-              data: data0
-            },
-            {
-              name: '냉난방 off 수',
-              data: data4
-            },
-            {
-              name: '환기 수',
-              data: data5
-            }
-          ]
-          this.chartOptionsLine1 = {
-            chart: {
-              id: 'chartOpt4',
-              width: '100%',
-              group: 'social',
-              toolbar: {
-                show: false
-              },
-              animations: {
-                enabled: false
-              }
-            },
-            stroke: {
-              width: 1,
-              //dashArray: [0,10],
-            },
-            yaxis: {},
-            xaxis: {
-              type: 'datetime',
-              categories: date,
-              labels: {
-                show: true,
-                rotate: 0,
-                // format: 'yy/MM/dd HH:mm',
-                formatter: function (value) {
-                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
-                }
-              }
-            }
-          }
-          this.chartOptionsLine2 = {
-            chart: {
-              id: 'chartOpt5',
+              id: 'ahuChart3',
+              group: 'ahuChart',
               width: '100%',
               toolbar: {
                 show: false
@@ -548,44 +455,17 @@ export default {
               width: 1,
               //dashArray: [0,10],
             },
-            yaxis: [{
-              },
-              {
-                opposite: true,
-              },
-            ],
+            yaxis: {
+                labels: {
+                  show: true,
+                  align: 'right',
+                  minWidth: 50,
+                  maxWidth: 200,
+              }
+            },
             xaxis: {
               type: 'datetime',
-              categories: date,
-              labels: {
-                show: true,
-                rotate: 0,
-                // format: 'yy/MM/dd HH:mm',
-                formatter: function (value) {
-                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
-                }
-              }
-            }
-          }
-          this.chartOptionsLine3 = {
-            chart: {
-              id: 'chartOpt6',
               width: '100%',
-              group: 'social',
-              toolbar: {
-                show: false
-              },
-              animations: {
-                enabled: false
-              }
-            },
-            stroke: {
-              width: 1,
-              //dashArray: [0,10],
-            },
-            yaxis: {},
-            xaxis: {
-              type: 'datetime',
               categories: date,
               labels: {
                 show: true,
@@ -624,24 +504,10 @@ export default {
           console.error(e.message)
         })
     },
-    toggleAhuNos: function () {
-      this.getSiteEnv()
-    },
-    toggleTimes: function () {
-      if (this.activeBtn === 0) {
-        this.getSiteEnv()
-      } else {
-        this.getTrend()
-      }
-    },
     searchGraph: function () {
       this.searchloading = true
       this.loading = true
-      if (this.activeBtn === 0) {
-        this.getSiteEnv()
-      } else {
-        this.getTrend()
-      }
+      this.getSiteEnv()
     }
   }
 }

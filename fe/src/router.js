@@ -41,14 +41,24 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/config.vue')
     },
     {
-      path: '/trend',
-      name: 'trend',
-      component: () => import(/* webpackChunkName: "about" */ './views/trend.vue')
+      path: '/roomTrend',
+      name: 'roomTrend',
+      component: () => import(/* webpackChunkName: "about" */ './views/roomTrend.vue')
     },
     {
-      path: '/solTrend',
-      name: 'solTrend',
-      component: () => import(/* webpackChunkName: "about" */ './views/solTrend.vue')
+      path: '/roomAvgTrend',
+      name: 'roomAvgTrend',
+      component: () => import(/* webpackChunkName: "about" */ './views/roomAvgTrend.vue')
+    },
+    {
+      path: '/ahuTrend',
+      name: 'ahuTrend',
+      component: () => import(/* webpackChunkName: "about" */ './views/ahuTrend.vue')
+    },
+    {
+      path: '/ahuAvgTrend',
+      name: 'ahuTrend',
+      component: () => import(/* webpackChunkName: "about" */ './views/ahuAvgTrend.vue')
     },
     {
       path: '*',

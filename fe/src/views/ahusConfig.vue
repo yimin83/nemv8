@@ -13,14 +13,17 @@
             <th class="text-center black--text ma-0 pa-0 pt-0 config-column" style="border-bottom:4px solid lightgrey;">팬<br>자동/수동<br>설정</th>
             <th class="text-center black--text ma-0 pa-0 pt-0 config-column" style="border-bottom:4px solid lightgrey;">댐퍼<br>자동/수동<br>설정</th>
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">내부<br>설정온도</th>
-            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">댐퍼 수동<br>설정값</th>
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">CO2 농도<br>기준 설정값</th>
+            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">댐퍼 수동<br>설정값</th>
+            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">댐퍼 수동<br>최대값</th>
+            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">댐퍼 수동<br>최소값</th>
+            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="width:60px;border-bottom:4px solid lightgrey;">PID</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="datas in ahuConfigs" class="ma-0 pa-0">
-            <td class="text-center black--text font-weight-bold ma-0 pa-0 pt-3 pb-2 config-column right-bold-border" style="background-color:rgb(294, 294, 189)">{{ahuNos[datas.AhuIndex-1].name}}({{ahuNos[datas.AhuIndex-1].desc}})</td>
-            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
+            <td class="text-center black--text font-weight-bold ma-0 pa-0 pt-3 pb-2 config-column right-bold-border" style="background-color:rgb(294, 294, 189);border-bottom:2px solid grey;">{{ahuNos[datas.AhuIndex-1].name}}({{ahuNos[datas.AhuIndex-1].desc}})</td>
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;">
               <v-select
               v-if="datas.UseScheduler !== 1"
               v-model="datas.UseScheduler"
@@ -47,7 +50,7 @@
               style="text-indent: 15px;"
               @change="saveAhuConfig()"
             ></v-select></td>
-            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;">
               <v-select
               v-if="datas.NotifyOccupantsState !== 1"
               v-model="datas.NotifyOccupantsState"
@@ -72,7 +75,7 @@
               style="text-indent: 15px;"
               @change="saveAhuConfig()"
             ></v-select></td>
-            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;">
               <v-select
               v-if="datas.EconomizerCycle !== 1"
               v-model="datas.EconomizerCycle"
@@ -94,7 +97,7 @@
               style="text-indent: 15px;"
               @change="saveAhuConfig()"></v-select>
             </td>
-            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;">
               <v-select
               v-if="datas.VarTempControl !== 1"
               v-model="datas.VarTempControl"
@@ -116,7 +119,7 @@
               style="text-indent: 15px;"
               @change="saveAhuConfig()"></v-select>
             </td>
-            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;">
               <v-select
               v-if="!(datas.HCMode === 0 || datas.HCMode === 1)"
               v-model="datas.HCMode"
@@ -148,8 +151,9 @@
               style="text-indent: 15px;"
               @change="saveAhuConfig()"></v-select>
             </td>
-            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;">
               <v-select
+              v-if="!(datas.FanAutoManual === 0 || datas.FanAutoManual === 1)"
               v-model="datas.FanAutoManual"
               :items="onOffs"
               item-value="value"
@@ -158,9 +162,20 @@
               class="font-weight-bold body-2 config-column-margin"
               style="text-indent: 15px;"
               @change="saveAhuConfig()"></v-select>
-            </td>
-            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)">
               <v-select
+              v-if="datas.FanAutoManual === 0 || datas.FanAutoManual === 1"
+              v-model="datas.FanAutoManual"
+              :items="onOffs"
+              item-value="value"
+              item-text="name"
+              append-icon=""
+              class="font-weight-bold body-2 config-column-margin redSel"
+              style="text-indent: 15px;"
+              @change="saveAhuConfig()"></v-select>
+            </td>
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;">
+              <v-select
+              v-if="!(datas.DamperAutoManual === 0 || datas.DamperAutoManual === 1)"
               v-model="datas.DamperAutoManual"
               :items="onOffs"
               item-value="value"
@@ -169,10 +184,33 @@
               class="font-weight-bold body-2 config-column-margin"
               style="text-indent: 15px;"
               @change="saveAhuConfig()"></v-select>
+              <v-select
+              v-if="datas.DamperAutoManual === 0 || datas.DamperAutoManual === 1"
+              v-model="datas.DamperAutoManual"
+              :items="onOffs"
+              item-value="value"
+              item-text="name"
+              append-icon=""
+              class="font-weight-bold body-2 config-column-margin redSel"
+              style="text-indent: 15px;"
+              @change="saveAhuConfig()"></v-select>
             </td>
-            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Tzone_set" @change="saveAhuConfig()"></v-text-field></td>
-            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Rdamp_set" @change="saveAhuConfig()"></v-text-field></td>
-            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.PPMco2_set" @change="saveAhuConfig()"></v-text-field></td>
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Tzone_set" @change="saveAhuConfig()"></v-text-field></td>
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.PPMco2_set" @change="saveAhuConfig()"></v-text-field></td>
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Rdamp_set" @change="saveAhuConfig()"></v-text-field></td>
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Rdamp_max" @change="saveAhuConfig()"></v-text-field></td>
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Rdamp_min" @change="saveAhuConfig()"></v-text-field></td>
+            <!-- <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.UsePID" @change="saveAhuConfig()"></v-text-field></td> -->
+            <td class="text-center ma-0 pa-0 font-weight-bold body-2 config-column" style="background-color:rgb(240, 240, 240);border-bottom:2px solid grey;">
+              <v-checkbox
+                v-model="datas.UsePID"
+                v-bind:false-value = "0"
+                v-bind:true-value = "1"
+                style="margin: 12px 0px -40px 0px;padding:0px 0px 0px 0px;justify-content: center;"
+                color="red"
+                class="pidChk"
+                label="사용"
+                @change="saveAhuConfig()"></v-checkbox></td>
           </tr>
         </tbody>
       </template>
@@ -181,6 +219,11 @@
   </v-container>
 </template>
 <style>
+.pidChk .v-label {
+    font-weight: bold;
+    margin-left: -5px;
+    font-size: 0.7em;
+}
 .centered-input input {
   text-align: center
 }
@@ -207,7 +250,7 @@
     color:blue;
 }
 .config-column-margin {
-  margin: -4px 0px -24px 0px;
+  margin: -3px 0px -25px 0px;
 }
 .right-border {
   border-right: 1px solid lightgrey;
@@ -280,6 +323,7 @@ export default {
         if (!(this.ahuConfigs[i].UseScheduler === this.tempAhuConfigs[i].UseScheduler &&
           this.ahuConfigs[i].NotifyOccupantsState === this.tempAhuConfigs[i].NotifyOccupantsState &&
           this.ahuConfigs[i].EconomizerCycle === this.tempAhuConfigs[i].EconomizerCycle &&
+          this.ahuConfigs[i].UsePID === this.tempAhuConfigs[i].UsePID &&
           this.ahuConfigs[i].VarTempControl === this.tempAhuConfigs[i].VarTempControl &&
           this.ahuConfigs[i].HCMode === this.tempAhuConfigs[i].HCMode &&
           this.ahuConfigs[i].FanAutoManual === this.tempAhuConfigs[i].FanAutoManual &&
@@ -287,6 +331,8 @@ export default {
           this.ahuConfigs[i].Tzone_set === this.tempAhuConfigs[i].Tzone_set &&
           this.ahuConfigs[i].Rdamp_set === this.tempAhuConfigs[i].Rdamp_set &&
           this.ahuConfigs[i].PPMco2_set === this.tempAhuConfigs[i].PPMco2_set &&
+          this.ahuConfigs[i].Rdamp_max === this.tempAhuConfigs[i].Rdamp_max &&
+          this.ahuConfigs[i].Rdamp_min === this.tempAhuConfigs[i].Rdamp_min &&
           this.ahuConfigs[i].Desc === this.tempAhuConfigs[i].Desc)) {
           ahuIdxs.push(this.ahuConfigs[i].AhuIndex)
         }

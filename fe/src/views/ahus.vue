@@ -35,11 +35,12 @@
             <td v-if="zone.zone.nHCState === 1" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold blue--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.nHCState}}</td>
             <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{(zone.zone.fData_hc_set_temp === -1)? '-' : zone.zone.fData_hc_set_temp}} <sup>o</sup>C</td>
             <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-bold-border" style="background-color:rgb(240, 240, 240)">{{(zone.zone.fData_temp_return === -1)? '-' : zone.zone.fData_temp_return}} <sup>o</sup>C</td>
-            <td v-if="zone.zone.cMode_manual_mode !== 1" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.manual_mode}}</td>
-            <td v-if="zone.zone.cMode_manual_mode === 1" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold red--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.manual_mode}}</td>
-            <td v-if="zone.zone.cState_supplay_fan !== 1" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.supplay_fan}}</td>
-            <td v-if="zone.zone.cState_supplay_fan === 1" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold red--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.supplay_fan}}</td>
-            <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.damper_auto_manual}}</td>
+            <td v-if="!(zone.zone.cMode_manual_mode === 1 || zone.zone.cMode_manual_mode === 0)" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.manual_mode}}</td>
+            <td v-if="zone.zone.cMode_manual_mode === 0 || zone.zone.cMode_manual_mode === 1" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold red--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.manual_mode}}</td>
+            <td v-if="zone.zone.cState_supplay_fan !== 1" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-bold-border" style="background-color:rgb(240, 240, 240)">{{zone.supplay_fan}}</td>
+            <td v-if="zone.zone.cState_supplay_fan === 1" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold red--text right-bold-border" style="background-color:rgb(240, 240, 240)">{{zone.supplay_fan}}</td>
+            <td v-if="!(zone.zone.cMode_damper_auto_manual === 1 || zone.zone.cMode_damper_auto_manual === 0)" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.damper_auto_manual}}</td>
+            <td v-if="zone.zone.cMode_damper_auto_manual === 0 || zone.zone.cMode_damper_auto_manual === 1" class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold red--text right-border" style="background-color:rgb(240, 240, 240)">{{zone.damper_auto_manual}}</td>
             <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{(zone.zone.nRdamp_set === -1)? '-' : zone.zone.nRdamp_set}}</td>
             <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-bold-border" style="background-color:rgb(240, 240, 240)">{{(zone.zone.fData_damper_manual_set === -1)? '-' : zone.zone.fData_damper_manual_set}}</td>
             <td class="text-center ma-0 pa-0 pt-3 pb-2 font-weight-bold black--text right-border" style="background-color:rgb(240, 240, 240)">{{(zone.zone.nPPMco2_set === -1)? '-' : zone.zone.nPPMco2_set}}</td>
@@ -51,7 +52,7 @@
         </tbody>
       </template>
     </v-simple-table>
-    <v-dialog v-model='ahuGraphModal' persistent  height="950px">
+    <v-dialog v-model='ahuGraphModal' persistent  height="950px"  width="1480px">
       <v-card height="900px">
         <v-toolbar dark icons-and-text>
           <v-toolbar-title>
@@ -97,9 +98,9 @@
                   label
                   outlined
                 >
-                {{graphTitle2}}
+                {{graphTitle1}}
                 </v-chip>
-                <apexchart type=line height=200 :options="chartOptionsLine2" :series="series2" />
+                <apexchart type=line height=200 width='1300px' :options="chartOptionsLine1" :series="series1" />
               </div>
               <div class="ma-0 pa-0 mb-n3">
                 <v-chip
@@ -108,9 +109,9 @@
                   label
                   outlined
                 >
-                {{graphTitle1}}
+                {{graphTitle2}}
                 </v-chip>
-                <apexchart type=line height=200 :options="chartOptionsLine1" :series="series1" />
+                <apexchart type=line height=200 width='1430px' :options="chartOptionsLine2" :series="series2" />
               </div>
               <div class="ma-0 pa-0 mb-n3">
                 <v-chip
@@ -121,7 +122,7 @@
                 >
                 {{graphTitle3}}
                 </v-chip>
-                <apexchart type=line height=200 :options="chartOptionsLine3" :series="series3" />
+                <apexchart type=line height=200 width='1300px' :options="chartOptionsLine3" :series="series3" />
               </div>
             </div>
           </div>
@@ -149,6 +150,18 @@
 </style>
 <script>
 import axios from 'axios'
+Apex = {
+  stroke: {
+    show: true,
+    curve: 'smooth',
+    lineCap: 'butt',
+    width: 3,
+    //dashArray: [0,10],
+  },
+  yaxis: {
+    tickAmount: 3
+  }
+}
 export default {
   created () {
     this.getAhus()
@@ -228,9 +241,9 @@ export default {
       for (var i = 0; i < this.zones.length; i++) {
         trncMode_hc_mode = (this.zones[i].cMode_hc_mode !== -1) ? this.hcModes[this.zones[i].cMode_hc_mode] : '중지'
         trncMode_manual_mode = (this.zones[i].cMode_manual_mode !== -1) ? this.manualModes[this.zones[i].cMode_manual_mode] : '미설정'
-        trncState_supplay_fan = (this.zones[i].cState_supplay_fan !== -1) ? this.manualModes[this.zones[i].cState_supplay_fan] : '미설정'
+        trncState_supplay_fan = (this.zones[i].cState_supplay_fan !== -1) ? this.manualModes[this.zones[i].cState_supplay_fan] : '사용안함'
         trncMode_damper_auto_manual = (this.zones[i].cMode_damper_auto_manual !== -1) ? this.damperAutoManual[this.zones[i].cMode_damper_auto_manual] : '미설정'
-        trncState_ahu = (this.zones[i].nHCState !== -1) ? this.ahuOperMode[this.zones[i].nHCState] : '미설정'
+        trncState_ahu = (this.zones[i].nHCState !== -1) ? this.ahuOperMode[this.zones[i].nHCState] : '사용안함'
         this.zones[i].fData_hc_set_temp = this.zones[i].fData_hc_set_temp.toFixed(1)
         this.zones[i].fData_temp_return = this.zones[i].fData_temp_return.toFixed(1)
         this.mergezones.push({ zone: this.zones[i], ahu: this.ahus[i], hc_mode: trncMode_hc_mode, manual_mode: trncMode_manual_mode, supplay_fan: trncState_supplay_fan, damper_auto_manual: trncMode_damper_auto_manual, nHCState: trncState_ahu })
@@ -294,7 +307,14 @@ export default {
           var data8 = []
           var data9 = []
           var data10 = []
+          var data11 = []
           var date = []
+          this.chartOptionsLine1 = {}
+          this.chartOptionsLine2 = {}
+          this.chartOptionsLine3 = {}
+          this.graphTitle1 = '온도 정보'
+          this.graphTitle2 = 'CO2 농도'
+          this.graphTitle3 = '설정 및 상태 정보'
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].fData_damper_manual_set !== null) {
               data0.push(this.mergeDatas[i].ahu.fData_damper_manual_set.toFixed(2))
@@ -312,12 +332,12 @@ export default {
               data2.push(-1)
             }
             if (this.datas[i].cState_supplay_fan !== null) {
-              data3.push(this.mergeDatas[i].ahu.cState_supplay_fan.toFixed(2))
+              data3.push(parseInt(this.mergeDatas[i].ahu.cState_supplay_fan)+12)
             } else {
               data3.push(-1)
             }
             if (this.datas[i].cMode_damper_auto_manual !== null) {
-              data4.push(this.mergeDatas[i].ahu.cMode_damper_auto_manual.toFixed(2))
+              data4.push(parseInt(this.mergeDatas[i].ahu.cMode_damper_auto_manual)+9)
             } else {
               data4.push(-1)
             }
@@ -332,17 +352,17 @@ export default {
               data6.push(-1)
             }
             if (this.datas[i].cMode_manual_mode !== null) {
-              data7.push(this.mergeDatas[i].ahu.cMode_manual_mode.toFixed(2))
+              data7.push(parseInt(this.mergeDatas[i].ahu.cMode_manual_mode)+6)
             } else {
               data7.push(-1)
             }
             if (this.datas[i].cMode_auto_mode !== null) {
-              data8.push(this.mergeDatas[i].ahu.cMode_auto_mode.toFixed(2))
+              data8.push(parseInt(this.mergeDatas[i].ahu.cMode_auto_mode)+3)
             } else {
               data8.push(-1)
             }
             if (this.datas[i].cMode_auto_manual !== null) {
-              data9.push(this.mergeDatas[i].ahu.cMode_auto_manual.toFixed(2))
+              data9.push(parseInt(this.mergeDatas[i].ahu.cMode_auto_manual))
             } else {
               data9.push(-1)
             }
@@ -350,6 +370,11 @@ export default {
               data10.push(this.mergeDatas[i].Tout.toFixed(2))
             } else {
               data10.push(-1)
+            }
+            if (this.datas[i].fData_damper_outer_set !== null) {
+              data11.push(this.mergeDatas[i].ahu.fData_damper_outer_set.toFixed(2))
+            } else {
+              data11.push(-1)
             }
             date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
           }
@@ -375,13 +400,17 @@ export default {
             {
               name: 'CO2',
               data: data6
+            },
+            {
+              name: '외기설정값',
+              data: data0
+            },
+            {
+              name: '외기현재값',
+              data: data11
             }
           ]
           this.series3 = [
-            {
-              name: '댐퍼설정값',
-              data: data0
-            },
             {
               name: '공급팬상태',
               data: data3
@@ -405,9 +434,9 @@ export default {
           ]
           this.chartOptionsLine1 = {
             chart: {
-              id: 'ab',
-              width: '100%',
-              group: 'social',
+              id: 'ahuChart1',
+              group: 'ahuChart',
+              width: '1300px',
               toolbar: {
                 show: false
               },
@@ -415,8 +444,21 @@ export default {
                 enabled: false
               }
             },
+            stroke: {
+              width: 1,
+              //dashArray: [0,10],
+            },
+            yaxis: {
+                labels: {
+                  show: true,
+                  align: 'right',
+                  minWidth: 50,
+                  maxWidth: 200,
+              }
+            },
             xaxis: {
               type: 'datetime',
+              width: '100%',
               categories: date,
               labels: {
                 show: true,
@@ -430,9 +472,9 @@ export default {
           }
           this.chartOptionsLine2 = {
             chart: {
-              id: 'bw',
-              width: '100%',
-              group: 'social',
+              id: 'ahuChart2',
+              group: 'ahuChart',
+              width: '1430px',
               toolbar: {
                 show: false
               },
@@ -440,8 +482,60 @@ export default {
                 enabled: false
               }
             },
+            stroke: {
+              width: 1,
+              //dashArray: [0,10],
+            },
+            yaxis: [
+              {
+                opposite: false,
+                title: {
+                  text: 'CO2'
+                },
+                labels: {
+                  show: true,
+                  align: 'right',
+                  style: {
+                      color: "#0000FF",
+                  },
+                  minWidth: 50,
+                  maxWidth: 200,
+                },
+              },
+              {
+                opposite: true,
+                title: {
+                  text: '외기설정값'
+                },
+                labels: {
+                  show: true,
+                  align: 'right',
+                  style: {
+                      color: "#FF0000",
+                  },
+                  minWidth: 50,
+                  maxWidth: 200,
+                },
+              },
+              {
+                opposite: true,
+                title: {
+                  text: '외기현재값'
+                },
+                labels: {
+                  show: true,
+                  align: 'right',
+                  style: {
+                      color: "#00FF00",
+                  },
+                  minWidth: 50,
+                  maxWidth: 200,
+                },
+              },
+            ],
             xaxis: {
               type: 'datetime',
+              width: '100%',
               categories: date,
               labels: {
                 show: true,
@@ -455,9 +549,9 @@ export default {
           }
           this.chartOptionsLine3 = {
             chart: {
-              id: 'cb',
-              width: '100%',
-              group: 'social',
+              id: 'ahuChart3',
+              group: 'ahuChart',
+              width: '1300px',
               toolbar: {
                 show: false
               },
@@ -465,8 +559,21 @@ export default {
                 enabled: false
               }
             },
+            stroke: {
+              width: 1,
+              //dashArray: [0,10],
+            },
+            yaxis: {
+                labels: {
+                  show: true,
+                  align: 'right',
+                  minWidth: 50,
+                  maxWidth: 200,
+              }
+            },
             xaxis: {
               type: 'datetime',
+              width: '100%',
               categories: date,
               labels: {
                 show: true,
