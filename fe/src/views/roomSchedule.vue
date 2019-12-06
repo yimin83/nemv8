@@ -203,6 +203,8 @@
         </center>
         <v-card-actions>
           <v-spacer></v-spacer>
+          <v-text-field v-model="groupDatas.Min"></v-text-field>
+          <v-text-field v-model="groupDatas.Min"></v-text-field>
           <v-btn v-if="this.activeBtn === 0" :loading="saveLoading" :disabled="loading" class="d-flex" @click="saveSchedule()">저장</v-btn>
           <v-btn :loading="startLoading" :disabled="loading" class="d-flex" @click="startSchedule()">구동</v-btn>
           <v-btn :loading="stopLoading" :disabled="loading" class="d-flex" @click="stopSchedule()">정지</v-btn>
@@ -368,6 +370,7 @@ export default {
         '601', '602', '603', '604', '605', '606', '607', '608', '609', '610', '611', '612', '613', '614', '615', '616', '617', '618', '619', '620', '621', '622', '623', '624', '625', '626', '627'],
       curGroups: [],
       groupDatas: [],
+      groupMemDatas: [],
       curGroupRooms: [],
       curGroupIdx: 0,
       srcScheduleDatas: [],
@@ -389,8 +392,9 @@ export default {
       axios.get(`${this.$apiRootPath}/rooms/groupSchedule`)
         .then((r) => {
           this.groupDatas = JSON.parse(r.data)
-          this.groupDatas.GroupIndex = [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3]
-          this.groupDatas.Use = [0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0]
+          this.groupMemDatas = JSON.parse(r.data)
+          // this.groupDatas.GroupIndex = [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3]
+          // this.groupDatas.Use = [0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0]
           this.refreshGroup()
           // alert(JSON.stringify(this.curGroups))
         })
@@ -436,16 +440,16 @@ export default {
     saveGroup() {
       for (var key in this.curGroupRooms) {
         if (this.curGroupRooms[key].roomExist === 1 || this.curGroupRooms[key].roomExist === true){
-          if (this.groupDatas.GroupIndex[key] !== this.curGroupIdx) {
-            this.groupDatas.GroupIndex[key] = this.curGroupIdx
-            this.groupDatas.Use[key] = 0
+          if (this.groupMemDatas.GroupIndex[key] !== this.curGroupIdx) {
+            this.groupMemDatas.GroupIndex[key] = this.curGroupIdx
+            this.groupMemDatas.Use[key] = 0
           }
-        } else if (this.curGroupRooms[key].roomExist !== 1 && (this.groupDatas.GroupIndex[key] === this.curGroupIdx)) {
-          this.groupDatas.GroupIndex[key] = -1
-          this.groupDatas.Use[key] = 0
+        } else if (this.curGroupRooms[key].roomExist !== 1 && (this.groupMemDatas.GroupIndex[key] === this.curGroupIdx)) {
+          this.groupMemDatas.GroupIndex[key] = -1
+          this.groupMemDatas.Use[key] = 0
         }
       }
-      axios.put(`${this.$apiRootPath}rooms/groupSchedule`, { config: this.groupDatas })
+      axios.put(`${this.$apiRootPath}rooms/groupSchedule`, { config: this.groupMemDatas })
         .then((r) => {
           // this.$data.settingRoomModal = false
           this.getRoomsGroup()
@@ -454,7 +458,6 @@ export default {
           alert(e.message)
           console.log(e.message)
         })
-      this.refreshGroup()
     },
     closeGroup() {
       this.settingGroupModal = false
