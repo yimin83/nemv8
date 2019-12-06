@@ -40,7 +40,13 @@ const oam_msg_type_e = {
 
 	oam_get_session_info: 17,
 
-	oam_event_alarm: 18
+	oam_event_alarm: 18,
+
+	oam_set_floorRad_scheduler_time_config: 19,
+	oam_get_floorRad_scheduler_time_config: 20,
+
+	oam_set_floorRad_scheduler_group_control: 21,
+	oam_get_floorRad_scheduler_group_control: 22
 };
 const MAX_ROOM_CNT = 91
 net.getConnection = function () {
@@ -48,6 +54,7 @@ net.getConnection = function () {
     var client = '';
     var recvData = [];
     var local_port = '';
+		var isNotFirst = false;
 
     client = net_client.connect({port: config.port, host: config.host}, function() {
         console.log("==================================== net_client.connect start  ========================================= : ");
@@ -58,13 +65,24 @@ net.getConnection = function () {
 				//this.setEncoding('utf8');
         //this.setTimeout(600000); // timeout : 10분
 				console.log("====================================  net_client.connect end  ==========================================");
+				console.log("isNotFirst : " + isNotFirst +", !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    });
+
+	    // 접속 종료 시 처리
+    client.on('connect', function() {
+			console.log("==================================== connect start ==========================================");
+			if(isNotFirst) {
+				router.reconnectAuth()
+			}
+			isNotFirst = true;
+			console.log("==================================== connect end ==========================================");
     });
 
     // 접속 종료 시 처리
     client.on('close', function() {
 			console.log("==================================== client.on.close start ==========================================");
 			console.log("client Socket Closed : " + " localport : " + local_port);
-			console.log("====================================   client.on.close end  ==========================================");
+			console.log("====================================   client.on.close end ==========================================");
     });
 
 // 데이터 수신 후 처리
@@ -91,7 +109,6 @@ net.getConnection = function () {
     client.on('error', function(err) {
         console.log('socketOutput client Socket Error: '+ JSON.stringify(err));
 				client.connect(config.port, config.host);
-				router.reconnectAuth()
     });
 
 		client.on('disconnect', function() {
@@ -189,6 +206,18 @@ var processOAMmsg = function (data, seq) {
 			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_priority)
       	router.setSeqMap(seq, JSON.stringify(floorRadRoomPriorityDat))
   }
+  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_group_control || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_scheduler_group_control)) {
+      var floorRadSchedulerGroupDat = floor_rad_scheduler_group_config_t.decode(data, ems_msg_header_t.size() +oam_msg_t.size(), {endian:"BE"});
+			console.log(JSON.stringify(floorRadSchedulerGroupDat))
+			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_group_control)
+      	router.setSeqMap(seq, JSON.stringify(floorRadSchedulerGroupDat))
+  }
+  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_time_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_scheduler_time_config)) {
+      var floorRadSchedulerTimeConfigDat = floor_rad_scheduler_time_config_t.decode(data, ems_msg_header_t.size() +oam_msg_t.size(), {endian:"BE"});
+			console.log(JSON.stringify(floorRadSchedulerTimeConfigDat))
+			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_time_config)
+      	router.setSeqMap(seq, JSON.stringify(floorRadSchedulerTimeConfigDat))
+  }
   else if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_event_alarm) {
 		console.log("$$$$$$$$$$$$$$$$$$$$$$ recieve Alarm!!!$$$$$$$$$$$$$$$$$$$$$$$$$$$")
     var emsAlarmDat = ems_alarm_t.decode(data, ems_msg_header_t.size() +oam_msg_t.size(), {endian:"BE"});
@@ -218,7 +247,13 @@ var processOAMmsg = function (data, seq) {
 		size = floor_rad_room_state_t.size()
   }
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_priority || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_room_priority)) {
-		size = 'oam_msg_type_e.oam_set_floorRad_room_priority'
+		size = floor_rad_room_priority_t.size()
+  }
+  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_time_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_scheduler_time_config)) {
+		size = floor_rad_scheduler_time_config_t.size()
+  }
+  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_group_control || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_scheduler_group_control)) {
+		size = floor_rad_scheduler_group_config_t.size()
   }
   else if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_event_alarm) {
 		size = 'oam_msg_type_e.oam_event_alarm'
@@ -255,33 +290,33 @@ var setAlarm = function(data) {
 	console.log("setAlarm : " +JSON.stringify(this.alarm))
 }
 net.getAlarm = function() {
-	console.log("################ getAlarm!!! ################")
+	// console.log("################ getAlarm!!! ################")
 	return processGetAlarm(returnAlarm)
 }
 net.chkAlarm = function() {
-	console.log("################ chkAlarm!!! ################")
+	// console.log("################ chkAlarm!!! ################")
 	processClearAlarm(clearAlarm)
 }
 
 function processGetAlarm(callback) {
-	console.log("################ processGetAlarm!!! ################")
+	// console.log("################ processGetAlarm!!! ################")
 	return callback(this.alarm)
 }
 function returnAlarm(data) {
-	console.log("################ returnAlarm!!! ################")
+	// console.log("################ returnAlarm!!! ################")
 	return data
 }
 
 function processClearAlarm(callback) {
-	console.log("################ processClearAlarm!!! ################")
+	// console.log("################ processClearAlarm!!! ################")
 	callback()
 }
 function clearAlarm() {
-	console.log("################ clearAlarm!!! ################")
+	// console.log("################ clearAlarm!!! ################")
 	this.alarm.beChecked = true
 }
 function processAlarm (data, callback) {
-  console.log("################ processAlarm start!!! ################")
+  // getconsole.log("################ processAlarm start!!! ################")
 	callback(data)
 }
 var ems_msg_header_t = new struct("ems_msg_header_t", [
@@ -939,9 +974,11 @@ var ahu_zone_config_msg_t = new struct("ahu_zone_config_msg_t", [
 	"PPMco2_set", struct.int32(),
 	"Rdamp_min", struct.float32(),
 	"Rdamp_max", struct.float32(),
-	"Desc", struct.char(23)
+	"HCInitTimeMin", struct.uint16(),
+	"PPMco2_init", struct.int32(),
+	"Desc", struct.char(17)
 ]);
-net.makeAhuZoneConfigMsg_t = function(ahuIndex, useScheduler, notifyOccupantsState, economizerCycle, usePID, varTempControl, hcMode, fanAutoManual, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, rdamp_min, rdamp_max, desc) {
+net.makeAhuZoneConfigMsg_t = function(ahuIndex, useScheduler, notifyOccupantsState, economizerCycle, usePID, varTempControl, hcMode, fanAutoManual, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, rdamp_min, rdamp_max, hcInitTimeMin, ppmCo2_init, desc) {
   var buffer = new Buffer(ahu_zone_config_msg_t.size());
   ahu_zone_config_msg_t.encode(buffer,0, {
     AhuIndex: ahuIndex,
@@ -958,6 +995,8 @@ net.makeAhuZoneConfigMsg_t = function(ahuIndex, useScheduler, notifyOccupantsSta
     PPMco2_set: ppmCo2_set,
 		Rdamp_min: rdamp_min,
 		Rdamp_max: rdamp_max,
+		HCInitTimeMin: hcInitTimeMin,
+		PPMco2_init: ppmCo2_init,
     Desc: desc
   },{endian:"BE"})
   return buffer;
@@ -981,9 +1020,11 @@ var ahu_zone_config_t = new struct("ahu_zone_config_t", [
     "PPMco2_set", struct.int32(),
 		"Rdamp_min", struct.float32(),
 		"Rdamp_max", struct.float32(),
-    "Desc", struct.char(23)
+		"HCInitTimeMin", struct.uint16(),
+		"PPMco2_init", struct.int32(),
+    "Desc", struct.char(17)
 ]);
-net.makeAhuZoneConfig_t = function(ahuIndex, useScheduler, notifyOccupantsState, economizerCycle, usePID, varTempControl, hcMode, fanAutoManual, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, rdamp_min, rdamp_max, desc) {
+net.makeAhuZoneConfig_t = function(ahuIndex, useScheduler, notifyOccupantsState, economizerCycle, usePID, varTempControl, hcMode, fanAutoManual, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, rdamp_min, rdamp_max, hcInitTimeMin, ppmCo2_init, desc) {
   var buffer = new Buffer(ahu_zone_config_t.size());
   ahu_zone_config_t.encode(buffer,0, {
     AhuIndex: ahuIndex,
@@ -1000,6 +1041,8 @@ net.makeAhuZoneConfig_t = function(ahuIndex, useScheduler, notifyOccupantsState,
     PPMco2_set: ppmCo2_set,
 		Rdamp_min: rdamp_min,
 		Rdamp_max: rdamp_max,
+		HCInitTimeMin: hcInitTimeMin,
+		PPMco2_init: ppmCo2_init,
     Desc: desc
   },{endian:"BE"})
   return buffer;
@@ -1227,17 +1270,66 @@ net.makeFloorRadRoomPrioritiy_t = function(tPriority) {
 net.getSizeFloorRadRoomPrioritiy_t = function() {
   return floor_rad_room_priority_t.size()
 }
+var floor_rad_scheduler_group_config_t = new struct("floor_rad_scheduler_group_config_t", [
+    "StartTime", struct.int32(),
+    "EndTime", struct.int32(),
+    "GroupIndex", struct.uint8(MAX_ROOM_CNT),
+    "Use", struct.uint8(MAX_ROOM_CNT),
+    "SchedulerSate", struct.uint8(),
+    "Reserved", struct.uint8()
+]);
+net.makeFloorRadSchedulerGroupConfig_t = function(startTime, endTime, groupIndex, use, schedulerSate, reserved) {
+  var buffer = new Buffer(floor_rad_scheduler_group_config_t.size());
+  floor_rad_scheduler_group_config_t.encode(buffer,0, {
+		StartTime: startTime,
+		EndTime: endTime,
+		GroupIndex: groupIndex,
+		Use: use,
+		SchedulerSate: schedulerSate,
+    Reserved: reserved
+  },{endian:"BE"})
+  return buffer;
+}
+net.getSizeFloorRadSchedulerGroupConfig_t = function() {
+  return floor_rad_scheduler_group_config_t.size()
+}
+
+const MAX_HEATING_SCHDULER_STEP = 24
+
+var floor_rad_scheduler_time_config_t = new struct("floor_rad_scheduler_time_config_t", [
+		"HeatingState0", struct.uint8(MAX_HEATING_SCHDULER_STEP),
+    "HeatingState1", struct.uint8(MAX_HEATING_SCHDULER_STEP),
+		"HeatingState2", struct.uint8(MAX_HEATING_SCHDULER_STEP),
+		"HeatingState3", struct.uint8(MAX_HEATING_SCHDULER_STEP),
+		"HeatingState4", struct.uint8(MAX_HEATING_SCHDULER_STEP),
+		"HeatingState5", struct.uint8(MAX_HEATING_SCHDULER_STEP),
+		"HeatingState6", struct.uint8(MAX_HEATING_SCHDULER_STEP),
+		"HeatingState7", struct.uint8(MAX_HEATING_SCHDULER_STEP),
+		"HeatingState8", struct.uint8(MAX_HEATING_SCHDULER_STEP),
+		"HeatingState9", struct.uint8(MAX_HEATING_SCHDULER_STEP)
+]);
+net.makeFloorRadSchedulerTimeConfig_t = function(heatingState0, heatingState1, heatingState2, heatingState3, heatingState4, heatingState5, heatingState6, heatingState7, heatingState8, heatingState9) {
+  var buffer = new Buffer(floor_rad_scheduler_time_config_t.size());
+  floor_rad_scheduler_time_config_t.encode(buffer,0, {
+		HeatingState0: heatingState0,
+		HeatingState1: heatingState1,
+		HeatingState2: heatingState2,
+		HeatingState3: heatingState3,
+		HeatingState4: heatingState4,
+    HeatingState5: heatingState5,
+		HeatingState6: heatingState6,
+		HeatingState7: heatingState7,
+		HeatingState8: heatingState8,
+		HeatingState9: heatingState9
+  },{endian:"BE"})
+  return buffer;
+}
+net.getSizeFloorRadSchedulerTimeConfig_t = function() {
+  return floor_rad_scheduler_group_config_t.size()
+}
 // typedef struct
 // {
-// 	u16		RoomNo;				// room number
-// 	u8		Priority;			// Priority
-// 	u8		Reserved;
-// } room_prioriy_t;
-//
-//
-// typedef struct
-// {
-// 	room_prioriy_t tPriority[MAX_ROOM_CNT];
-// } floor_rad_room_priority_t;
+// 	u8		HeatingState[MAX_HEATING_GROUP][MAX_HEATING_SCHDULER_STEP];
+// } floor_rad_scheduler_time_config_t;
 
 module.exports = net;

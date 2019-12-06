@@ -134,13 +134,15 @@ export default {
           var data5 = []
           var data6 = []
           var data7 = []
+          var data8 = []
+          var data9 = []
           var date = []
           var nCnt = 0
           this.graphTitle1 = '온도 정보'
           this.graphTitle2 = '상태 정보'
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].ucRoomState !== null) {
-              data0.push(parseInt(this.datas[i].ucRoomState)+4)
+              data0.push(parseInt(this.datas[i].ucRoomState)+7)
             } else {
               data0.push(-1)
             }
@@ -154,33 +156,47 @@ export default {
             } else {
               data2.push(-1)
             }
-            if (this.datas[i].fTset !== null && this.datas[i].fTset < 50) {
+            if (this.datas[i].fTset !== null && this.datas[i].fTset <= 60) {
               data3.push((this.datas[i].fTset).toFixed(2))
             } else {
-              data3.push(-1)
+              data3.push(-2)
             }
-            if (this.datas[i].fTsurf_cur !== null && this.datas[i].fTsurf_cur < 50) {
+            if (this.datas[i].fTsurf_cur !== null && this.datas[i].fTsurf_cur <= 60) {
               data4.push((this.datas[i].fTsurf_cur).toFixed(2))
             } else {
-              data4.push(-1)
+              data4.push(-2)
             }
-            if (this.datas[i].fTroom_cur !== null && this.datas[i].fTroom_cur < 50) {
+            if (this.datas[i].fTroom_cur !== null && this.datas[i].fTroom_cur <= 60) {
               data5.push((this.datas[i].fTroom_cur).toFixed(2))
             } else {
-              data5.push(-1)
+              data5.push(-2)
             }
-            if (this.datas[i].fTroom_set !== null && this.datas[i].fTroom_set < 50) {
+            if (this.datas[i].fTroom_set !== null && this.datas[i].fTroom_set <= 60) {
               data6.push((this.datas[i].fTroom_set).toFixed(2))
             } else {
-              data6.push(-1)
+              data6.push(-2)
             }
-            if (this.datas[i].fTsurf_set !== null && this.datas[i].fTsurf_set < 50) {
+            if (this.datas[i].fTsurf_set !== null && this.datas[i].fTsurf_set <= 60) {
               data7.push((this.datas[i].fTsurf_set).toFixed(2))
             } else {
-              data7.push(-1)
+              data7.push(-2)
             }
-            // if(i === 0) alert(new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(0, 10) + ' ' + new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(11, 5))
-            // date.push(new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(0, 10) + ' ' + new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(11, 5) )
+            if (this.datas[i].usManHeatingMode !== null && this.datas[i].usManHeatingMode <= 60) {
+              if (this.datas[i].usManHeatingMode === '0') {
+                data8.push(parseInt(this.datas[i].usManHeatingMode+6))
+              } else if (this.datas[i].usManHeatingMode === '1') {
+                data8.push(parseInt(this.datas[i].usManHeatingMode+5))
+              } else {
+                data8.push(parseInt(this.datas[i].usManHeatingMode+4))
+              }
+            } else {
+              data8.push(-2)
+            }
+            if (this.datas[i].fTset_cur !== null && this.datas[i].fTset_cur <= 60) {
+              data9.push((this.datas[i].fTset_cur).toFixed(2))
+            } else {
+              data9.push(-2)
+            }
             if (this.time.value === 0 ){
               date.push(new Date((this.datas[i].m + (9 * 60 * 60)) * 1000).toISOString())
               nCnt = 3
@@ -189,11 +205,14 @@ export default {
               nCnt = 0
             }
           }
-          //alert("data2 : " + JSON.stringify(data2) + ", date : " + JSON.stringify(date))
           this.series1 = [
             {
               name: '설정온도',
               data: data3
+            },
+            {
+              name: '제어기설정온도',
+              data: data9
             },
             {
               name: '실내설정온도',
@@ -214,9 +233,13 @@ export default {
           ]
           this.series2 = [
             {
-              name: '재실정보',
-              data: data0
+              name: '난방모드',
+              data: data8
             },
+            // {
+            //   name: '재실정보',
+            //   data: data0
+            // },
             {
               name: '난방설정상태',
               data: data1

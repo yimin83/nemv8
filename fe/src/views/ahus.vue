@@ -132,6 +132,11 @@
   </v-container>
 </template>
 <style>
+.v-dialog > .v-card > .v-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
 .centered-input input {
   text-align: center
 }
@@ -182,7 +187,7 @@ export default {
       damperAutoManual: ['자동', '수동'],
       ahuOperMode: ['난방ON', '냉방ON', '난방OFF', '냉방OFF'],
       time: { 'name': '10분', 'value': 600 },
-      times: [{ 'name': '5분', 'value': 300 }, { 'name': '10분', 'value': 600 }, { 'name': '1시간', 'value': 3600 }, { 'name': '하루', 'value': (3600 * 24) }],
+      times: [{ 'name': '5분', 'value': 300 }, { 'name': '10분', 'value': 600 }, { 'name': '1시간', 'value': 3600 }, { 'name': '하루', 'value': (3600 * 24) }, { 'name': '전체', 'value': 0 }],
       activeBtn: 0,
       datas: [],
       envDatas: [],
@@ -309,6 +314,7 @@ export default {
           var data10 = []
           var data11 = []
           var date = []
+          var nCnt = 0
           this.chartOptionsLine1 = {}
           this.chartOptionsLine2 = {}
           this.chartOptionsLine3 = {}
@@ -376,7 +382,13 @@ export default {
             } else {
               data11.push(-1)
             }
-            date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
+            if (this.time.value === 0 ){
+              date.push(new Date((this.datas[i].m + (9 * 60 * 60)) * 1000).toISOString())
+              nCnt = 3
+            } else {
+              date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
+              nCnt = 0
+            }
           }
           this.series1 = [
             {
@@ -465,7 +477,7 @@ export default {
                 rotate: 0,
                 // format: 'yy/MM/dd HH:mm',
                 formatter: function (value) {
-                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
+                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, parseInt(5 + nCnt)))
                 }
               }
             }
@@ -542,7 +554,7 @@ export default {
                 rotate: 0,
                 // format: 'yy/MM/dd HH:mm',
                 formatter: function (value) {
-                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
+                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, parseInt(5 + nCnt)))
                 }
               }
             }
@@ -580,7 +592,7 @@ export default {
                 rotate: 0,
                 // format: 'yy/MM/dd HH:mm',
                 formatter: function (value) {
-                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
+                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, parseInt(5 + nCnt)))
                 }
               }
             }

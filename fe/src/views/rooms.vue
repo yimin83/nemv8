@@ -208,7 +208,7 @@
                     </v-card-text>
                   </v-card>
                   <v-card
-                    v-if='(room.ucSetStatus === 1 && room.ucCurStatus === 0)'
+                    v-if='(((room.ucTotalStatus & 16) !== 0) && room.ucCurStatus === 0)'
                     color='deep-orange lighten-4'
                     class='ma-0 pa-0 font-weight-bold'
                     outlined
@@ -304,7 +304,7 @@
                     </v-card-text>
                   </v-card>
                   <v-card
-                    v-if='(!(room.ucSetStatus === 1 && room.ucCurStatus === 0) && (room.ucCurStatus === 0 || room.ucCurStatus === 2))'
+                    v-if='(!(((room.ucTotalStatus & 16) !== 0) && room.ucCurStatus === 0) && (room.ucCurStatus === 0 || room.ucCurStatus === 2))'
                     color='blue-grey lighten-5'
                     class='ma-0 pa-0 font-weight-bold'
                     outlined
@@ -500,7 +500,7 @@
                 </v-card-text>
               </v-card>
               <v-card
-                v-if='(room.ucSetStatus === 1 && room.ucCurStatus === 0)'
+                v-if='(((room.ucTotalStatus & 16) !== 0) && room.ucCurStatus === 0)'
                 color='deep-orange lighten-4'
                 class='ma-0 pa-0 font-weight-bold'
                 outlined
@@ -596,7 +596,7 @@
                 </v-card-text>
               </v-card>
               <v-card
-                v-if='(!(room.ucSetStatus === 1 && room.ucCurStatus === 0) && (room.ucCurStatus === 0 || room.ucCurStatus === 2))'
+                v-if='(!(((room.ucTotalStatus & 16) !== 0) && room.ucCurStatus === 0) && (room.ucCurStatus === 0 || room.ucCurStatus === 2))'
                 color='blue-grey lighten-5'
                 class='ma-0 pa-0 font-weight-bold'
                 outlined
@@ -761,19 +761,20 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-dialog v-model='settingRoomModal' persistent width="1300px">
-      <v-card>
+    <v-dialog v-model='settingRoomModal' persistent width="1300px" >
+      <v-card  class="scroll-y">
         <v-toolbar dark icons-and-text>
           <v-toolbar-title>
             <v-row>
             <v-col class='ma-0 pr-0 pt-5'>
-              <v-select
+              <v-autocomplete
                   :items='roomNos'
                   v-model='roomNo'
+                  autocomplete
                   class="grey--text headline roomSel"
-                  style="max-width:73px;"
+                  style="max-width:80px;"
                   @change='openRoomStat(roomNo)'
-                ></v-select>
+                ></v-autocomplete>
             </v-col>
             <v-col class='ma-0 pt-6 pl-0'>호 객실 설정</v-col>
           </v-row>
@@ -788,57 +789,112 @@
         <v-card-text>
           <div>
               <v-row>
-                <v-col cols="12" sm="3">
+                <v-col cols="12" sm="3" class='ml-0 mr-0'>
                   <v-card
                     class="mx-auto"
-                    max-width="200"
+                    max-width="230"
                   >
                     <v-list
                       shaped
-                      class="overflow-y-auto ma-0 pa-0"
+                      class="ma-0 pa-0"
                       dense
-                      max-height="550px">
-                      <template
-                      v-for="(item, i) in items"  class="ma-0 pa-0">
-                        <v-list-item v-if="i===0">
-                          <v-list-item-action class="ma-0 pa-0">
-                            <v-checkbox
-                              v-model="beAll"
-                              color="primary"
-                              @change="allCheckBox()"
-                            ></v-checkbox>
-                          </v-list-item-action>
-                          <v-list-item-content>
-                            <v-list-item-subtitle>전체</v-list-item-subtitle>
-                          </v-list-item-content>
-                          <v-list-item-action class="ma-0 pa-0">
-                            <v-checkbox
-                              v-model="bePriShow"
-                              color="primary"
-                              @change="refresItems()"
-                            ></v-checkbox>
-                          </v-list-item-action>
-                          <v-list-item-content>
-                            <v-list-item-subtitle>우선<br>순위</v-list-item-subtitle>
-                          </v-list-item-content>
-                        </v-list-item>
-                        <v-list-item class="ma-0 mb-n4 pt-0">
-                          <v-list-item-action class="mt-0 pt-0">
-                            <v-checkbox
-                              v-model="item.beChecked"
-                              color="primary"
-                              class="ma-0 pa-0"
-                            ></v-checkbox>
-                          </v-list-item-action>
-                          <v-list-item-content  class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8">
-                            <v-list-item-subtitle>{{item.RoomNo}} <v-icon v-if="bePriShow" x-small @click="upPrio(item.RoomNo)">keyboard_arrow_up</v-icon><v-icon v-if="bePriShow" x-small @click="downPrio(item.RoomNo)">keyboard_arrow_down</v-icon></v-list-item-subtitle>
-                          </v-list-item-content>
-                        </v-list-item>
+                      max-height="800px">
+                      <v-row dense class="ma-0 pa-0" justify="left">
+                        <v-col dense max-width="60px" class="ma-0 pa-0">
+                          <v-list-item class="ma-0 mr-1 mb-n3 pa-0 pt-0">
+                            <v-list-item-action class="mt-0 pt-0">
+                              <v-checkbox
+                                v-model="beAll"
+                                color="primary"
+                                @change="allCheckBox()"
+                              ></v-checkbox>
+                            </v-list-item-action>
+                            <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8 mr-n2">
+                              <v-list-item-subtitle class="ma-0 pa-0">전체</v-list-item-subtitle>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-col>
+                      <template v-for="(item, i) in items" dense class="ma-0 pa-0" justify="left">
+                        <v-col v-if="i >= 0 && i <=12"  dense max-width="60px" class="ma-0 pa-0">
+                          <v-list-item class="ma-0 mr-1 mb-n3 pa-0 pt-0">
+                            <v-list-item-action class="mt-0 pt-0">
+                              <v-checkbox
+                                v-model="item.beChecked"
+                                color="primary"
+                                class="ma-0 pa-0"
+                                @change="chkCheckBoxs()"
+                              ></v-checkbox>
+                            </v-list-item-action>
+                            <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8">
+                              <v-list-item-subtitle class="ma-0 pa-0">
+                                {{item.RoomNo}}
+                              </v-list-item-subtitle>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-col>
                       </template>
+                      <template v-for="(item, i) in items" dense class="ma-0 pa-0" justify="left">
+                        <v-col v-if="i >= 13 && i <=38"  dense max-width="60px" class="ma-0 pa-0">
+                          <v-list-item class="ma-0 mr-1 mb-n3 pa-0 pt-0">
+                            <v-list-item-action class="mt-0 pt-0">
+                              <v-checkbox
+                                v-model="item.beChecked"
+                                color="primary"
+                                class="ma-0 pa-0"
+                                @change="chkCheckBoxs()"
+                              ></v-checkbox>
+                            </v-list-item-action>
+                            <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8">
+                              <v-list-item-subtitle class="ma-0 pa-0">
+                                {{item.RoomNo}}
+                              </v-list-item-subtitle>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-col>
+                      </template>
+                      <template v-for="(item, i) in items" dense class="ma-0 pa-0" justify="left">
+                        <v-col v-if="i >= 39 && i <=65"  dense max-width="60px" class="ma-0 pa-0">
+                          <v-list-item class="ma-0 mr-1 mb-n3 pa-0 pt-0">
+                            <v-list-item-action class="mt-0 pt-0">
+                              <v-checkbox
+                                v-model="item.beChecked"
+                                color="primary"
+                                class="ma-0 pa-0"
+                                @change="chkCheckBoxs()"
+                              ></v-checkbox>
+                            </v-list-item-action>
+                            <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8">
+                              <v-list-item-subtitle class="ma-0 pa-0">
+                                {{item.RoomNo}}
+                              </v-list-item-subtitle>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-col>
+                      </template>
+                      <template v-for="(item, i) in items" dense class="ma-0 pa-0" justify="left">
+                        <v-col v-if="i >= 66 && i <=90"  dense max-width="60px" class="ma-0 pa-0">
+                          <v-list-item class="ma-0 mr-1 mb-n3 pa-0 pt-0">
+                            <v-list-item-action class="mt-0 pt-0">
+                              <v-checkbox
+                                v-model="item.beChecked"
+                                color="primary"
+                                class="ma-0 pa-0"
+                                @change="chkCheckBoxs()"
+                              ></v-checkbox>
+                            </v-list-item-action>
+                            <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8">
+                              <v-list-item-subtitle class="ma-0 pa-0">
+                                {{item.RoomNo}}
+                              </v-list-item-subtitle>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-col>
+                      </template>
+                      </v-row>
                     </v-list>
                   </v-card>
                 </v-col>
-                <v-col cols="12" sm="6">
+                <v-col cols="12" sm="6" class='ml-0 mr-0'>
                   <v-card
                     dense
                     max-width="6560px"
@@ -1090,14 +1146,12 @@
                               </v-list-item>
                             </v-list>
                           </v-card>
-
                         </v-col>
                       </v-row>
-
                     </v-card-text>
                   </v-card>
               </v-col>
-            <v-col>
+            <v-col class='ml-0 mr-0'>
               <v-card
                 dense
                 max-width="350px"
@@ -1170,6 +1224,13 @@
     </v-dialog>
   </v-container>
 </template>
+<style>
+.v-dialog > .v-card > .v-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+</style>
 <script>
 import axios from 'axios'
 Apex = {
@@ -1196,6 +1257,7 @@ export default {
       CurStatus: 0,
       SetStatus: 0,
       roomsStats: [],
+      roomsOldStats: [],
       roomNos: [],
       roomNo: 0,
       series1: [],
@@ -1205,7 +1267,7 @@ export default {
       roomGraphModal: false,
       settingRoomModal: false,
       time: { 'name': '10분', 'value': 600 },
-      times: [{ 'name': '5분', 'value': 300 }, { 'name': '10분', 'value': 600 }, { 'name': '1시간', 'value': 3600 }, { 'name': '하루', 'value': (3600 * 24) }],
+      times: [{ 'name': '5분', 'value': 300 }, { 'name': '10분', 'value': 600 }, { 'name': '1시간', 'value': 3600 }, { 'name': '하루', 'value': (3600 * 24) }, { 'name': '전체', 'value': 0 }],
       startTime: this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY/MM/DD HH:mm'),
       endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD HH:mm'),
       bePriShow: false,
@@ -1266,14 +1328,38 @@ export default {
       // axios.get(`http://localhost:3000/api/rooms`)
       axios.get(`${this.$apiRootPath}rooms`)
         .then((r) => {
-          this.roomsStats = r.data
+          if (this.roomsOldStats.length !== 0) {
+            for (var key in this.roomsOldStats) {
+              if( this.roomsOldStats[key].ucRoomState !==  r.data[key].ucRoomState ) {
+                this.roomsStats[key].ucRoomState = r.data[key].ucRoomState
+              }
+              if( this.roomsOldStats[key].ucTotalStatus !==  r.data[key].ucTotalStatus ) {
+                this.roomsStats[key].ucTotalStatus = r.data[key].ucTotalStatus
+              }
+              if( this.roomsOldStats[key].ucCurStatus !==  r.data[key].ucCurStatus ) {
+                this.roomsStats[key].ucCurStatus = r.data[key].ucCurStatus
+              }
+              if( this.roomsOldStats[key].fTsurf_cur !==  r.data[key].fTsurf_cur ) {
+                this.roomsStats[key].fTsurf_cur = r.data[key].fTsurf_cur
+              }
+              if( this.roomsOldStats[key].fTroom_cur !==  r.data[key].fTroom_cur ) {
+                this.roomsStats[key].fTroom_cur = r.data[key].fTroom_cur
+              }
+              if( this.roomsOldStats[key].usManHeatingMode !==  r.data[key].usManHeatingMode ) {
+                this.roomsStats[key].usManHeatingMode = r.data[key].usManHeatingMode
+              }
+            }
+          } else {
+            this.roomsStats = r.data
+          }
           this.CurStatus = 0
           this.SetStatus = 0
           for (var i = 0; i < this.roomsStats.length; i++) {
             this.CurStatus = this.CurStatus + ((this.roomsStats[i].ucCurStatus === 1) ? 1 : 0)
-            this.SetStatus = this.SetStatus + ((this.roomsStats[i].ucSetStatus === 1) ? 1 : 0)
+            this.SetStatus = this.SetStatus + (((this.roomsStats[i].ucTotalStatus & 16) !== 0) ? 1 : 0)
             this.roomNos.push(this.roomsStats[i].usRoomNo)
           }
+          this.roomsOldStats = this.roomsStats
         })
         .catch((e) => {
           alert(e.message)
@@ -1296,12 +1382,15 @@ export default {
           var data5 = []
           var data6 = []
           var data7 = []
+          var data8 = []
+          var data9 = []
           var date = []
+          var nCnt = 0
           this.graphTitle1 = '온도 정보'
           this.graphTitle2 = '상태 정보'
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].ucRoomState !== null) {
-              data0.push(parseInt(this.datas[i].ucRoomState)+4)
+              data0.push(parseInt(this.datas[i].ucRoomState)+7)
             } else {
               data0.push(-1)
             }
@@ -1340,15 +1429,38 @@ export default {
             } else {
               data7.push(-1)
             }
-            // if(i === 0) alert(new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(0, 10) + ' ' + new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(11, 5))
-            // date.push(new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(0, 10) + ' ' + new Date(this.datas[i].m * this.time.value * 1000).toISOString().substr(11, 5) )
-            date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
+            if (this.datas[i].usManHeatingMode !== null && this.datas[i].usManHeatingMode < 50) {
+              if (this.datas[i].usManHeatingMode === '0') {
+                data8.push(parseInt(this.datas[i].usManHeatingMode+6))
+              } else if (this.datas[i].usManHeatingMode === '1') {
+                data8.push(parseInt(this.datas[i].usManHeatingMode+5))
+              } else {
+                data8.push(parseInt(this.datas[i].usManHeatingMode+4))
+              }
+            } else {
+              data8.push(-1)
+            }
+            if (this.datas[i].fTset_cur !== null && this.datas[i].fTset_cur < 50) {
+              data9.push((this.datas[i].fTset_cur).toFixed(2))
+            } else {
+              data9.push(-1)
+            }
+            if (this.time.value === 0 ){
+              date.push(new Date((this.datas[i].m + (9 * 60 * 60)) * 1000).toISOString())
+              nCnt = 3
+            } else {
+              date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
+              nCnt = 0
+            }
           }
-          //alert("data2 : " + JSON.stringify(data2) + ", date : " + JSON.stringify(date))
           this.series1 = [
             {
               name: '설정온도',
               data: data3
+            },
+            {
+              name: '제어기설정온도',
+              data: data9
             },
             {
               name: '실내설정온도',
@@ -1369,9 +1481,13 @@ export default {
           ]
           this.series2 = [
             {
-              name: '재실정보',
-              data: data0
+              name: '난방모드',
+              data: data8
             },
+            // {
+            //   name: '재실정보',
+            //   data: data0
+            // },
             {
               name: '난방설정상태',
               data: data1
@@ -1406,7 +1522,7 @@ export default {
                 rotate: 0,
                 // format: 'yy/MM/dd HH:mm',
                 formatter: function (value) {
-                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
+                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, parseInt(5 + nCnt)))
                 }
               }
             }
@@ -1436,7 +1552,7 @@ export default {
                 rotate: 0,
                 // format: 'yy/MM/dd HH:mm',
                 formatter: function (value) {
-                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, 5))
+                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, parseInt(5 + nCnt)))
                 }
               }
             }
@@ -1452,6 +1568,9 @@ export default {
     },
     closeRoomGraph: function () {
       this.startReload()
+      this.time = { 'name': '10분', 'value': 600 }
+      this.startTime = this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY/MM/DD HH:mm')
+      this.endTime = this.$moment(new Date().toISOString()).format('YYYY/MM/DD HH:mm')
       this.searchloading = false
       this.loading = false
       this.roomGraphModal = false
@@ -1581,6 +1700,7 @@ export default {
         })
     },
     stopRoomStat: function () {
+      var roomNos = []
       this.saveloading = true
       this.loading = true
       this.roomStat.HeatingMode = 2
@@ -1588,12 +1708,21 @@ export default {
       this.roomStat.MH_HeatingStopTimeSec = (this.trnMH_HeatingStopTimeHour * 60 * 60) + (this.trnMH_HeatingStopTimeMin * 60)
       this.roomStat.MH_TotalHeatingTimeSec = (this.trnMH_TotalHeatingTimeHour * 60 * 60) + (this.trnMH_TotalHeatingTimeMin * 60)
       this.roomStat.MH_TodayStartTime = (this.trnMH_TodayStartTimeHour * 60 * 60) + (this.trnMH_TodayStartTimeMin * 60)
-      var roomNos = []
-      for (var key in this.items) {
-        if (this.items[key].beChecked) {
-          roomNos.push(this.items[key].RoomNo)
+
+      if (this.beAll) {
+        roomNos.push(65535)
+      } else {
+        for (var key in this.items) {
+          if (this.items[key].beChecked) {
+            roomNos.push(this.items[key].RoomNo)
+          }
         }
       }
+      // for (var key in this.items) {
+      //   if (this.items[key].beChecked) {
+      //     roomNos.push(this.items[key].RoomNo)
+      //   }
+      // }
       // axios.put(`http://localhost:3000/api/rooms/roomStat`, { config: this.roomStat, roomNos: roomNos })
       axios.put(`${this.$apiRootPath}rooms/roomStat`, { config: this.roomStat, roomNos: roomNos })
         .then((r) => {
@@ -1606,18 +1735,28 @@ export default {
         })
     },
     saveRoomStat: function () {
+    var roomNos = []
       this.saveloading = true
       this.loading = true
       this.roomStat.MH_HeatingTimeSec = (this.trnMH_HeatingTimeHour * 60 * 60) + (this.trnMH_HeatingTimeMin * 60)
       this.roomStat.MH_HeatingStopTimeSec = (this.trnMH_HeatingStopTimeHour * 60 * 60) + (this.trnMH_HeatingStopTimeMin * 60)
       this.roomStat.MH_TotalHeatingTimeSec = (this.trnMH_TotalHeatingTimeHour * 60 * 60) + (this.trnMH_TotalHeatingTimeMin * 60)
       this.roomStat.MH_TodayStartTime = (this.trnMH_TodayStartTimeHour * 60 * 60) + (this.trnMH_TodayStartTimeMin * 60)
-      var roomNos = []
-      for (var key in this.items) {
-        if (this.items[key].beChecked) {
-          roomNos.push(this.items[key].RoomNo)
+
+      if (this.beAll) {
+        roomNos.push(65535)
+      } else {
+        for (var key in this.items) {
+          if (this.items[key].beChecked) {
+            roomNos.push(this.items[key].RoomNo)
+          }
         }
       }
+      // for (var key in this.items) {
+      //   if (this.items[key].beChecked) {
+      //     roomNos.push(this.items[key].RoomNo)
+      //   }
+      // }
       // axios.put(`http://localhost:3000/api/rooms/roomStat`, { config: this.roomStat, roomNos: roomNos })
       axios.put(`${this.$apiRootPath}rooms/roomStat`, { config: this.roomStat, roomNos: roomNos })
         .then((r) => {
@@ -1655,6 +1794,16 @@ export default {
         this.items[key].beChecked = this.beAll
       }
     },
+    chkCheckBoxs() {
+      var beAllChecked = true
+      for (var key in this.items) {
+        if (!this.items[key].beChecked) {
+          beAllChecked = false
+          break
+        }
+      }
+      this.beAll = beAllChecked
+    },
     refresItems () {
       var srcArr = []
       var tmpPri = []
@@ -1683,6 +1832,7 @@ export default {
       srcArr = this.items
       this.items = []
       this.items = srcArr
+      this.chkCheckBoxs()
     },
     upPrio (roomNo) {
       var beChanged = false

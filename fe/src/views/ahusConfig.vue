@@ -13,7 +13,9 @@
             <th class="text-center black--text ma-0 pa-0 pt-0 config-column" style="border-bottom:4px solid lightgrey;">팬<br>자동/수동<br>설정</th>
             <th class="text-center black--text ma-0 pa-0 pt-0 config-column" style="border-bottom:4px solid lightgrey;">댐퍼<br>자동/수동<br>설정</th>
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">내부<br>설정온도</th>
-            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">CO2 농도<br>기준 설정값</th>
+            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">냉난방<br>초기시간(분)</th>
+            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">CO2<br>초기설정값</th>
+            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">CO2 농도<br>기준설정값</th>
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">댐퍼 수동<br>설정값</th>
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">댐퍼 수동<br>최대값</th>
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">댐퍼 수동<br>최소값</th>
@@ -196,6 +198,8 @@
               @change="saveAhuConfig()"></v-select>
             </td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Tzone_set" @change="saveAhuConfig()"></v-text-field></td>
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.HCInitTimeMin" @change="saveAhuConfig()"></v-text-field></td>
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.PPMco2_init" @change="saveAhuConfig()"></v-text-field></td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.PPMco2_set" @change="saveAhuConfig()"></v-text-field></td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Rdamp_set" @change="saveAhuConfig()"></v-text-field></td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Rdamp_max" @change="saveAhuConfig()"></v-text-field></td>
@@ -331,8 +335,10 @@ export default {
           this.ahuConfigs[i].Tzone_set === this.tempAhuConfigs[i].Tzone_set &&
           this.ahuConfigs[i].Rdamp_set === this.tempAhuConfigs[i].Rdamp_set &&
           this.ahuConfigs[i].PPMco2_set === this.tempAhuConfigs[i].PPMco2_set &&
-          this.ahuConfigs[i].Rdamp_max === this.tempAhuConfigs[i].Rdamp_max &&
           this.ahuConfigs[i].Rdamp_min === this.tempAhuConfigs[i].Rdamp_min &&
+          this.ahuConfigs[i].Rdamp_max === this.tempAhuConfigs[i].Rdamp_max &&
+          this.ahuConfigs[i].HCInitTimeMin === this.tempAhuConfigs[i].HCInitTimeMin &&
+          this.ahuConfigs[i].PPMco2_init === this.tempAhuConfigs[i].PPMco2_init &&
           this.ahuConfigs[i].Desc === this.tempAhuConfigs[i].Desc)) {
           ahuIdxs.push(this.ahuConfigs[i].AhuIndex)
         }

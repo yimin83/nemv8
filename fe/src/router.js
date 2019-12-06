@@ -26,6 +26,11 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/roomsConfig.vue')
     },
     {
+      path: '/groupSchedule',
+      name: 'groupSchedule',
+      component: () => import(/* webpackChunkName: "about" */ './views/roomSchedule.vue')
+    },
+    {
       path: '/ahusStat',
       name: 'ahus',
       component: () => import(/* webpackChunkName: "about" */ './views/ahus.vue')

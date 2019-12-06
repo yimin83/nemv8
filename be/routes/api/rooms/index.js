@@ -41,7 +41,13 @@ const oam_msg_type_e = {
 
 	oam_get_session_info: 17,
 
-	oam_event_alarm: 18
+	oam_event_alarm: 18,
+
+	oam_set_floorRad_scheduler_time_config: 19,
+	oam_get_floorRad_scheduler_time_config: 20,
+
+	oam_set_floorRad_scheduler_group_control: 21,
+	oam_get_floorRad_scheduler_group_control: 22
 }
 
 var client = net.getConnection()
@@ -51,7 +57,6 @@ var nSeq = counter.get()
 var totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeEmsAuthReq_t()
 var msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_Auth, Msg_Status_OK)
 var msgBuffer = net.makeEmsAuthReq_t(EMS_ID, EMS_PASSWORD, UserLevel, web_interface)
-console.log("############msgBuffer hex : " + msgBuffer.toString('hex'))
 var fullBuffer = new Buffer(totalSize)
 msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
 msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t())
@@ -68,15 +73,16 @@ var requestAuth = function () {
 	totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeEmsAuthReq_t()
 	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_Auth, Msg_Status_OK)
 	msgBuffer = net.makeEmsAuthReq_t(EMS_ID, EMS_PASSWORD, UserLevel, web_interface)
-	console.log("############msgBuffer hex : " + msgBuffer.toString('hex'))
+	// console.log("############msgBuffer hex : " + msgBuffer.toString('hex'))
 	var fullBuffer = new Buffer(totalSize)
 	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
 	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t())
+	console.log("################ requestAuth end!!! ################")
 	net.writeData(client, fullBuffer, null)
 }
 requestAuth()
 var dataLen = 0
-var IntervalA
+
 // const startCallback = Date.now()
 // while (Date.now() - startCallback < 10000) {
 // }
@@ -185,6 +191,9 @@ var checkRsvRoomsArr = function () {
 makeRsvRoomsArr()
 //setInterval(checkRsvRoomsArr, 5000)
 const seqMap = new Map()
+const timerMap = new Map()
+
+
 router.get('/', function(req, res, next) {
 	console.log("############ get floor_rad_room ############")
   mysqlDB.query("SELECT * FROM floor_rad_room", function(err, result, fields) {
@@ -193,16 +202,101 @@ router.get('/', function(req, res, next) {
     }
     else{
       res.json(result)
-      console.log("############ get floor_rad_room from db res: " + JSON.stringify(result))
+      // console.log("############ get floor_rad_room from db res: " + JSON.stringify(result))
     }
   })
 })
 
 router.get('/getSiteInfo', function(req, res, next) {
-	console.log("############ getSiteInfo ############")
+	// console.log("############ getSiteInfo ############")
   res.json({'siteInfo':config.siteInfo})
-	console.log("############ get getSiteInfo from db res: " + JSON.stringify(config))
+	// console.log("############ get getSiteInfo from db res: " + JSON.stringify(config))
 })
+
+router.get('/groupSchedule', (req, res, next) => { // 수정
+	console.log("############ get /groupSchedule ")
+	dataLen = 0
+	msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_scheduler_group_control, dataLen, null)
+	totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+	nSeq = counter.get()
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+	fullBuffer = new Buffer(totalSize)
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+	net.writeData(client, fullBuffer, nSeq)
+  var timer = setInterval(checkMap, 100, nSeq, res)
+	timerMap.set(nSeq, timer)
+})
+
+router.put('/groupSchedule', (req, res, next) => { // 수정
+	console.log("############ put groupSchedule values : " + JSON.stringify(req.body))
+	var prioArr = []
+	var dataBuffer = new Buffer(net.makeFloorRadSchedulerGroupConfig_t())
+	dataBuffer = net.makeFloorRadSchedulerGroupConfig_t(
+		req.body.config.StartTime,
+		req.body.config.EndTime,
+		req.body.config.GroupIndex,
+		req.body.config.Use,
+		req.body.config.SchedulerSate,
+		req.body.config.Reserved
+	)
+	dataLen = net.getSizeFloorRadSchedulerGroupConfig_t()
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_floorRad_scheduler_group_control, dataLen, null)
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+	nSeq = counter.get()
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+	fullBuffer = new Buffer(totalSize)
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
+	net.writeData(client, fullBuffer, nSeq)
+	res.send({ success: true })
+})
+
+router.get('/timeSchedule', (req, res, next) => { // 수정
+	console.log("############ get /timeSchedule ")
+	dataLen = 0
+	msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_scheduler_time_config, dataLen, null)
+	totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+	nSeq = counter.get()
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+	fullBuffer = new Buffer(totalSize)
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+	net.writeData(client, fullBuffer, nSeq)
+  var timer = setInterval(checkMap, 100, nSeq, res)
+	timerMap.set(nSeq, timer)
+})
+
+router.put('/timeSchedule', (req, res, next) => { // 수정
+	console.log("############ put timeSchedule values : " + JSON.stringify(req.body))
+	var prioArr = []
+	var dataBuffer = new Buffer(net.getSizeFloorRadSchedulerTimeConfig_t())
+	dataBuffer = net.makeFloorRadSchedulerTimeConfig_t(
+		req.body.config.HeatingState0,
+		req.body.config.HeatingState1,
+		req.body.config.HeatingState2,
+		req.body.config.HeatingState3,
+		req.body.config.HeatingState4,
+		req.body.config.HeatingState5,
+		req.body.config.HeatingState6,
+		req.body.config.HeatingState7,
+		req.body.config.HeatingState8,
+		req.body.config.heatingState9
+	)
+	dataLen = net.getSizeFloorRadRoomState()
+  msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_floorRad_scheduler_time_config, dataLen, null)
+  totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+	nSeq = counter.get()
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+	fullBuffer = new Buffer(totalSize)
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
+	net.writeData(client, fullBuffer, nSeq)
+	res.send({ success: true })
+})
+
 
 router.get('/roomPriority', (req, res, next) => { // 수정
 	console.log("############ get /roomPriority ")
@@ -215,13 +309,21 @@ router.get('/roomPriority', (req, res, next) => { // 수정
 	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
 	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
 	net.writeData(client, fullBuffer, nSeq)
-	IntervalA = setInterval(checkMap, 100, nSeq, res)
+  var timer = setInterval(checkMap, 100, nSeq, res)
+	timerMap.set(nSeq, timer)
 })
 
 router.put('/roomStat', (req, res, next) => { // 수정
 	console.log("############ put roomStat values : " + JSON.stringify(req.body))
 	var dataBuffer = new Buffer(net.getSizeFloorRadRoomState())
+
 	for (var key in req.body.roomNos) {
+		if(req.body.roomNos[key] === req.body.config.RoomNo) {
+			req.body.config.OptimalNeedTime = 1
+		} else {
+			req.body.config.OptimalNeedTime = 0
+		}
+		// console.log("req.body.roomNos[key] : " + req.body.roomNos[key] + ", req.body.config.OptimalNeedTime : " + req.body.config.OptimalNeedTime)
 		dataBuffer = net.makeFloorRadRoomState_t(
 			req.body.roomNos[key],
 			req.body.config.HeatingMode,
@@ -299,6 +401,8 @@ router.put('/ahusConfig', (req, res, next) => { // 수정
 					req.body.config[i].PPMco2_set,
 					req.body.config[i].Rdamp_min,
 					req.body.config[i].Rdamp_max,
+					req.body.config[i].HCInitTimeMin,
+					req.body.config[i].PPMco2_init,
 					req.body.config[i].Desc
 				)
 				dataLen = net.getSizeAhuZoneConfig_t()
@@ -346,10 +450,10 @@ router.put('/roomPrio', (req, res, next) => { // 수정
 })
 
 router.get('/getAlarm', (req, res, next) => { // 수정
-	console.log("############ get /getAlarm ")
+	// console.log("############ get /getAlarm ")
   // console.log("######################### getRoomConfig ######################### ")
 	res.json(net.getAlarm())
-	console.log("############ get getAlarm from memory: " + JSON.stringify(net.getAlarm()))
+	// console.log("############ get getAlarm from memory: " + JSON.stringify(net.getAlarm()))
 	if(net.getAlarm() != null) {
 		net.chkAlarm()
 	}
@@ -369,28 +473,7 @@ router.put('/roomStatTrend', (req, res, next) => { // 수정
 		else{
 			//console.log("############ get /roomStatTrend :" + JSON.stringify(result))
 			res.json(result)
-      console.log("############ get roomStatTrend from db res: " + JSON.stringify(result))
-		}
-	})
-})
-
-router.put('/roomSummaryTrend', (req, res, next) => { // 수정
-	console.log("############ put /roomSummaryTrend : " + JSON.stringify(req.body))
-	const usRoomNo = req.body.usRoomNo
-	const startTime = req.body.startTime
-	const endTime = req.body.endTime
-	const time = req.body.time
-	var beforeTime = new Date().getTime();
-  // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query(
-	"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m, ucCurStatus, AVG(fTsurf_cur) AS fTsurf_cur, AVG(fTroom_cur) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
-		if(err) {
-			console.log("############ put /roomSummaryTrend error : " + err)
-		}
-		else{
-			// console.log("############ get /roomSummaryTrend :" + JSON.stringify(result))
-			res.json(result)
-      console.log("############ get roomSummaryTrend from db res: " + JSON.stringify(result))
+      // console.log("############ get roomStatTrend from db res: " + JSON.stringify(result))
 		}
 	})
 })
@@ -405,26 +488,26 @@ router.put('/getRoomTrend', (req, res, next) => { // 수정
   // console.log("######################### getRoomConfig ######################### ")
 	if(time != 0){
 		mysqlDB.query(
-			"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m, ucRoomState, ucSetStatus, ucCurStatus, AVG(fTset) AS fTset, AVG(fTsurf_set) AS fTsurf_set, AVG(fTroom_set) AS fTroom_set, AVG(fTsurf_cur) AS fTsurf_cur, AVG(fTroom_cur) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
+			"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m, ucRoomState, ucSetStatus, ucCurStatus, usManHeatingMode, AVG(fTset) AS fTset, AVG(fTset_cur) AS fTset_cur, AVG(fTsurf_set) AS fTsurf_set, AVG(fTroom_set) AS fTroom_set, AVG(fTsurf_cur) AS fTsurf_cur, AVG(fTroom_cur) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
 			if(err) {
 				console.log("############ put /getRoomTrend error : " + err)
 			}
 			else{
 				// console.log("############ put /getRoomTrend :" + JSON.stringify(result))
 				res.json(result)
-	      console.log("############ get getRoomTrend from db res: " + JSON.stringify(result))
+	      // console.log("############ get getRoomTrend from db res: " + JSON.stringify(result))
 			}
 		})
 	} else {
 		mysqlDB.query(
-			"SELECT nSetLastTime AS m, ucRoomState, ucSetStatus, ucCurStatus, fTset, fTsurf_set, fTroom_set, fTsurf_cur, fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) ORDER BY m DESC", [usRoomNo, startTime, endTime], function(err, result, fields) {
+			"SELECT nSetLastTime AS m, ucRoomState, ucSetStatus, ucCurStatus, usManHeatingMode, fTset, fTset_cur, fTsurf_set, fTroom_set, fTsurf_cur, fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) ORDER BY m DESC", [usRoomNo, startTime, endTime], function(err, result, fields) {
 			if(err) {
 				console.log("############ put /getRoomTrend error : " + err)
 			}
 			else{
 				// console.log("############ put /getRoomTrend :" + JSON.stringify(result))
 				res.json(result)
-	      console.log("############ get getRoomTrend from db res: " + JSON.stringify(result))
+	      // console.log("############ get getRoomTrend from db res: " + JSON.stringify(result))
 			}
 		})
 	}
@@ -444,7 +527,7 @@ router.put('/solTrend', (req, res, next) => { // 수정
 		else{
 			// console.log("############ get /getSolTrend :" + JSON.stringify(result))
 			res.json(result)
-      console.log("############ get solTrend from db res: " + JSON.stringify(result))
+      // console.log("############ get solTrend from db res: " + JSON.stringify(result))
 		}
 	})
 })
@@ -463,7 +546,7 @@ console.log("############ put /siteEnv req.body : " + JSON.stringify(req.body))
 		else{
 			// console.log("############ get /solAhuTrend :" + JSON.stringify(result))
 			res.json(result)
-      console.log("############ get siteEnv from db res: " + JSON.stringify(result))
+      // console.log("############ get siteEnv from db res: " + JSON.stringify(result))
 		}
 	})
 })
@@ -475,30 +558,44 @@ console.log("############ put /solAhuTrend req.body : " + JSON.stringify(req.bod
 	const endTime = req.body.endTime
 	const time = req.body.time
 	var beforeTime = new Date().getTime();
-	mysqlDB.query("SELECT * FROM ( SELECT nLastUpdateTime DIV ? AS m, AVG(fData_damper_manual_set) AS fData_damper_manual_set, AVG(fData_temp_supply) AS fData_temp_supply, AVG(cState_supplay_fan) AS cState_supplay_fan, AVG(fData_hc_set_temp) AS fData_hc_set_temp, AVG(fData_temp_return) AS fData_temp_return, AVG(fData_damper_outer_set) AS fData_damper_outer_set, cMode_damper_auto_manual, AVG(nPPMco2_cur) AS nPPMco2_cur, cMode_manual_mode, cMode_auto_mode, cMode_auto_manual FROM solbeach_zone_record WHERE nZoneIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, ahuNo, startTime, endTime], function(err, result, fields) {
-		if(err) {
-			console.log("############ put /solAhuTrend error : " + err)
-		}
-		else{
-			// console.log("############ get /solAhuTrend :" + JSON.stringify(result))
-			res.json(result)
-      console.log("############ get solAhuTrend from db res: " + JSON.stringify(result))
-		}
-	})
+	if(time != 0){
+		mysqlDB.query("SELECT * FROM ( SELECT nLastUpdateTime DIV ? AS m, AVG(fData_damper_manual_set) AS fData_damper_manual_set, AVG(fData_temp_supply) AS fData_temp_supply, AVG(cState_supplay_fan) AS cState_supplay_fan, AVG(fData_hc_set_temp) AS fData_hc_set_temp, AVG(fData_temp_return) AS fData_temp_return, AVG(fData_damper_outer_set) AS fData_damper_outer_set, cMode_damper_auto_manual, AVG(nPPMco2_cur) AS nPPMco2_cur, cMode_manual_mode, cMode_auto_mode, cMode_auto_manual FROM solbeach_zone_record WHERE nZoneIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, ahuNo, startTime, endTime], function(err, result, fields) {
+			if(err) {
+				console.log("############ put /solAhuTrend error : " + err)
+			}
+			else{
+				// console.log("############ get /solAhuTrend :" + JSON.stringify(result))
+				res.json(result)
+	      // console.log("############ get solAhuTrend from db res: " + JSON.stringify(result))
+			}
+		})
+	} else {
+		mysqlDB.query("SELECT nLastUpdateTime AS m, fData_damper_manual_set, fData_temp_supply, cState_supplay_fan, fData_hc_set_temp, fData_temp_return, fData_damper_outer_set, cMode_damper_auto_manual, nPPMco2_cur, cMode_manual_mode, cMode_auto_mode, cMode_auto_manual FROM solbeach_zone_record WHERE nZoneIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) ORDER BY m DESC", [ahuNo, startTime, endTime], function(err, result, fields) {
+			if(err) {
+				console.log("############ put /solAhuTrend error : " + err)
+			}
+			else{
+				// console.log("############ get /solAhuTrend :" + JSON.stringify(result))
+				res.json(result)
+	      // console.log("############ get solAhuTrend from db res: " + JSON.stringify(result))
+			}
+		})
+	}
 })
 
 router.get('/emsSysConfig', function(req, res, next) {
-	console.log("############ get emsSysConfig ##########")
   dataLen = 0
   msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_sys_config, dataLen, null)
   totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
   nSeq = counter.get()
+	console.log("############ get emsSysConfig ########## nSeq : " + nSeq)
   msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
   fullBuffer = new Buffer(totalSize)
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
   msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
   net.writeData(client, fullBuffer, nSeq)
-  IntervalA = setInterval(checkMap, 100, nSeq, res)
+  var timer = setInterval(checkMap, 100, nSeq, res)
+	timerMap.set(nSeq, timer)
 })
 
 router.put('/emsSysConfig', (req, res, next) => { // 수정
@@ -678,7 +775,7 @@ router.get('/ahusConfigDB', function(req, res, next) {
     }
     else{
       res.json(result)
-      console.log("############ get ahusConfigDB from db res: " + JSON.stringify(result))
+      // console.log("############ get ahusConfigDB from db res: " + JSON.stringify(result))
     }
   })
 })
@@ -691,7 +788,7 @@ router.get('/zones', function(req, res, next) {
     else{
 			// console.log(JSON.stringify(result))
       res.json(result)
-      console.log("############ get zones from db res: " + JSON.stringify(result))
+      // console.log("############ get zones from db res: " + JSON.stringify(result))
     }
   })
 })
@@ -713,23 +810,8 @@ router.get('/ahusConfig/:ahuIndex', function(req, res, next) {
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
   msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
   net.writeData(client, fullBuffer, nSeq)
-  IntervalA = setInterval(checkMap, 100, nSeq, res)
-
-  // const ahuIndex = req.params.ahuIndex
-	// var data = new Uint16Array(2)
-	// ahusConfigData = []
-	// data[0] = ahuIndex
-	// console.log("############ get /ahusConfig/:ahuIndex : " + ahuIndex)
-  // dataLen = 0
-  // msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_solBeach_zone_config, dataLen, data)
-  // totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
-  // nSeq = counter.get()
-  // msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
-  // fullBuffer = new Buffer(totalSize)
-  // msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
-  // msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
-  // net.writeData(client, fullBuffer, nSeq)
-  // IntervalB = setInterval(pushMap, 10, nSeq, res, 1)
+  var timer = setInterval(checkMap, 100, nSeq, res)
+	timerMap.set(nSeq, timer)
 })
 
 var pushMap = function(seq, res, idx) {
@@ -785,7 +867,8 @@ router.get('/damperConfig/:ahuIndex', function(req, res, next) {
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
   msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
   net.writeData(client, fullBuffer, nSeq)
-  IntervalA = setInterval(checkMap, 100, nSeq, res)
+  var timer = setInterval(checkMap, 100, nSeq, res)
+	timerMap.set(nSeq, timer)
 })
 
 router.put('/damperConfig', (req, res, next) => { // 수정
@@ -850,13 +933,16 @@ router.put('/cmdRoomState', (req, res, next) => { // 수정
 	res.send({ success: true })
 })
 
+
 var checkMap = function(seq, res) {
   // console.log("######################### checkMap ######################### ")
   var json = seqMap.get(seq)
   if(json != '' && json != null) {
-    clearInterval(IntervalA)
 		try {
-    	res.json(seqMap.get(nSeq))
+			// console.log("checkMap seq : " + seq)
+			// console.log(res.socket)
+			res.json(seqMap.get(seq))
+		  clearInterval(timerMap.get(seq))
 			// throw new Error('오류 핸들링 테스트')
 		}
 		catch (exception) {
@@ -864,7 +950,8 @@ var checkMap = function(seq, res) {
 			return true
 		}
     // console.log("configSetting seqMap.get(nSeq) : " + seqMap.get(nSeq))
-    seqMap.delete(nSeq)
+    seqMap.delete(seq)
+    timerMap.delete(seq)
   }
 }
 router.get('/:usRoomNo', (req, res, next) => { // 수정
@@ -876,7 +963,7 @@ router.get('/:usRoomNo', (req, res, next) => { // 수정
       }
       else{
         res.json(result)
-	      console.log("############ get /:usRoomNo from db res: " + JSON.stringify(result))
+	      // console.log("############ get /:usRoomNo from db res: " + JSON.stringify(result))
       }
     })
 })
@@ -895,7 +982,8 @@ router.get('/getRoomConfig/:roomNo', (req, res, next) => { // 수정
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
   msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
   net.writeData(client, fullBuffer, nSeq)
-  IntervalA = setInterval(checkMap, 100, nSeq, res)
+  var timer = setInterval(checkMap, 100, nSeq, res)
+	timerMap.set(nSeq, timer)
 })
 
 router.post('/', (req, res, next) => { // 생성
@@ -1037,13 +1125,14 @@ router.get('/getRoomStat/:roomNo', function(req, res, next) {
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
   msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
   net.writeData(client, fullBuffer, nSeq)
-  IntervalA = setInterval(checkMap, 100, nSeq, res)
+  var timer = setInterval(checkMap, 100, nSeq, res)
+	timerMap.set(nSeq, timer)
 })
 
 exports.setSeqMap = function (seq, jsonData) {
     // res.redirect("/")
     seqMap.set(seq, jsonData)
-    console.log('setSeqMap seq : '+seq+' seqMap.get(seq) : ' + seqMap.get(seq))
+    // console.log('setSeqMap seq : '+seq+' seqMap.get(seq) : ' + seqMap.get(seq))
 }
 
 exports.reconnectAuth = function () {

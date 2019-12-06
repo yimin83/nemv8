@@ -173,6 +173,11 @@ export default {
                 to: { path: '/rooms' }
               },
               {
+                icon: 'favorite',
+                title: '스케쥴관리',
+                to: { path: '/groupSchedule' }
+              },
+              {
                 icon: 'help',
                 title: '트랜드',
                 to: { path: '/roomTrend' }
@@ -188,16 +193,6 @@ export default {
                 icon: 'help',
                 title: '평균그래프',
                 to: { path: '/roomAvgTrend' }
-              },
-              {
-                icon: 'help',
-                title: '공조기상태그래프',
-                to: { path: '/ahuTrend' }
-              },
-              {
-                icon: 'help',
-                title: '평균그래프',
-                to: { path: '/ahuAvgTrend' }
               }
             ]
           } else {
