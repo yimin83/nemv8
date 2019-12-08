@@ -1276,7 +1276,7 @@ var floor_rad_scheduler_group_config_t = new struct("floor_rad_scheduler_group_c
     "GroupIndex", struct.uint8(MAX_ROOM_CNT),
     "Use", struct.uint8(MAX_ROOM_CNT),
     "SchedulerSate", struct.uint8(),
-    "Reserved", struct.uint8()
+    "Reserved", struct.uint8(5)
 ]);
 net.makeFloorRadSchedulerGroupConfig_t = function(startTime, endTime, groupIndex, use, schedulerSate, reserved) {
   var buffer = new Buffer(floor_rad_scheduler_group_config_t.size());

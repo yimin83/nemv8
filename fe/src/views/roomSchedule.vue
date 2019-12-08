@@ -27,7 +27,7 @@
                   <v-toolbar dark dense icons-and-text>
                     <span>{{scheGrupsName[group.groupIdx]}}그룹</span>
                     <v-toolbar-items>
-                      <v-btn class="ml-n2" icon dark @click="setttingGroup(group.groupIdx)">
+                      <v-btn class="ml-n2" icon dark @click="openGroup(group.groupIdx)">
                         <v-icon small> mdi-settings</v-icon>
                       </v-btn>
                     </v-toolbar-items>
@@ -43,6 +43,8 @@
                             <v-list-item-action class="mt-0 pt-0">
                               <v-checkbox
                                 v-model="group.groupRoomUses[i]"
+                                v-bind:false-value = "0"
+                                v-bind:true-value = "1"
                                 color="primary"
                                 class="ma-0 pa-0"
                                 dense
@@ -203,8 +205,66 @@
         </center>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-text-field v-model="groupDatas.Min"></v-text-field>
-          <v-text-field v-model="groupDatas.Min"></v-text-field>
+            <v-menu
+              v-model='startMenu'
+              :close-on-content-click='false'
+              :nudge-right='40'
+              lazy
+              transition='scale-transition'
+              offset-y
+              full-width
+              min-width='290px'
+            >
+            <template v-slot:activator='{ on }'>
+              <v-text-field
+                v-model='startDate'
+                label='시작일'
+                prepend-icon='event'
+                readonly
+                v-on='on'
+                style='max-width:120px'
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model='startDate' no-title @input='startMenu = false'></v-date-picker>
+          </v-menu>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <v-text-field
+          v-model="startTime"
+          label="시작시간"
+          value="19/12/01 00:00"
+          type="time"
+          style="max-width:100px"></v-text-field>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <v-menu
+              v-model='endMenu'
+              :close-on-content-click='false'
+              :nudge-right='40'
+              lazy
+              transition='scale-transition'
+              offset-y
+              full-width
+              min-width='290px'
+            >
+            <template v-slot:activator='{ on }'>
+              <v-text-field
+                v-model='endDate'
+                label='종료일'
+                prepend-icon='event'
+                readonly
+                v-on='on'
+                style='max-width:120px'
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model='endDate' no-title @input='endMenu = false'></v-date-picker>
+          </v-menu>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <v-text-field
+          v-model="endTime"
+          label="종료시간"
+          value="19/12/01 00:00"
+          type="time"
+          style="max-width:100px"></v-text-field>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           <v-btn v-if="this.activeBtn === 0" :loading="saveLoading" :disabled="loading" class="d-flex" @click="saveSchedule()">저장</v-btn>
           <v-btn :loading="startLoading" :disabled="loading" class="d-flex" @click="startSchedule()">구동</v-btn>
           <v-btn :loading="stopLoading" :disabled="loading" class="d-flex" @click="stopSchedule()">정지</v-btn>
@@ -319,6 +379,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
+            <v-btn class="d-flex" :disabled="loading"  @click='clearAllGrpCheck()'>전체선택해제</v-btn>
             <v-btn class="d-flex" :loading="saveloading" :disabled="loading"  @click='saveGroup()'>저장</v-btn>
             <v-btn class="d-flex" :loading="closeloading" :disabled="loading"  @click='closeGroup()'>취소</v-btn>
           </v-card-actions>
@@ -361,29 +422,33 @@ export default {
         {value:7, name:'8'},
         {value:8, name:'9'},
         {value:9, name:'10'},
-        {value:-1, name:'-'}
+        {value:255, name:'-'}
       ],
       roomNos: [
         '201', '202', '203', '204', '205', '206', '207', '208', '209', '210', '211', '212', '213',
         '301', '302', '303', '304', '305', '306', '307', '308', '309', '310', '311', '312', '313', '314', '315', '316', '317', '318', '319', '320', '321', '322', '323', '324', '325',
         '501', '502', '503', '504', '505', '506', '507', '508', '509', '510', '511', '512', '513', '514', '515', '516', '517', '518', '519', '520', '521', '522', '523', '524', '525', '526',
         '601', '602', '603', '604', '605', '606', '607', '608', '609', '610', '611', '612', '613', '614', '615', '616', '617', '618', '619', '620', '621', '622', '623', '624', '625', '626', '627'],
-      curGroups: [],
-      groupDatas: [],
-      groupMemDatas: [],
-      curGroupRooms: [],
+      curGroups: [], // vue 화면에서 표시하기 쉽게 변형된 전체 그룹정보
+      groupDatas: [], // be로 전송할 난방설정 json 데이터(난방그룹의 저장, 구동시 사용)
+      groupMemDatas: [], // be로 전송할 난방설정 json 데이터(난방그룹의 저장, 구동시 사용)
+      curGroupRooms: [], // vue 화면에서 표시하기 쉽게 변형된 그룹소속 객실 정보
       curGroupIdx: 0,
-      srcScheduleDatas: [],
-      scheduleDatas: [],
-      startTime: this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY/MM/DD HH:mm'),
-      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD HH:mm'),
+      srcScheduleDatas: [], // be로 전송할 난방시간설정 json 데이터
+      scheduleDatas: [], // vue 화면에서 표시하기 쉽게 변형된 난방시간설정 정보
       startLoading: false,
       stopLoading: false,
       saveloading: false,
       stopLoading: false,
       loading: false,
       settingGroupModal: false,
-      groupTitle:0
+      groupTitle:0,
+      startMenu:false,
+      startDate: new Date().toISOString().substr(0, 10),
+      startTime: '',
+      endMenu:false,
+      endDate: new Date().toISOString().substr(0, 10),
+      endTime: ''
     }
   },
   methods: {
@@ -391,11 +456,16 @@ export default {
       // axios.get(`http://localhost:3000/api/rooms`)
       axios.get(`${this.$apiRootPath}/rooms/groupSchedule`)
         .then((r) => {
+          var tmpTime
           this.groupDatas = JSON.parse(r.data)
           this.groupMemDatas = JSON.parse(r.data)
+          this.startDate = this.groupDatas.StartTime !== 0 ? this.$moment(new Date(this.groupDatas.StartTime * 1000).toISOString()).format('YYYY-MM-DD') : '0000-00-00'
+          this.startTime = this.groupDatas.StartTime !== 0 ? this.$moment(new Date(this.groupDatas.StartTime * 1000).toISOString()).format('HH:mm') : '00:00'
+          this.endDate = this.groupDatas.EndTime !== 0 ? this.$moment(new Date(this.groupDatas.EndTime * 1000).toISOString()).format('YYYY-MM-DD') : '0000-00-00'
+          this.endTime = this.groupDatas.EndTime !== 0 ? this.$moment(new Date(this.groupDatas.EndTime * 1000).toISOString()).format('HH:mm') : '00:00'
           // this.groupDatas.GroupIndex = [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3]
           // this.groupDatas.Use = [0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0]
-          this.refreshGroup()
+          this.refreshGroupForVue()
           // alert(JSON.stringify(this.curGroups))
         })
         .catch((e) => {
@@ -403,7 +473,7 @@ export default {
           console.error(e.message)
         })
     },
-    refreshGroup() {
+    refreshGroupForVue() {
       var groupRoomIdxs = []
       var groupRoomUses = []
       this.curGroups = []
@@ -419,8 +489,27 @@ export default {
         this.curGroups.push({ 'groupIdx':i, 'groupRoomIdxs':groupRoomIdxs, 'groupRoomUses':groupRoomUses })
       }
     },
-    setttingGroup(grpId) {
-      this.groupTitle = grpId
+    makeSaveScheduleGroup(){
+      // this.curGroups.push({ 'groupIdx':i, 'groupRoomIdxs':groupRoomIdxs, 'groupRoomUses':groupRoomUses })
+      for (var grpKey in this.groupDatas.GroupIndex){
+        for (var curGrpKey in this.curGroups){
+          for (var curGrpRoomIdxkey in this.curGroups[curGrpKey].groupRoomIdxs) {
+            if(grpKey === this.curGroups[curGrpKey].groupRoomIdxs[curGrpRoomIdxkey]){
+              this.groupDatas.GroupIndex[grpKey] = this.curGroups[curGrpKey].groupIdx
+              this.groupDatas.Use[grpKey] = this.curGroups[curGrpKey].groupRoomUses[curGrpRoomIdxkey]
+              break;
+            }
+          }
+        }
+      }
+      var nStartDate = Math.round((new Date(this.startDate + " " + this.startTime).getTime()) / 1000)
+      var nEndDate = Math.round((new Date(this.endDate + " " + this.endTime).getTime()) / 1000)
+      this.groupDatas.StartTime = nStartDate
+      this.groupDatas.EndTime = nEndDate
+      alert(JSON.stringify(this.groupDatas))
+    },
+    openGroup(grpId) {
+      this.groupTitle = parseInt(grpId + 1)
       this.curGroupIdx = grpId
       var roomIdx = []
       var roomUse = []
@@ -437,6 +526,11 @@ export default {
       }
       this.settingGroupModal = true
     },
+    clearAllGrpCheck() {
+      for (var key in this.curGroupRooms) {
+        this.curGroupRooms[key].roomExist = false
+      }
+    },
     saveGroup() {
       for (var key in this.curGroupRooms) {
         if (this.curGroupRooms[key].roomExist === 1 || this.curGroupRooms[key].roomExist === true){
@@ -445,7 +539,7 @@ export default {
             this.groupMemDatas.Use[key] = 0
           }
         } else if (this.curGroupRooms[key].roomExist !== 1 && (this.groupMemDatas.GroupIndex[key] === this.curGroupIdx)) {
-          this.groupMemDatas.GroupIndex[key] = -1
+          this.groupMemDatas.GroupIndex[key] = 255
           this.groupMemDatas.Use[key] = 0
         }
       }
@@ -462,7 +556,7 @@ export default {
     closeGroup() {
       this.settingGroupModal = false
     },
-    makeSchedulerGroupForWeb() {
+    makeSchedulerGroupForVue() {
       var hourData = []
       this.scheduleDatas = []
       for (var i = 0; i < 24; i++){
@@ -487,7 +581,7 @@ export default {
       axios.get(`${this.$apiRootPath}/rooms/timeSchedule`)
         .then((r) => {
           this.srcScheduleDatas = JSON.parse(r.data)
-          this.makeSchedulerGroupForWeb()
+          this.makeSchedulerGroupForVue()
         })
         .catch((e) => {
           alert(e.message)
@@ -519,12 +613,18 @@ export default {
     },
     saveSchedule() {
       alert("saveSchedule")
+      this.groupDatas.SchedulerSate = 2
+      this.makeSaveScheduleGroup();
     },
     startSchedule() {
       alert("startSchedule")
+      this.groupDatas.SchedulerSate = 1
+      this.makeSaveScheduleGroup();
     },
     stopSchedule() {
       alert("stopSchedule")
+      this.groupDatas.SchedulerSate = 0
+      this.makeSaveScheduleGroup();
     }
   }
 }
