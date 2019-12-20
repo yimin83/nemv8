@@ -213,6 +213,12 @@ router.get('/getSiteInfo', function(req, res, next) {
 	// console.log("############ get getSiteInfo from db res: " + JSON.stringify(config))
 })
 
+router.get('/getTime', (req, res, next) => { // 수정
+	// console.log("############ get /getTime ")
+	var curTime = new Date().toISOString()
+	res.json({"curTime": curTime})
+})
+
 router.get('/groupSchedule', (req, res, next) => { // 수정
 	console.log("############ get /groupSchedule ")
 	dataLen = 0
@@ -237,7 +243,7 @@ router.put('/groupSchedule', (req, res, next) => { // 수정
 		req.body.config.EndTime,
 		req.body.config.GroupIndex,
 		req.body.config.Use,
-		req.body.config.SchedulerSate,
+		req.body.config.SchedulerState,
 		req.body.config.Reserved
 	)
 	dataLen = net.getSizeFloorRadSchedulerGroupConfig_t()
@@ -282,9 +288,9 @@ router.put('/timeSchedule', (req, res, next) => { // 수정
 		req.body.config.HeatingState6,
 		req.body.config.HeatingState7,
 		req.body.config.HeatingState8,
-		req.body.config.heatingState9
+		req.body.config.HeatingState9
 	)
-	dataLen = net.getSizeFloorRadRoomState()
+	dataLen = net.getSizeFloorRadSchedulerTimeConfig_t()
   msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_set_floorRad_scheduler_time_config, dataLen, null)
   totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
 	nSeq = counter.get()
@@ -338,11 +344,16 @@ router.put('/roomStat', (req, res, next) => { // 수정
 			req.body.config.Tsurf_cr,
 			req.body.config.Troom_set,
 			req.body.config.Troom_cr,
-			req.body.config.MH_SchedulerUsed,
+			req.body.config.MH_SchedulerState,
 			req.body.config.MH_HeatingTimeSec,
-			req.body.config.MH_HeatingStopTimeSec,
-			req.body.config.MH_TotalHeatingTimeSec,
-			req.body.config.MH_TodayStartTime,
+			req.body.config.SchGroupIndex,
+			req.body.config.SchHeatingStatus,
+			req.body.config.SchUse,
+			req.body.config.SchState,
+			req.body.config.OperationState,
+			req.body.config.TotalStatus,
+			req.body.config.Reserved1,
+			req.body.config.Reserved2,
 			req.body.config.MH_Tsurf_set,
 			req.body.config.MH_Tsurf_cr,
 			req.body.config.MH_Troom_set,
@@ -653,6 +664,7 @@ router.put('/emsSysConfig', (req, res, next) => { // 수정
 			Reserved1:req.body.configs.tFloorRadConf.Reserved1,
 			Reserved2:req.body.configs.tFloorRadConf.Reserved2,
 			CalTempInc:req.body.configs.tFloorRadConf.CalTempInc,
+			Reserved3:req.body.configs.tFloorRadConf.Reserved3,
 			tVariableTemp:{
 				HeatingHighTemp:req.body.configs.tFloorRadConf.tVariableTemp.HeatingHighTemp,
 				HeatingLowTemp:req.body.configs.tFloorRadConf.tVariableTemp.HeatingLowTemp,
@@ -708,6 +720,7 @@ router.put('/emsSysConfig', (req, res, next) => { // 수정
 			SchedulerOption:req.body.configs.tSolBeachConf.SchedulerOption,
 			Reserved1:req.body.configs.tSolBeachConf.Reserved1,
 			Reserved2:req.body.configs.tSolBeachConf.Reserved2,
+			Reserved3:req.body.configs.tSolBeachConf.Reserved3,
 			tRdamp:{
 				DamperCtrlMode:req.body.configs.tSolBeachConf.tRdamp.DamperCtrlMode,
 				Rdamp_set:req.body.configs.tSolBeachConf.tRdamp.Rdamp_set,

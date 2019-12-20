@@ -161,6 +161,7 @@ export default {
       axios.get(`${this.$apiRootPath}rooms/getSiteInfo`)
         .then((r) => {
           if (r.data.siteInfo === 1) {
+            document.title = "객실 관리 EMS"
             this.items = [
               {
                 icon: 'favorite',
@@ -196,6 +197,7 @@ export default {
               }
             ]
           } else {
+            document.title = "HVAC EMS"
             this.items = [
               {
                 icon: 'favorite',

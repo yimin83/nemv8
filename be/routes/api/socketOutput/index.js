@@ -53,8 +53,10 @@ net.getConnection = function () {
     //서버에 해당 포트로 접속
     var client = '';
     var recvData = [];
+		var recvBuff = []
     var local_port = '';
 		var isNotFirst = false;
+		var tcpPos = 0
 
     client = net_client.connect({port: config.port, host: config.host}, function() {
         console.log("==================================== net_client.connect start  ========================================= : ");
@@ -74,7 +76,9 @@ net.getConnection = function () {
 			if(isNotFirst) {
 				router.reconnectAuth()
 			}
-			isNotFirst = true;
+			recvData = []
+			tcpPos = 0
+			isNotFirst = true
 			console.log("==================================== connect end ==========================================");
     });
 
@@ -88,22 +92,78 @@ net.getConnection = function () {
 // 데이터 수신 후 처리
     client.on('data', function(data) {
         console.log("socketOutput data recv log===============================================================================");
-        if(data.length > 0) {
-            //bufTestRevc = new Buffer.alloc(6);
-          var decodeDat = ems_msg_header_t.decode(data, 0, {endian:"BE"});
-					console.log("decodeDat seqNo : " + decodeDat.SeqNo)
-          if(decodeDat.MsgType == ems_msg_type_e.Msg_Type_Auth) {
-            console.log("Auth!!!!!")
-          } else if(decodeDat.MsgType  == ems_msg_type_e.Msg_Type_OAM) {
-            console.log("OAM!!!!")
-            processOAMmsg(data, decodeDat.SeqNo)
-          }
+				// client.end();
+        // console.log("client end!!!");
 
-        }
+				var nPktLen = 0
+				var beLoop = true
+				var nPos = 0
+				var pktLen = 0
+				var tmpBuff = []
+				var decodeDat = []
+
+				console.log("data.length : " + data.length + ", ems_msg_header_t.size() : " + ems_msg_header_t.size())
+				if(data.length >= ems_msg_header_t.size()) {
+					console.log("tcpPos : " + tcpPos)
+					tmpBuff = recvBuff.slice(tcpPos)
+					console.log("tmpBuff.length  : " + tmpBuff.length)
+					if(tmpBuff.length != 0) {
+						recvBuff = []
+						recvBuff = tmpBuff.slice()
+					}
+					// recvData.push(data.slice())
+					recvBuff.push.apply(recvBuff, data)
+					// recvBuff = data
+					console.log(data)
+					console.log("data.length : " + data.length + ", recvBuff.length : " + recvBuff.length + ", nPos : " + nPos)
+					console.log(recvBuff)
+					while(beLoop){
+						decodeDat = ems_msg_header_t.decode(recvBuff, nPos, {endian:"BE"});
+						console.log("nPos : " + nPos + ", decodeDat.Length : " + decodeDat.Length)
+						pktLen = decodeDat.Length
+						console.log("pktLen : " + pktLen)
+						if(recvBuff.length == pktLen ){
+							if(decodeDat.MsgType == ems_msg_type_e.Msg_Type_Auth) {
+		            console.log("if Auth!!!!!")
+		          } else if(decodeDat.MsgType  == ems_msg_type_e.Msg_Type_OAM) {
+		            console.log("if OAM!!!!")
+		            processOAMmsg(recvBuff, nPos, decodeDat.SeqNo)
+		          }
+							beLoop = false
+						} else if (recvBuff.length > pktLen){
+							if(decodeDat.MsgType == ems_msg_type_e.Msg_Type_Auth) {
+								console.log("else if Auth!!!!!")
+							} else if(decodeDat.MsgType  == ems_msg_type_e.Msg_Type_OAM) {
+								console.log("else if OAM!!!!")
+								processOAMmsg(recvBuff, nPos, decodeDat.SeqNo)
+								nPos = nPos + pktLen
+							}
+						} else {
+							beLoop = false
+						}
+						if(nPos > data.length) {
+							tcpPos = nPos - pktLen
+							beLoop = false
+						}
+					}
+				}
+
+        // if(data.length > 0) {
+        //   var decodeDat = ems_msg_header_t.decode(data, 0, {endian:"BE"});
+				// 	// console.log("decodeDat seqNo : " + decodeDat.SeqNo)
+        //   if(decodeDat.MsgType == ems_msg_type_e.Msg_Type_Auth) {
+        //     console.log("Auth!!!!!")
+        //   } else if(decodeDat.MsgType  == ems_msg_type_e.Msg_Type_OAM) {
+        //     console.log("OAM!!!!")
+        //     processOAMmsg(data, decodeDat.SeqNo)
+        //   }
+				// }
+
     });
 
     client.on('end', function() {
         console.log('socketOutput client Socket End');
+				client.connect(config.port, config.host);
     });
 
     client.on('error', function(err) {
@@ -142,10 +202,11 @@ net.writeData = function (socket, data, seq) {
 }
 
 var alarm = null
-var processOAMmsg = function (data, seq) {
+var processOAMmsg = function (data, pos, seq) {
   var ret = 0
 	let res
-  var oamMsgDat = oam_msg_t.decode(data, ems_msg_header_t.size(), {endian:"BE"});
+	console.log("data.length : " + data.length + ", pos : " + pos + ", pos+ems_msg_header_t.size() : " + (parseInt(pos)+ems_msg_header_t.size()))
+  var oamMsgDat = oam_msg_t.decode(data, (parseInt(pos)+ems_msg_header_t.size()), {endian:"BE"});
 	var size = 0
 
 	if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_sys_config )
@@ -198,25 +259,29 @@ var processOAMmsg = function (data, seq) {
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_state || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_room_state)
    && oamMsgDat.DataLen == floor_rad_room_state_t.size()) {
       var floorRoomStateDat = floor_rad_room_state_t.decode(data, ems_msg_header_t.size() +oam_msg_t.size(), {endian:"BE"});
+			// console.log(JSON.stringify(floorRoomStateDat))
 			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_state)
       	router.setSeqMap(seq, JSON.stringify(floorRoomStateDat))
   }
-  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_priority || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_room_priority)) {
+  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_priority || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_room_priority)
+   && oamMsgDat.DataLen == floor_rad_room_priority_t.size()) {
       var floorRadRoomPriorityDat = floor_rad_room_priority_t.decode(data, ems_msg_header_t.size() +oam_msg_t.size(), {endian:"BE"});
 			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_priority)
       	router.setSeqMap(seq, JSON.stringify(floorRadRoomPriorityDat))
   }
-  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_group_control || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_scheduler_group_control)) {
-      var floorRadSchedulerGroupDat = floor_rad_scheduler_group_config_t.decode(data, ems_msg_header_t.size() +oam_msg_t.size(), {endian:"BE"});
-			console.log(JSON.stringify(floorRadSchedulerGroupDat))
-			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_group_control)
-      	router.setSeqMap(seq, JSON.stringify(floorRadSchedulerGroupDat))
+  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_group_control || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_scheduler_group_control)
+   && oamMsgDat.DataLen == floor_rad_scheduler_group_config_t.size()) {
+    var floorRadSchedulerGroupDat = floor_rad_scheduler_group_config_t.decode(data, ems_msg_header_t.size() +oam_msg_t.size(), {endian:"BE"});
+		// console.log(JSON.stringify(floorRadSchedulerGroupDat))
+		if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_group_control)
+    	router.setSeqMap(seq, JSON.stringify(floorRadSchedulerGroupDat))
   }
-  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_time_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_scheduler_time_config)) {
-      var floorRadSchedulerTimeConfigDat = floor_rad_scheduler_time_config_t.decode(data, ems_msg_header_t.size() +oam_msg_t.size(), {endian:"BE"});
-			console.log(JSON.stringify(floorRadSchedulerTimeConfigDat))
-			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_time_config)
-      	router.setSeqMap(seq, JSON.stringify(floorRadSchedulerTimeConfigDat))
+  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_time_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_scheduler_time_config)
+   && oamMsgDat.DataLen == floor_rad_scheduler_time_config_t.size()) {
+		var floorRadSchedulerTimeConfigDat = floor_rad_scheduler_time_config_t.decode(data, ems_msg_header_t.size() + oam_msg_t.size(), {endian:"BE"});
+		// console.log(JSON.stringify(floorRadSchedulerTimeConfigDat))
+		if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_time_config)
+    	router.setSeqMap(seq, JSON.stringify(floorRadSchedulerTimeConfigDat))
   }
   else if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_event_alarm) {
 		console.log("$$$$$$$$$$$$$$$$$$$$$$ recieve Alarm!!!$$$$$$$$$$$$$$$$$$$$$$$$$$$")
@@ -609,6 +674,7 @@ var floor_rad_conf_t = new struct("floor_rad_conf_t", [
     "Reserved1", struct.uint32(),
     "Reserved2", struct.uint8(3),
 		"CalTempInc", struct.uint8(),
+		"Reserved3", struct.uint32(10),
     "tVariableTemp", var_temp_conf_t,
     "tPeak", peak_demand_conf_t,
     "tOptimalStop", optimal_stop_conf_t,
@@ -616,7 +682,11 @@ var floor_rad_conf_t = new struct("floor_rad_conf_t", [
     "tPreHeating", pre_heating_conf_t,
 		"tNotify", notify_conf_t
 ]);
-net.makeFloorRadConf_t = function(controlOption, roomCnt, useTsurf, troom_set, tsurf_set, troom_cr, tsurf_cr, tctrl_res, tsurf_init, tset_init_inc, tset_init_inc_max, checkInHour, rr_CheckInHour, rr_StayHour, telNumber0, telNumber1, telNumber2, telNumber3, telNumber4, operationOption, minStateChagneTimeSec, reserved1, reserved2, calTempInc, tVariableTemp, tPeak, tOptimalStop, tDemandResponse, tPreHeating, tNotify) {
+net.makeFloorRadConf_t = function(controlOption, roomCnt, useTsurf, troom_set, tsurf_set,
+	troom_cr, tsurf_cr, tctrl_res, tsurf_init, tset_init_inc, tset_init_inc_max, checkInHour,
+	rr_CheckInHour, rr_StayHour, telNumber0, telNumber1, telNumber2, telNumber3, telNumber4,
+	operationOption, minStateChagneTimeSec, reserved1, reserved2, calTempInc, reserved3,
+	tVariableTemp, tPeak, tOptimalStop, tDemandResponse, tPreHeating, tNotify) {
   var buffer = new Buffer(floor_rad_conf_t.size());
   floor_rad_conf_t.encode(buffer,0, {
     ControlOption: controlOption,
@@ -639,6 +709,7 @@ net.makeFloorRadConf_t = function(controlOption, roomCnt, useTsurf, troom_set, t
 		Reserved1: reserved1,
 		Reserved2: reserved2,
 		CalTempInc: calTempInc,
+		Reserved3: reserved3,
     tVariableTemp: tVariableTemp,
     tPeak: tPeak,
     tOptimalStop: tOptimalStop,
@@ -770,6 +841,7 @@ var solbeach_conf_t = new struct("solbeach_conf_t", [
 		"SchedulerOption", struct.uint32(),
 		"Reserved1", struct.uint32(),
 		"Reserved2", struct.uint32(),
+		"Reserved3", struct.uint32(10),
     "tRdamp", damp_control_conf_t,
 	  "tPID", pid_control_conf_t,
 		"tC02Conf", co2_conf_t,
@@ -777,7 +849,10 @@ var solbeach_conf_t = new struct("solbeach_conf_t", [
 		"tEconomizerCycle", economizer_cycle_t,
 		"tNotify", notify_conf_t
 ]);
-net.makeSolbeachConf_t = function(controlOption, zoneCnt, hcMode, tzone_set, tctrl_res, telNumber0, telNumber1, telNumber2, telNumber3, telNumber4, co2LoadPeriodSec, noControlOption, schedulerOption, reserved1, reserved2, tRdamp, tPID, tC02Conf, tVariableTemp, tEconomizerCycle, tNotify) {
+net.makeSolbeachConf_t = function(controlOption, zoneCnt, hcMode, tzone_set, tctrl_res,
+	telNumber0, telNumber1, telNumber2, telNumber3, telNumber4, co2LoadPeriodSec,
+	noControlOption, schedulerOption, reserved1, reserved2, reserved3, tRdamp, tPID,
+	tC02Conf, tVariableTemp, tEconomizerCycle, tNotify) {
   var buffer = new Buffer(solbeach_conf_t.size());
   solbeach_conf_t.encode(buffer,0, {
     ControlOption: controlOption,
@@ -795,6 +870,7 @@ net.makeSolbeachConf_t = function(controlOption, zoneCnt, hcMode, tzone_set, tct
 		SchedulerOption: schedulerOption,
 		Reserved1: reserved1,
 		Reserved2: reserved2,
+		Reserved3: reserved3,
     tRdamp: tRdamp,
     tPID: tPID,
     tC02Conf: tC02Conf,
@@ -892,11 +968,12 @@ net.getSizeOamMsg_t = function() {
 var manual_heating_t = new struct("manual_heating_t", [
     "RoomNo", struct.uint16(),
     "HeatingMode", struct.uint16(),
-    "SchedulerUsed", struct.uint8(),
+    "SchedulerState", struct.uint8(),
     "HeatingTimeSec", struct.int32(),
-    "HeatingStopTimeSec", struct.int32(),
-    "TodayStartTime", struct.int32(),
-    "TotalHeatingTimeSec", struct.int32(),
+		"GroupIndex", struct.uint8(),
+		"SchHeatingStatus", struct.uint8(),
+		"Reserved", struct.uint8(2),
+		"Reserved1", struct.int32(2),
     "HeatingStartTime", struct.int32(),
     "HeatingEndTime", struct.int32(),
     "Tsurf_set", struct.float32(),
@@ -904,16 +981,17 @@ var manual_heating_t = new struct("manual_heating_t", [
     "Troom_set", struct.float32(),
     "Troom_cr", struct.float32()
 ]);
-net.makeManualHeating_t = function(roomNo, heatingMode, schedulerUsed, heatingTimeSec, heatingStopTimeSec, todayStartTime, totalHeatingTimeSec, heatingStartTime, heatingEndTime, tsurf_set, tsurf_cr, troom_set, troom_cr) {
+net.makeManualHeating_t = function(roomNo, heatingMode, schedulerState, heatingTimeSec, groupIndex, reserved, reserved1, schHeatingStatus, heatingStartTime, heatingEndTime, tsurf_set, tsurf_cr, troom_set, troom_cr) {
   var buffer = new Buffer(manual_heating_t.size());
   manual_heating_t.encode(buffer,0, {
     RoomNo: roomNo,
     HeatingMode: heatingMode,
-    SchedulerUsed: schedulerUsed,
+    SchedulerState: schedulerState,
     HeatingTimeSec: heatingTimeSec,
-    HeatingStopTimeSec: heatingStopTimeSec,
-    TodayStartTime: todayStartTime,
-    TotalHeatingTimeSec: totalHeatingTimeSec,
+		GroupIndex: groupIndex,
+		SchHeatingStatus: schHeatingStatus,
+		Reserved: reserved,
+		Reserved1: reserved1,
     HeatingStartTime: heatingStartTime,
     HeatingEndTime: heatingEndTime,
     Tsurf_set: tsurf_set,
@@ -1163,12 +1241,17 @@ var floor_rad_room_state_t = new struct("floor_rad_room_state_t", [
     "Tsurf_cr", struct.float32(),
     "Troom_set", struct.float32(),
     "Troom_cr", struct.float32(),
-		"MH_SchedulerUsed", struct.uint8(),
+		"MH_SchedulerState", struct.uint8(),
     "MH_HeatingTimeSec", struct.int32(),
-    "MH_HeatingStopTimeSec", struct.int32(),
-    "MH_TotalHeatingTimeSec", struct.int32(),
-    "MH_TodayStartTime", struct.int32(),
-    "MH_Tsurf_set", struct.float32(),
+		"SchGroupIndex", struct.uint8(),
+		"SchHeatingStatus", struct.uint8(),
+		"SchUse", struct.uint8(),
+		"SchState", struct.uint8(),
+		"OperationState", struct.uint8(),
+		"TotalStatus", struct.uint8(),
+		"Reserved1", struct.uint8(2),
+		"Reserved2", struct.int32(),
+		"MH_Tsurf_set", struct.float32(),
     "MH_Tsurf_cr", struct.float32(),
     "MH_Troom_set", struct.float32(),
     "MH_Troom_cr", struct.float32(),
@@ -1190,7 +1273,11 @@ var floor_rad_room_state_t = new struct("floor_rad_room_state_t", [
     "Tset_cur", struct.float32(),
     "Tcr_cur", struct.float32()
 ]);
-net.makeFloorRadRoomState_t = function(roomNo, heatingMode, useTsurf, roomState, reservedRoomType, reservedRoomHour, checkInOutEnable, checkInTime, checkOutTime, tsurf_set, tsurf_cr, troom_set, troom_cr, mh_SchedulerUsed, mh_HeatingTimeSec, mh_HeatingStopTimeSec, mh_TotalHeatingTimeSec, mh_TodayStartTime, mh_Tsurf_set, mh_Tsurf_cr, mh_Troom_set, mh_Troom_cr, heatingSetState, heatingCurState, preHeatingOption, optimalNeedTime, preHeatingStartTime, mh_StartTime, mh_EndTime, mh_HeatingLeftTime, tsurf_inc, tsurf_dec, troom_inc, troom_dec, troom_cur, tsurf_cur, lastControlTime, tset_cur, tcr_cur) {
+net.makeFloorRadRoomState_t = function(roomNo, heatingMode, useTsurf, roomState, reservedRoomType, reservedRoomHour,
+	checkInOutEnable, checkInTime, checkOutTime, tsurf_set, tsurf_cr, troom_set, troom_cr, mh_SchedulerState, mh_HeatingTimeSec,
+	schGroupIndex, schHeatingStatus, schUse, schState, operationState, totalStatus, reserved1, reserved2, mh_Tsurf_set,
+	mh_Tsurf_cr, mh_Troom_set, mh_Troom_cr, heatingSetState, heatingCurState, preHeatingOption, optimalNeedTime, preHeatingStartTime, mh_StartTime, mh_EndTime,
+	mh_HeatingLeftTime, tsurf_inc, tsurf_dec, troom_inc, troom_dec, troom_cur, tsurf_cur, lastControlTime, tset_cur, tcr_cur) {
   var buffer = new Buffer(floor_rad_room_state_t.size());
   floor_rad_room_state_t.encode(buffer,0, {
 		RoomNo: roomNo,
@@ -1206,11 +1293,16 @@ net.makeFloorRadRoomState_t = function(roomNo, heatingMode, useTsurf, roomState,
     Tsurf_cr: tsurf_cr,
     Troom_set: troom_set,
     Troom_cr: troom_cr,
-		MH_SchedulerUsed: mh_SchedulerUsed,
+		MH_SchedulerState: mh_SchedulerState,
     MH_HeatingTimeSec: mh_HeatingTimeSec,
-    MH_HeatingStopTimeSec: mh_HeatingStopTimeSec,
-    MH_TotalHeatingTimeSec: mh_TotalHeatingTimeSec,
-    MH_TodayStartTime: mh_TodayStartTime,
+		SchGroupIndex: schGroupIndex,
+		SchHeatingStatus: schHeatingStatus,
+		SchUse: schUse,
+		SchState: schState,
+		OperationState: operationState,
+		TotalStatus: totalStatus,
+		Reserved1: reserved1,
+		Reserved2: reserved2,
     MH_Tsurf_set: mh_Tsurf_set,
     MH_Tsurf_cr: mh_Tsurf_cr,
     MH_Troom_set: mh_Troom_set,
@@ -1275,17 +1367,17 @@ var floor_rad_scheduler_group_config_t = new struct("floor_rad_scheduler_group_c
     "EndTime", struct.int32(),
     "GroupIndex", struct.uint8(MAX_ROOM_CNT),
     "Use", struct.uint8(MAX_ROOM_CNT),
-    "SchedulerSate", struct.uint8(),
+    "SchedulerState", struct.uint8(),
     "Reserved", struct.uint8(5)
 ]);
-net.makeFloorRadSchedulerGroupConfig_t = function(startTime, endTime, groupIndex, use, schedulerSate, reserved) {
+net.makeFloorRadSchedulerGroupConfig_t = function(startTime, endTime, groupIndex, use, schedulerState, reserved) {
   var buffer = new Buffer(floor_rad_scheduler_group_config_t.size());
   floor_rad_scheduler_group_config_t.encode(buffer,0, {
 		StartTime: startTime,
 		EndTime: endTime,
 		GroupIndex: groupIndex,
 		Use: use,
-		SchedulerSate: schedulerSate,
+		SchedulerState: schedulerState,
     Reserved: reserved
   },{endian:"BE"})
   return buffer;
@@ -1325,7 +1417,7 @@ net.makeFloorRadSchedulerTimeConfig_t = function(heatingState0, heatingState1, h
   return buffer;
 }
 net.getSizeFloorRadSchedulerTimeConfig_t = function() {
-  return floor_rad_scheduler_group_config_t.size()
+  return floor_rad_scheduler_time_config_t.size()
 }
 // typedef struct
 // {

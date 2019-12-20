@@ -1,8 +1,10 @@
 <template>
   <v-container grid-list-md>
     <v-divider class='my-3 mt-0 mb-3'></v-divider>
-      <div class="text--primary">
-      난방(보일러 on) : {{SetStatus}}({{CurStatus}})
+      <div class="text--primary" width="1000px">
+        <v-row class="ma-0 pa-0">
+          <v-col cols="12" sm="4" class="ma-0 pa-0">난방(보일러 on) : {{SetStatus}}({{CurStatus}}) - {{curSchedullerTitle}}</v-col><v-col cols="12" sm="6" class="ma-0 pa-0" >시스템 시간 : {{systemTime}}</v-col>
+        </v-row>
       </div>
     <v-divider class='my-3'></v-divider>
     <v-layout row wrap class='ml-0'>
@@ -127,10 +129,12 @@
                         class="ma-0 pa-0"
                       >
                         <template v-slot:activator="{ on }" class="ma-0 pa-0">
-                          <div class="text--primary font-weight-bold title mb-1"
-                          style="cursor: pointer"
-                          v-on="on">
-                            {{room.usRoomNo}}호
+                          <div
+                            class="text--primary font-weight-bold title mb-1"
+                            style="cursor: pointer"
+                            v-on="on">
+                            <label v-if='((room.ucTotalStatus & 8) !== 0)' style="color: #78909C;cursor: pointer;">{{room.usRoomNo}}호</label>
+                            <label v-if='((room.ucTotalStatus & 8) === 0)' style="cursor: pointer;">{{room.usRoomNo}}호</label>
                           </div>
                         </template>
                         <v-list>
@@ -150,7 +154,7 @@
                         <v-chip
                           v-if='room.ucRoomState === 0'
                           class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="blue-grey lighten-2"
+                          color="blue-grey lighten-4"
                           small>공실
                         </v-chip>
                         <v-chip
@@ -177,7 +181,7 @@
                         <v-chip
                           v-if='room.usManHeatingMode === 1'
                           class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="blue lighten-3"
+                          color="indigo lighten-2"
                           small>
                           수동
                         </v-chip>
@@ -198,17 +202,26 @@
                           <div class='body-2 font-weight-bold ma-0 pa-0'>{{(!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
                         </v-card>
                         <v-card
+                          v-if='((room.ucTotalStatus & 16) !== 0)'
                           class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
                           color="brown lighten-4"
                           label="바닥온도"
                           small>
-                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ?room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
+                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
+                        </v-card>
+                        <v-card
+                          v-if='((room.ucTotalStatus & 16) === 0)'
+                          class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
+                          color="#eeeeee"
+                          label="바닥온도"
+                          small>
+                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
                         </v-card>
                       </div>
                     </v-card-text>
                   </v-card>
                   <v-card
-                    v-if='(((room.ucTotalStatus & 16) !== 0) && room.ucCurStatus === 0)'
+                    v-if='(room.ucUserSetStatus === 1 && room.ucCurStatus === 0)'
                     color='deep-orange lighten-4'
                     class='ma-0 pa-0 font-weight-bold'
                     outlined
@@ -223,10 +236,12 @@
                         class="ma-0 pa-0"
                       >
                         <template v-slot:activator="{ on }" class="ma-0 pa-0">
-                          <div class="text--primary font-weight-bold title mb-1"
-                          style="cursor: pointer"
-                          v-on="on">
-                            {{room.usRoomNo}}호
+                          <div
+                            class="text--primary font-weight-bold title mb-1"
+                            style="cursor: pointer"
+                            v-on="on">
+                            <label v-if='((room.ucTotalStatus & 8) !== 0)' style="color: #78909C;cursor: pointer;">{{room.usRoomNo}}호</label>
+                            <label v-if='((room.ucTotalStatus & 8) === 0)' style="cursor: pointer;">{{room.usRoomNo}}호</label>
                           </div>
                         </template>
                         <v-list>
@@ -273,7 +288,7 @@
                         <v-chip
                           v-if='room.usManHeatingMode === 1'
                           class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="blue lighten-3"
+                          color="indigo lighten-2"
                           small>
                           수동
                         </v-chip>
@@ -294,17 +309,26 @@
                           <div class='body-2 font-weight-bold ma-0 pa-0'>{{(!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
                         </v-card>
                         <v-card
+                          v-if='((room.ucTotalStatus & 16) !== 0)'
                           class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
                           color="brown lighten-4"
                           label="바닥온도"
                           small>
-                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ?room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
+                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
+                        </v-card>
+                        <v-card
+                          v-if='((room.ucTotalStatus & 16) === 0)'
+                          class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
+                          color="#eeeeee"
+                          label="바닥온도"
+                          small>
+                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
                         </v-card>
                       </div>
                     </v-card-text>
                   </v-card>
                   <v-card
-                    v-if='(!(((room.ucTotalStatus & 16) !== 0) && room.ucCurStatus === 0) && (room.ucCurStatus === 0 || room.ucCurStatus === 2))'
+                    v-if='(!(room.ucUserSetStatus === 1 && room.ucCurStatus === 0) && (room.ucCurStatus === 0 || room.ucCurStatus === 2))'
                     color='blue-grey lighten-5'
                     class='ma-0 pa-0 font-weight-bold'
                     outlined
@@ -319,10 +343,12 @@
                         class="ma-0 pa-0"
                       >
                         <template v-slot:activator="{ on }" class="ma-0 pa-0">
-                          <div class="text--primary font-weight-bold title mb-1"
-                          style="cursor: pointer"
-                          v-on="on">
-                            {{room.usRoomNo}}호
+                          <div
+                            class="text--primary font-weight-bold title mb-1"
+                            style="cursor: pointer"
+                            v-on="on">
+                            <label v-if='((room.ucTotalStatus & 8) !== 0)' style="color: #78909C;cursor: pointer;">{{room.usRoomNo}}호</label>
+                            <label v-if='((room.ucTotalStatus & 8) === 0)' style="cursor: pointer;">{{room.usRoomNo}}호</label>
                           </div>
                         </template>
                         <v-list>
@@ -369,7 +395,7 @@
                         <v-chip
                           v-if='room.usManHeatingMode === 1'
                           class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="blue lighten-3"
+                          color="indigo lighten-2"
                           small>
                           수동
                         </v-chip>
@@ -390,8 +416,17 @@
                           <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTroom_cur === 255 || room.fTroom_cur === -1 ) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
                         </v-card>
                         <v-card
+                          v-if='((room.ucTotalStatus & 16) !== 0)'
                           class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
                           color="brown lighten-4"
+                          label="바닥온도"
+                          small>
+                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
+                        </v-card>
+                        <v-card
+                          v-if='((room.ucTotalStatus & 16) === 0)'
+                          class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
+                          color="#eeeeee"
                           label="바닥온도"
                           small>
                           <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
@@ -419,10 +454,12 @@
                     class="ma-0 pa-0"
                   >
                     <template v-slot:activator="{ on }" class="ma-0 pa-0">
-                      <div class="text--primary font-weight-bold title mb-1"
-                      style="cursor: pointer"
-                      v-on="on">
-                        {{room.usRoomNo}}호
+                      <div
+                        class="text--primary font-weight-bold title mb-1"
+                        style="cursor: pointer"
+                        v-on="on">
+                        <label v-if='((room.ucTotalStatus & 8) !== 0)' style="color: #78909C;cursor: pointer;">{{room.usRoomNo}}호</label>
+                        <label v-if='((room.ucTotalStatus & 8) === 0)' style="cursor: pointer;">{{room.usRoomNo}}호</label>
                       </div>
                     </template>
                     <v-list>
@@ -469,7 +506,7 @@
                     <v-chip
                       v-if='room.usManHeatingMode === 1'
                       class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="blue lighten-3"
+                      color="indigo lighten-2"
                       small>
                       수동
                     </v-chip>
@@ -490,8 +527,17 @@
                       <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTroom_cur === 255 || room.fTroom_cur === -1 ) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
                     </v-card>
                     <v-card
+                      v-if='((room.ucTotalStatus & 16) !== 0)'
                       class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
                       color="brown lighten-4"
+                      label="바닥온도"
+                      small>
+                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
+                    </v-card>
+                    <v-card
+                      v-if='((room.ucTotalStatus & 16) === 0)'
+                      class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
+                      color="#eeeeee"
                       label="바닥온도"
                       small>
                       <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
@@ -500,7 +546,7 @@
                 </v-card-text>
               </v-card>
               <v-card
-                v-if='(((room.ucTotalStatus & 16) !== 0) && room.ucCurStatus === 0)'
+                v-if='(room.ucUserSetStatus === 1 && room.ucCurStatus === 0)'
                 color='deep-orange lighten-4'
                 class='ma-0 pa-0 font-weight-bold'
                 outlined
@@ -515,10 +561,12 @@
                     class="ma-0 pa-0"
                   >
                     <template v-slot:activator="{ on }" class="ma-0 pa-0">
-                      <div class="text--primary font-weight-bold title mb-1"
-                      style="cursor: pointer"
-                      v-on="on">
-                        {{room.usRoomNo}}호
+                      <div
+                        class="text--primary font-weight-bold title mb-1"
+                        style="cursor: pointer"
+                        v-on="on">
+                        <label v-if='((room.ucTotalStatus & 8) !== 0)' style="color: #78909C;cursor: pointer;">{{room.usRoomNo}}호</label>
+                        <label v-if='((room.ucTotalStatus & 8) === 0)' style="cursor: pointer;">{{room.usRoomNo}}호</label>
                       </div>
                     </template>
                     <v-list>
@@ -565,7 +613,7 @@
                     <v-chip
                       v-if='room.usManHeatingMode === 1'
                       class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="blue lighten-3"
+                      color="indigo lighten-2"
                       small>
                       수동
                     </v-chip>
@@ -586,17 +634,26 @@
                       <div class='body-2 font-weight-bold ma-0 pa-0'>{{(!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
                     </v-card>
                     <v-card
+                      v-if='((room.ucTotalStatus & 16) !== 0)'
                       class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
                       color="brown lighten-4"
                       label="바닥온도"
                       small>
-                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ?room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
+                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
+                    </v-card>
+                    <v-card
+                      v-if='((room.ucTotalStatus & 16) === 0)'
+                      class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
+                      color="#eeeeee"
+                      label="바닥온도"
+                      small>
+                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
                     </v-card>
                   </div>
                 </v-card-text>
               </v-card>
               <v-card
-                v-if='(!(((room.ucTotalStatus & 16) !== 0) && room.ucCurStatus === 0) && (room.ucCurStatus === 0 || room.ucCurStatus === 2))'
+                v-if='(!(room.ucUserSetStatus === 1 && room.ucCurStatus === 0) && (room.ucCurStatus === 0 || room.ucCurStatus === 2))'
                 color='blue-grey lighten-5'
                 class='ma-0 pa-0 font-weight-bold'
                 outlined
@@ -611,10 +668,12 @@
                     class="ma-0 pa-0"
                   >
                     <template v-slot:activator="{ on }" class="ma-0 pa-0">
-                      <div class="text--primary font-weight-bold title mb-1"
-                      style="cursor: pointer"
-                      v-on="on">
-                        {{room.usRoomNo}}호
+                      <div
+                        class="text--primary font-weight-bold title mb-1"
+                        style="cursor: pointer"
+                        v-on="on">
+                        <label v-if='((room.ucTotalStatus & 8) !== 0)' style="color: #78909C;cursor: pointer;">{{room.usRoomNo}}호</label>
+                        <label v-if='((room.ucTotalStatus & 8) === 0)' style="cursor: pointer;">{{room.usRoomNo}}호</label>
                       </div>
                     </template>
                     <v-list>
@@ -661,7 +720,7 @@
                     <v-chip
                       v-if='room.usManHeatingMode === 1'
                       class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="blue lighten-3"
+                      color="indigo lighten-2"
                       small>
                       수동
                     </v-chip>
@@ -682,8 +741,17 @@
                       <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTroom_cur === 255 || room.fTroom_cur === -1 ) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
                     </v-card>
                     <v-card
+                      v-if='((room.ucTotalStatus & 16) !== 0)'
                       class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
                       color="brown lighten-4"
+                      label="바닥온도"
+                      small>
+                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
+                    </v-card>
+                    <v-card
+                      v-if='((room.ucTotalStatus & 16) === 0)'
+                      class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
+                      color="#eeeeee"
                       label="바닥온도"
                       small>
                       <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
@@ -696,7 +764,7 @@
         </v-row>
       </v-flex>
     </v-layout>
-    <v-dialog v-model='roomGraphModal' persistent width="1350px">
+    <v-dialog v-model='roomGraphModal' persistent width="1400px">
       <v-card>
         <v-toolbar dark icons-and-text>
           <span class='headline'>{{roomNo}}호 상태 그래프</span>
@@ -710,26 +778,78 @@
         <v-card-text>
           <div>
             <v-row>
-              <v-col class="d-flex" cols="12" sm="1">
-                <v-select
-                  v-model="time.value"
-                  :items="times"
-                  item-value="value"
-                  item-text="name"
-                  label='시간단위'
-                  class='ma-0 mt-1 pa-0 grey--text caption roomSel'
-                ></v-select>
-              </v-col>
-              <v-col class="d-flex" cols="12" sm="2">
-                <v-text-field label='시작일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='startTime'></v-text-field>
-              </v-col>
-              <v-col class="d-flex" cols="12" sm="2">
-                <v-text-field label='종료일' class='ma-0 mt-1 pa-0 grey--text caption' v-model='endTime'></v-text-field>
-              </v-col>
-              <v-col class="d-flex" cols="12" sm="1">
-                <v-btn class="d-flex" :loading="searchloading" :disabled="loading" @click="openRoomGraph(roomNo)">
-                  <span>검색</span>
-                </v-btn>
+              <v-col class="d-flex" cols="12" sm="8">&nbsp;&nbsp;
+              <v-autocomplete
+                v-model="time.value"
+                :items="this.times"
+                item-value="value"
+                item-text="name"
+                label='시간단위'
+                style='max-width:80px'
+                class='grey--text caption'
+              ></v-autocomplete>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <v-menu
+                  v-model='startMenu'
+                  :close-on-content-click='false'
+                  :nudge-right='40'
+                  lazy
+                  transition='scale-transition'
+                  offset-y
+                  full-width
+                  min-width='290px'
+                >
+                <template v-slot:activator='{ on }'>
+                  <v-text-field
+                    v-model='startDate'
+                    label='시작일'
+                    prepend-icon='event'
+                    readonly
+                    v-on='on'
+                    style='max-width:120px'
+                  ></v-text-field>
+                </template>
+                <v-date-picker v-model='startDate' no-title @input='startMenu = false'></v-date-picker>
+              </v-menu>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <v-text-field
+              v-model="startTime"
+              label="시작시간"
+              type="time"
+              style="max-width:100px"></v-text-field>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <v-menu
+                  v-model='endMenu'
+                  :close-on-content-click='false'
+                  :nudge-right='40'
+                  lazy
+                  transition='scale-transition'
+                  offset-y
+                  full-width
+                  min-width='290px'
+                >
+                <template v-slot:activator='{ on }'>
+                  <v-text-field
+                    v-model='endDate'
+                    label='종료일'
+                    prepend-icon='event'
+                    readonly
+                    v-on='on'
+                    style='max-width:120px'
+                  ></v-text-field>
+                </template>
+                <v-date-picker v-model='endDate' no-title @input='endMenu = false'></v-date-picker>
+              </v-menu>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <v-text-field
+              v-model="endTime"
+              label="종료시간"
+              type="time"
+              style="max-width:100px"></v-text-field>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <v-btn class="d-flex" :loading="searchloading" :disabled="loading" @click="searchGraph()">
+                <span>검색</span>
+              </v-btn>
               </v-col>
               <v-col></v-col>
             </v-row>
@@ -800,96 +920,106 @@
                       dense
                       max-height="800px">
                       <v-row dense class="ma-0 pa-0" justify="left">
-                        <v-col dense max-width="60px" class="ma-0 pa-0">
-                          <v-list-item class="ma-0 mr-1 mb-n3 pa-0 pt-0">
-                            <v-list-item-action class="mt-0 pt-0">
-                              <v-checkbox
-                                v-model="beAll"
-                                color="primary"
-                                @change="allCheckBox()"
-                              ></v-checkbox>
-                            </v-list-item-action>
-                            <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8 mr-n2">
-                              <v-list-item-subtitle class="ma-0 pa-0">전체</v-list-item-subtitle>
-                            </v-list-item-content>
-                          </v-list-item>
-                        </v-col>
-                      <template v-for="(item, i) in items" dense class="ma-0 pa-0" justify="left">
-                        <v-col v-if="i >= 0 && i <=12"  dense max-width="60px" class="ma-0 pa-0">
-                          <v-list-item class="ma-0 mr-1 mb-n3 pa-0 pt-0">
-                            <v-list-item-action class="mt-0 pt-0">
-                              <v-checkbox
-                                v-model="item.beChecked"
-                                color="primary"
-                                class="ma-0 pa-0"
-                                @change="chkCheckBoxs()"
-                              ></v-checkbox>
-                            </v-list-item-action>
-                            <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8">
-                              <v-list-item-subtitle class="ma-0 pa-0">
-                                {{item.RoomNo}}
-                              </v-list-item-subtitle>
-                            </v-list-item-content>
-                          </v-list-item>
-                        </v-col>
-                      </template>
-                      <template v-for="(item, i) in items" dense class="ma-0 pa-0" justify="left">
-                        <v-col v-if="i >= 13 && i <=38"  dense max-width="60px" class="ma-0 pa-0">
-                          <v-list-item class="ma-0 mr-1 mb-n3 pa-0 pt-0">
-                            <v-list-item-action class="mt-0 pt-0">
-                              <v-checkbox
-                                v-model="item.beChecked"
-                                color="primary"
-                                class="ma-0 pa-0"
-                                @change="chkCheckBoxs()"
-                              ></v-checkbox>
-                            </v-list-item-action>
-                            <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8">
-                              <v-list-item-subtitle class="ma-0 pa-0">
-                                {{item.RoomNo}}
-                              </v-list-item-subtitle>
-                            </v-list-item-content>
-                          </v-list-item>
-                        </v-col>
-                      </template>
-                      <template v-for="(item, i) in items" dense class="ma-0 pa-0" justify="left">
-                        <v-col v-if="i >= 39 && i <=65"  dense max-width="60px" class="ma-0 pa-0">
-                          <v-list-item class="ma-0 mr-1 mb-n3 pa-0 pt-0">
-                            <v-list-item-action class="mt-0 pt-0">
-                              <v-checkbox
-                                v-model="item.beChecked"
-                                color="primary"
-                                class="ma-0 pa-0"
-                                @change="chkCheckBoxs()"
-                              ></v-checkbox>
-                            </v-list-item-action>
-                            <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8">
-                              <v-list-item-subtitle class="ma-0 pa-0">
-                                {{item.RoomNo}}
-                              </v-list-item-subtitle>
-                            </v-list-item-content>
-                          </v-list-item>
-                        </v-col>
-                      </template>
-                      <template v-for="(item, i) in items" dense class="ma-0 pa-0" justify="left">
-                        <v-col v-if="i >= 66 && i <=90"  dense max-width="60px" class="ma-0 pa-0">
-                          <v-list-item class="ma-0 mr-1 mb-n3 pa-0 pt-0">
-                            <v-list-item-action class="mt-0 pt-0">
-                              <v-checkbox
-                                v-model="item.beChecked"
-                                color="primary"
-                                class="ma-0 pa-0"
-                                @change="chkCheckBoxs()"
-                              ></v-checkbox>
-                            </v-list-item-action>
-                            <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8">
-                              <v-list-item-subtitle class="ma-0 pa-0">
-                                {{item.RoomNo}}
-                              </v-list-item-subtitle>
-                            </v-list-item-content>
-                          </v-list-item>
-                        </v-col>
-                      </template>
+                        <template v-for="(item, i) in items" dense class="ma-0 pa-0" justify="left">
+                          <v-col v-if="i === 0" dense class="ma-0 pa-0" cols="6" sm="3" max-width="60px">
+                            <v-list-item class="ma-0 mr-1 mb-n3 pa-0 pt-0">
+                              <v-list-item-action class="mt-0 pt-0">
+                                <v-checkbox
+                                  v-model="beAll"
+                                  color="primary"
+                                  @click.native.prevent="allCheckBox()"
+                                ></v-checkbox>
+                              </v-list-item-action>
+                              <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8 mr-n2">
+                                <v-list-item-subtitle class="ma-0 pa-0">전체</v-list-item-subtitle>
+                              </v-list-item-content>
+                            </v-list-item>
+                          </v-col>
+                          <v-col v-if="i<13" class="ma-0 pa-0" cols="6" sm="3" max-width="60px">
+                            <v-list-item
+                              class="ma-0 mr-1 mb-n3 pa-0 pt-0">
+                              <v-list-item-action class="mt-0 pt-0">
+                                <v-checkbox
+                                  v-model="item.beChecked"
+                                  color="primary"
+                                  class="ma-0 pa-0"
+                                  @change="chkCheckBoxs()"
+                                ></v-checkbox>
+                              </v-list-item-action>
+                              <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8">
+                                <v-list-item-subtitle class="ma-0 pa-0">
+                                  {{item.RoomNo}}
+                                </v-list-item-subtitle>
+                              </v-list-item-content>
+                            </v-list-item>
+                          </v-col>
+                        </template>
+                      </v-row>
+                      <v-row class="ma-0 pa-0">
+                        <template v-for="(item, i) in items" dense class="ma-0 pa-0" justify="left">
+                          <v-col v-if="i > 12 && i < 38" class="ma-0 pa-0" cols="6" sm="3" max-width="60px">
+                            <v-list-item
+                              class="ma-0 mr-1 mb-n3 pa-0 pt-0">
+                              <v-list-item-action class="mt-0 pt-0">
+                                <v-checkbox
+                                  v-model="item.beChecked"
+                                  color="primary"
+                                  class="ma-0 pa-0"
+                                  @change="chkCheckBoxs()"
+                                ></v-checkbox>
+                              </v-list-item-action>
+                              <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8">
+                                <v-list-item-subtitle class="ma-0 pa-0">
+                                  {{item.RoomNo}}
+                                </v-list-item-subtitle>
+                              </v-list-item-content>
+                            </v-list-item>
+                          </v-col>
+                        </template>
+                      </v-row>
+                      <v-row class="ma-0 pa-0">
+                        <template v-for="(item, i) in items" dense class="ma-0 pa-0" justify="left">
+                          <v-col v-if="i > 37 && i < 64" class="ma-0 pa-0" cols="6" sm="3" max-width="60px">
+                            <v-list-item
+                              class="ma-0 mr-1 mb-n3 pa-0 pt-0">
+                              <v-list-item-action class="mt-0 pt-0">
+                                <v-checkbox
+                                  v-model="item.beChecked"
+                                  color="primary"
+                                  class="ma-0 pa-0"
+                                  @change="chkCheckBoxs()"
+                                ></v-checkbox>
+                              </v-list-item-action>
+                              <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8">
+                                <v-list-item-subtitle class="ma-0 pa-0">
+                                  {{item.RoomNo}}
+                                </v-list-item-subtitle>
+                              </v-list-item-content>
+                            </v-list-item>
+                          </v-col>
+                        </template>
+                      </v-row>
+                      <v-row class="ma-0 pa-0">
+                        <template v-for="(item, i) in items" dense class="ma-0 pa-0" justify="left">
+                          <v-col v-if="i > 63 && i < 91" class="ma-0 pa-0" cols="6" sm="3" max-width="60px">
+                            <v-list-item
+                              class="ma-0 mr-1 mb-n3 pa-0 pt-0">
+                              <v-list-item-action class="mt-0 pt-0">
+                                <v-checkbox
+                                  v-model="item.beChecked"
+                                  color="primary"
+                                  class="ma-0 pa-0"
+                                  @change="chkCheckBoxs()"
+                                ></v-checkbox>
+                              </v-list-item-action>
+                              <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8">
+                                <v-list-item-subtitle class="ma-0 pa-0">
+                                  {{item.RoomNo}}
+                                </v-list-item-subtitle>
+                              </v-list-item-content>
+                            </v-list-item>
+                          </v-col>
+                        </template>
                       </v-row>
                     </v-list>
                   </v-card>
@@ -899,7 +1029,7 @@
                     dense
                     max-width="6560px"
                     class="mx-auto">
-                    <v-card-title class="subheading font-weight-bold">난방설정</v-card-title>
+                    <v-card-title class="subheading font-weight-bold">난방설정 ({{curSettingTitle}})</v-card-title>
                     <v-divider class='my-0'>></v-divider>
                     <v-card-text class="ma-0 ml-2 pb-0 pa-0">
                       <v-row class="ma-0 pa-0">
@@ -1029,32 +1159,6 @@
                             <v-divider class='my-0'>></v-divider>
                             <v-list dense>
                               <v-list-item>
-                                <v-list-item-title>스케줄러사용:</v-list-item-title>
-                                <v-list-item-title class="align-end">
-                                  <v-list-item-title>
-                                    <v-select
-                                      v-if="roomStat.HeatingMode === 1"
-                                      v-model="roomStat.MH_SchedulerUsed"
-                                      :items="roomScheduleUsed"
-                                      item-value="value"
-                                      item-text="name"
-                                      hide-details
-                                      class="pa-0 font-weight-bold black--text body-2 roomSel"
-                                    ></v-select>
-                                    <v-select
-                                      v-if="roomStat.HeatingMode !== 1"
-                                      disabled
-                                      v-model="roomStat.MH_SchedulerUsed"
-                                      :items="roomScheduleUsed"
-                                      item-value="value"
-                                      item-text="name"
-                                      hide-details
-                                      class="pa-0 font-weight-bold black--text body-2 roomSel"
-                                    ></v-select>
-                                  </v-list-item-title>
-                                </v-list-item-title>
-                              </v-list-item>
-                              <v-list-item>
                                 <v-list-item-title>난방 가동 시간:</v-list-item-title>
                                 <v-list-item-title class="align-end">
                                   <v-row>
@@ -1070,49 +1174,33 @@
                                 </v-list-item-title>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>난방 휴지 시간:</v-list-item-title>
-                                <v-list-item-title class="align-end">
-                                  <v-row>
-                                    <v-col>
-                                      <v-text-field v-if="(roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="시간" v-model="trnMH_HeatingStopTimeHour"></v-text-field>
-                                      <v-text-field v-if="(roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="시간" v-model="trnMH_HeatingStopTimeHour"></v-text-field>
-                                    </v-col>
-                                    <v-col>
-                                      <v-text-field v-if="(roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="분" v-model="trnMH_HeatingStopTimeMin"></v-text-field>
-                                      <v-text-field v-if="(roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="분" v-model="trnMH_HeatingStopTimeMin"></v-text-field>
-                                    </v-col>
-                                  </v-row>
-                                </v-list-item-title>
+                                <v-list-item-title>그룹스케줄 :</v-list-item-title>
+                                <v-list-item
+                                  class="ma-0 mr-1 mb-n3 pa-0 pt-0">
+                                  <v-list-item-action class="mt-0 pt-0">
+                                    <v-checkbox
+                                      v-if="roomStat.HeatingMode === 1"
+                                      v-model="roomStat.SchUse"
+                                      color="primary"
+                                      class="ma-0 pa-0"
+                                    ></v-checkbox>
+                                    <v-checkbox
+                                      v-if="roomStat.HeatingMode !== 1"
+                                      disabled
+                                      v-model="roomStat.SchUse"
+                                      color="primary"
+                                      class="ma-0 pa-0"
+                                    ></v-checkbox>
+                                  </v-list-item-action>
+                                  <v-list-item-content class="pl-0 pt-0 pb-0 mt-n3 mb-0 ml-n8">
+                                    <v-list-item-subtitle class="ma-0 pa-0">
+                                      사용
+                                    </v-list-item-subtitle>
+                                  </v-list-item-content>
+                                </v-list-item>
                               </v-list-item>
                               <v-list-item>
-                                <v-list-item-title>난방 시작 시간:</v-list-item-title>
-                                <v-list-item-title class="align-end">
-                                  <v-row>
-                                    <v-col>
-                                      <v-text-field v-if="(roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="시" v-model="trnMH_TodayStartTimeHour"></v-text-field>
-                                      <v-text-field v-if="(roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="시" v-model="trnMH_TodayStartTimeHour"></v-text-field>
-                                    </v-col>
-                                    <v-col>
-                                      <v-text-field v-if="(roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1)" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="분" v-model="trnMH_TodayStartTimeMin"></v-text-field>
-                                      <v-text-field v-if="(roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1)" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="분" v-model="trnMH_TodayStartTimeMin"></v-text-field>
-                                    </v-col>
-                                  </v-row>
-                                </v-list-item-title>
-                              </v-list-item>
-                              <v-list-item>
-                                <v-list-item-title>전체 난방 시간:</v-list-item-title>
-                                <v-list-item-title class="align-end">
-                                  <v-row>
-                                    <v-col>
-                                      <v-text-field v-if="roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="시간" v-model="trnMH_TotalHeatingTimeHour"></v-text-field>
-                                      <v-text-field v-if="roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="시간" v-model="trnMH_TotalHeatingTimeHour"></v-text-field>
-                                    </v-col>
-                                    <v-col>
-                                      <v-text-field v-if="roomStat.HeatingMode === 1 && roomStat.MH_SchedulerUsed === 1" class="text-center ma-0 pa-0 pt-3" height=13 :rules="rules" label="분" v-model="trnMH_TotalHeatingTimeMin"></v-text-field>
-                                      <v-text-field v-if="roomStat.HeatingMode !== 1 || roomStat.MH_SchedulerUsed !== 1" class="text-center ma-0 pa-0 pt-3" disabled height=13 :rules="rules" label="분" v-model="trnMH_TotalHeatingTimeMin"></v-text-field>
-                                    </v-col>
-                                  </v-row>
-                                </v-list-item-title>
+                                  스케줄러<label v-if="roomStat.MH_SchedulerState === 1">동작</label><label v-if="roomStat.MH_SchedulerState !== 1">정지</label>(그룹번호:{{roomStat.SchGroupIndex+1}},현재난방<label v-if="roomStat.SchHeatingStatus === 1">ON</label><label v-if="roomStat.SchHeatingStatus !== 1">OFF</label>)
                               </v-list-item>
                               <v-list-item>
                                 <v-list-item-title>바닥온도:</v-list-item-title>
@@ -1164,6 +1252,10 @@
                     <v-list-item-title class="align-end" style="max-width:110px">{{roomStat.HeatingSetState}}/{{roomStat.HeatingCurState}}</v-list-item-title>
                   </v-list-item>
                   <v-list-item>
+                    <v-list-item-title>전체 상태:</v-list-item-title>
+                    <v-list-item-title class="align-end" style="max-width:110px">{{roomStat.TotalStatus}}</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
                     <v-list-item-title>바닥 설정온도/제어범위:</v-list-item-title>
                     <v-list-item-title class="align-end" style="max-width:110px">{{roomStat.Tset_cur}}/{{roomStat.Tcr_cur}}</v-list-item-title>
                   </v-list-item>
@@ -1204,22 +1296,28 @@
                     <v-list-item-title class="align-end" style="max-width:110px">{{roomStat.PreHeatingOption}}</v-list-item-title>
                   </v-list-item>
                   <v-list-item>
+                    <v-list-item-title>온도 동작 상태:</v-list-item-title>
+                    <v-list-item-title class="align-end" style="margin:-9px 0px 0px 19px;">
+                      <v-text-field dense solo flat class="body-2" style="height:30px;" v-model="roomStat.OperationState"></v-text-field>
+                    </v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
                     <v-list-item-title>최종제어시간:</v-list-item-title>
                     <v-list-item-title class="align-end" style="max-width:110px">{{trnLastControlTime}}</v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-card>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn class="d-flex ma-0 pa-0" :loading="saveloading" :disabled="loading"  @click='saveRoomStat()'>난방시작</v-btn>
+                <v-btn class="d-flex ma-0 ml-1 pa-0" :loading="saveloading" :disabled="loading"  @click='stopRoomStat()'>난방중지</v-btn>
+                <v-btn class="d-flex ma-0 ml-1 pa-0" :loading="reloading" :disabled="loading" @click='openRoomStat(roomNo)'>새로고침</v-btn>
+                <v-btn class="d-flex ma-0 ml-1 pa-0" :loading="closeloading" :disabled="loading"  @click='closeRoomStat()'>취소</v-btn>
+              </v-card-actions>
             </v-col>
             </v-row>
           </div>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn class="d-flex" :loading="saveloading" :disabled="loading"  @click='saveRoomStat()'>난방시작</v-btn>
-          <v-btn class="d-flex" :loading="saveloading" :disabled="loading"  @click='stopRoomStat()'>난방중지</v-btn>
-          <v-btn class="d-flex" :loading="reloading" :disabled="loading" @click='openRoomStat(roomNo)'>새로고침</v-btn>
-          <v-btn class="d-flex" :loading="closeloading" :disabled="loading"  @click='closeRoomStat()'>취소</v-btn>
-        </v-card-actions>
       </v-card>
     </v-dialog>
   </v-container>
@@ -1233,26 +1331,28 @@
 </style>
 <script>
 import axios from 'axios'
-Apex = {
-  stroke: {
-    show: true,
-    curve: 'smooth',
-    lineCap: 'butt',
-    width: 3,
-    //dashArray: [0,10],
-  },
-  yaxis: {
-    tickAmount: 3
-  }
-}
+// Apex = {
+//   stroke: {
+//     show: true,
+//     curve: 'smooth',
+//     lineCap: 'butt',
+//     width: 3,
+//     //dashArray: [0,10],
+//   },
+//   yaxis: {
+//     tickAmount: 3
+//   }
+// }
 export default {
   created () {
     this.getRooms()
     this.timer = setInterval(this.getRooms, 5000)
+    this.refreshTime()
   },
   data () {
     return {
       timer: null,
+      refreshTimer: null,
       datas: [],
       CurStatus: 0,
       SetStatus: 0,
@@ -1268,8 +1368,12 @@ export default {
       settingRoomModal: false,
       time: { 'name': '10분', 'value': 600 },
       times: [{ 'name': '5분', 'value': 300 }, { 'name': '10분', 'value': 600 }, { 'name': '1시간', 'value': 3600 }, { 'name': '하루', 'value': (3600 * 24) }, { 'name': '전체', 'value': 0 }],
-      startTime: this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY/MM/DD HH:mm'),
-      endTime: this.$moment(new Date().toISOString()).format('YYYY/MM/DD HH:mm'),
+      startMenu:false,
+      startDate: this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY-MM-DD'),
+      startTime: this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('HH:mm'),
+      endMenu:false,
+      endDate: this.$moment(new Date().toISOString()).format('YYYY-MM-DD'),
+      endTime: this.$moment(new Date().toISOString()).format('HH:mm'),
       bePriShow: false,
       beAll: false,
       settingTitle: '',
@@ -1315,14 +1419,46 @@ export default {
       graphTitle1: '온도 정보',
       graphTitle2: '상태 정보',
       curStatTitle: '-',
-      menuItems: ['create file', 'create directory']
+      curSettingTitle: '-',
+      curSchedullerTitle: '스케줄러 동작',
+      menuItems: ['create file', 'create directory'],
+      systemTime: '-'
     }
   },
   methods: {
     startReload () {
-      clearInterval(this.timer)
       this.getRooms()
+      clearInterval(this.timer)
       this.timer = setInterval(this.getRooms, 5000)
+    },
+    refreshTime() {
+      clearTimeout(this.refreshTimer)
+      this.refreshTimer = setTimeout(this.refreshTime, 1000)
+      axios.get(`${this.$apiRootPath}/rooms/getTime`)
+        .then((r) => {
+          this.systemTime = this.$moment(r.data.curTime).format('YYYY/MM/DD HH:mm:ss')
+        })
+        .catch((e) => {
+          alert(e.message)
+          console.error(e.message)
+        })
+    },
+    getRoomsGroup () {
+      // axios.get(`http://localhost:3000/api/rooms`)
+      axios.get(`${this.$apiRootPath}/rooms/groupSchedule`)
+        .then((r) => {
+          this.groupDatas = JSON.parse(r.data)
+          if (this.groupDatas.SchedulerState === 1) {
+            this.curSchedullerTitle = '스케줄러 동작'
+          } else {
+            this.curSchedullerTitle = '스케줄러 정지'
+          }
+          // alert(JSON.stringify(this.curGroups))
+        })
+        .catch((e) => {
+          alert(e.message)
+          console.error(e.message)
+        })
     },
     getRooms () {
       // axios.get(`http://localhost:3000/api/rooms`)
@@ -1348,6 +1484,9 @@ export default {
               if( this.roomsOldStats[key].usManHeatingMode !==  r.data[key].usManHeatingMode ) {
                 this.roomsStats[key].usManHeatingMode = r.data[key].usManHeatingMode
               }
+              if( this.roomsOldStats[key].ucUserSetStatus !==  r.data[key].ucUserSetStatus ) {
+                this.roomsStats[key].ucUserSetStatus = r.data[key].ucUserSetStatus
+              }
             }
           } else {
             this.roomsStats = r.data
@@ -1360,6 +1499,178 @@ export default {
             this.roomNos.push(this.roomsStats[i].usRoomNo)
           }
           this.roomsOldStats = this.roomsStats
+          this.getRoomsGroup()
+        })
+        .catch((e) => {
+          alert(e.message)
+          console.error(e.message)
+        })
+    },
+    searchGraph () {
+      this.searchloading = true
+      this.loading = true
+      this.getTrendRoomSearch(this.roomNo)
+    },
+    getTrendRoomSearch (usRoomNo) {
+      // axios.put(`http://localhost:3000/api/rooms/getRoomTrend`, { usRoomNo: usRoomNo, startTime: this.startTime, endTime: this.endTime, time: this.time.value })
+      var startDateTime = this.startDate + ' ' + this.startTime
+      var endDateTime = this.endDate + ' ' + this.endTime
+      axios.put(`${this.$apiRootPath}rooms/getRoomTrend`, { usRoomNo: usRoomNo, startTime: startDateTime, endTime: endDateTime, time: this.time.value })
+        .then((r) => {
+          this.datas = r.data
+          var data0 = []
+          var data1 = []
+          var data2 = []
+          var data3 = []
+          var data4 = []
+          var data5 = []
+          var data6 = []
+          var data7 = []
+          var data8 = []
+          var data9 = []
+          var date = []
+          var nCnt = 0
+          this.graphTitle1 = '온도 정보'
+          this.graphTitle2 = '상태 정보'
+          for (var i = 0; i < this.datas.length; i++) {
+            if (this.datas[i].ucRoomState !== null) {
+              data0.push(parseInt(this.datas[i].ucRoomState)+7)
+            } else {
+              data0.push(-1)
+            }
+            if (this.datas[i].ucSetStatus !== null) {
+              data1.push(parseInt(this.datas[i].ucSetStatus)+2)
+            } else {
+              data1.push(-1)
+            }
+            if (this.datas[i].ucCurStatus !== null) {
+              data2.push(parseInt(this.datas[i].ucCurStatus))
+            } else {
+              data2.push(-1)
+            }
+            if (this.datas[i].fTset !== null && this.datas[i].fTset <= 60) {
+              data3.push((this.datas[i].fTset).toFixed(2))
+            } else {
+              data3.push(-2)
+            }
+            if (this.datas[i].fTsurf_cur !== null && this.datas[i].fTsurf_cur <= 60) {
+              data4.push((this.datas[i].fTsurf_cur).toFixed(2))
+            } else {
+              data4.push(-2)
+            }
+            if (this.datas[i].fTroom_cur !== null && this.datas[i].fTroom_cur <= 60) {
+              data5.push((this.datas[i].fTroom_cur).toFixed(2))
+            } else {
+              data5.push(-2)
+            }
+            if (this.datas[i].fTroom_set !== null && this.datas[i].fTroom_set <= 60) {
+              data6.push((this.datas[i].fTroom_set).toFixed(2))
+            } else {
+              data6.push(-2)
+            }
+            if (this.datas[i].fTsurf_set !== null && this.datas[i].fTsurf_set <= 60) {
+              data7.push((this.datas[i].fTsurf_set).toFixed(2))
+            } else {
+              data7.push(-2)
+            }
+            if (this.datas[i].usManHeatingMode !== null && this.datas[i].usManHeatingMode <= 60) {
+              if (this.datas[i].usManHeatingMode === '0') {
+                data8.push(parseInt(this.datas[i].usManHeatingMode+6))
+              } else if (this.datas[i].usManHeatingMode === '1') {
+                data8.push(parseInt(this.datas[i].usManHeatingMode+5))
+              } else {
+                data8.push(parseInt(this.datas[i].usManHeatingMode+4))
+              }
+            } else {
+              data8.push(-2)
+            }
+            if (this.datas[i].fTset_cur !== null && this.datas[i].fTset_cur <= 60) {
+              data9.push((this.datas[i].fTset_cur).toFixed(2))
+            } else {
+              data9.push(-2)
+            }
+            if (this.time.value === 0 ){
+              date.push(new Date((this.datas[i].m + (9 * 60 * 60)) * 1000).toISOString())
+              nCnt = 3
+            } else {
+              date.push(new Date((this.datas[i].m * this.time.value + (9 * 60 * 60)) * 1000).toISOString())
+              nCnt = 0
+            }
+          }
+          this.series1 = [
+            {
+              name: '설정온도',
+              data: data3
+            },
+            {
+              name: '제어기설정온도',
+              data: data9
+            },
+            {
+              name: '실내설정온도',
+              data: data6
+            },
+            // {
+            //   name: '바닥설정온도',
+            //   data: data7
+            // },
+            {
+              name: '현재바닥온도',
+              data: data4
+            },
+            {
+              name: '현재실내온도',
+              data: data5
+            }
+          ]
+          this.series2 = [
+            {
+              name: '난방모드',
+              data: data8
+            },
+            // {
+            //   name: '재실정보',
+            //   data: data0
+            // },
+            {
+              name: '난방설정상태',
+              data: data1
+            },
+            {
+              name: '난방가동상태',
+              data: data2
+            }
+          ]
+          this.chartOptionsLine1 = {
+            xaxis: {
+              categories: date,
+              type: 'datetime',
+              labels: {
+                show: true,
+                rotate: 0,
+                // format: 'yy/MM/dd HH:mm',
+                formatter: function (value) {
+                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, parseInt(5 + nCnt)))
+                }
+              }
+            }
+          }
+          this.chartOptionsLine2 = {
+            xaxis: {
+              type: 'datetime',
+              categories: date,
+              labels: {
+                show: true,
+                rotate: 0,
+                // format: 'yy/MM/dd HH:mm',
+                formatter: function (value) {
+                  return (new Date(value).toISOString().substr(2, 8) + ' ' + new Date(value).toISOString().substr(11, parseInt(5 + nCnt)))
+                }
+              }
+            }
+          }
+          this.searchloading = false
+          this.loading = false
         })
         .catch((e) => {
           alert(e.message)
@@ -1371,7 +1682,9 @@ export default {
       this.searchloading = true
       this.loading = true
       this.roomNo = roomNo
-      axios.put(`${this.$apiRootPath}rooms/getRoomTrend`, { usRoomNo: roomNo, startTime: this.startTime, endTime: this.endTime, time: this.time.value })
+      var startDateTime = this.startDate + ' ' + this.startTime
+      var endDateTime = this.endDate + ' ' + this.endTime
+      axios.put(`${this.$apiRootPath}rooms/getRoomTrend`, { usRoomNo: roomNo, startTime: startDateTime, endTime: endDateTime, time: this.time.value })
         .then((r) => {
           this.datas = r.data
           var data0 = []
@@ -1466,10 +1779,10 @@ export default {
               name: '실내설정온도',
               data: data6
             },
-            {
-              name: '바닥설정온도',
-              data: data7
-            },
+            // {
+            //   name: '바닥설정온도',
+            //   data: data7
+            // },
             {
               name: '현재바닥온도',
               data: data4
@@ -1506,6 +1819,10 @@ export default {
                 show: false
               }
             },
+            stroke: {
+              width: 3,
+              //dashArray: [0,10],
+            },
             yaxis: {
                 labels: {
                   show: true,
@@ -1535,6 +1852,10 @@ export default {
               toolbar: {
                 show: false
               }
+            },
+            stroke: {
+              width: 3,
+              //dashArray: [0,10],
             },
             yaxis: {
                 labels: {
@@ -1569,8 +1890,10 @@ export default {
     closeRoomGraph: function () {
       this.startReload()
       this.time = { 'name': '10분', 'value': 600 }
-      this.startTime = this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY/MM/DD HH:mm')
-      this.endTime = this.$moment(new Date().toISOString()).format('YYYY/MM/DD HH:mm')
+      this.startDate = this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('YYYY-MM-DD')
+      this.startTime = this.$moment(new Date((new Date().getTime() - (2 * 24 * 60 * 60 * 1000))).toISOString()).format('HH:mm')
+      this.endDate = this.$moment(new Date().toISOString()).format('YYYY-MM-DD')
+      this.endTime = this.$moment(new Date().toISOString()).format('HH:mm')
       this.searchloading = false
       this.loading = false
       this.roomGraphModal = false
@@ -1639,6 +1962,12 @@ export default {
       axios.get(`${this.$apiRootPath}rooms/getRoomStat/${roomNo}`)
         .then((r) => {
           this.roomStat = JSON.parse(r.data)
+
+          if (this.roomStat.SchState === 1){
+            this.curSettingTitle = '스케줄러 동작중'
+          } else {
+            this.curSettingTitle = '스케줄러 중지'
+          }
           if (this.roomStat.HeatingMode === 0){
             this.curStatTitle = '자동모드'
           } else if (this.roomStat.HeatingMode === 1){
@@ -1701,14 +2030,17 @@ export default {
     },
     stopRoomStat: function () {
       var roomNos = []
-      this.saveloading = true
-      this.loading = true
       this.roomStat.HeatingMode = 2
       this.roomStat.MH_HeatingTimeSec = (this.trnMH_HeatingTimeHour * 60 * 60) + (this.trnMH_HeatingTimeMin * 60)
       this.roomStat.MH_HeatingStopTimeSec = (this.trnMH_HeatingStopTimeHour * 60 * 60) + (this.trnMH_HeatingStopTimeMin * 60)
       this.roomStat.MH_TotalHeatingTimeSec = (this.trnMH_TotalHeatingTimeHour * 60 * 60) + (this.trnMH_TotalHeatingTimeMin * 60)
       this.roomStat.MH_TodayStartTime = (this.trnMH_TodayStartTimeHour * 60 * 60) + (this.trnMH_TodayStartTimeMin * 60)
-
+      if (this.groupDatas.SchedulerState === 1 && this.beAll === true) {
+        alert("스케줄러 동작 중에는 전체 선택을 할 수 없습니다.");
+        return
+      }
+      this.saveloading = true
+      this.loading = true
       if (this.beAll) {
         roomNos.push(65535)
       } else {
@@ -1736,13 +2068,13 @@ export default {
     },
     saveRoomStat: function () {
     var roomNos = []
+      this.roomStat.MH_HeatingTimeSec = (this.trnMH_HeatingTimeHour * 60 * 60) + (this.trnMH_HeatingTimeMin * 60)
+      if (this.groupDatas.SchedulerState === 1 && this.beAll === true) {
+        alert("스케줄러 동작 중에는 전체 선택을 할 수 없습니다.");
+        return
+      }
       this.saveloading = true
       this.loading = true
-      this.roomStat.MH_HeatingTimeSec = (this.trnMH_HeatingTimeHour * 60 * 60) + (this.trnMH_HeatingTimeMin * 60)
-      this.roomStat.MH_HeatingStopTimeSec = (this.trnMH_HeatingStopTimeHour * 60 * 60) + (this.trnMH_HeatingStopTimeMin * 60)
-      this.roomStat.MH_TotalHeatingTimeSec = (this.trnMH_TotalHeatingTimeHour * 60 * 60) + (this.trnMH_TotalHeatingTimeMin * 60)
-      this.roomStat.MH_TodayStartTime = (this.trnMH_TodayStartTimeHour * 60 * 60) + (this.trnMH_TodayStartTimeMin * 60)
-
       if (this.beAll) {
         roomNos.push(65535)
       } else {
@@ -1790,6 +2122,11 @@ export default {
       }
     },
     allCheckBox () {
+      if (this.roomStat.SchState === 1) {
+        alert("스케줄러 동작 중에는 전체 선택을 할 수 없습니다.");
+        this.beAll = false
+        return
+      }
       for (var key in this.items) {
         this.items[key].beChecked = this.beAll
       }
