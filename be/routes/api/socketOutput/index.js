@@ -51,12 +51,12 @@ const oam_msg_type_e = {
 const MAX_ROOM_CNT = 91
 net.getConnection = function () {
     //서버에 해당 포트로 접속
-    var client = '';
-    var recvData = [];
-		var recvBuff = []
-    var local_port = '';
-		var isNotFirst = false;
+    var client = ''
+    var recvData = []
+		var recvBuff = new Buffer(8192);
 		var tcpPos = 0
+    var local_port = ''
+		var isNotFirst = false;
 
     client = net_client.connect({port: config.port, host: config.host}, function() {
         console.log("==================================== net_client.connect start  ========================================= : ");
@@ -94,71 +94,91 @@ net.getConnection = function () {
         console.log("socketOutput data recv log===============================================================================");
 				// client.end();
         // console.log("client end!!!");
-
+				//
 				var nPktLen = 0
+				var beBufferOver = true
 				var beLoop = true
 				var nPos = 0
+				var buffPos = 0
+				var loopPos = 0
+				var nInnerPos = 0
+				var nLoopPos = 0
+				var nSize = 0
 				var pktLen = 0
-				var tmpBuff = []
+				var loopCnt = 1
+				var tmpBuff = new Buffer(4092);
 				var decodeDat = []
-
-				console.log("data.length : " + data.length + ", ems_msg_header_t.size() : " + ems_msg_header_t.size())
-				if(data.length >= ems_msg_header_t.size()) {
-					console.log("tcpPos : " + tcpPos)
-					tmpBuff = recvBuff.slice(tcpPos)
-					console.log("tmpBuff.length  : " + tmpBuff.length)
-					if(tmpBuff.length != 0) {
-						recvBuff = []
-						recvBuff = tmpBuff.slice()
-					}
-					// recvData.push(data.slice())
-					recvBuff.push.apply(recvBuff, data)
-					// recvBuff = data
-					console.log(data)
-					console.log("data.length : " + data.length + ", recvBuff.length : " + recvBuff.length + ", nPos : " + nPos)
-					console.log(recvBuff)
-					while(beLoop){
-						decodeDat = ems_msg_header_t.decode(recvBuff, nPos, {endian:"BE"});
-						console.log("nPos : " + nPos + ", decodeDat.Length : " + decodeDat.Length)
-						pktLen = decodeDat.Length
-						console.log("pktLen : " + pktLen)
-						if(recvBuff.length == pktLen ){
+				// console.log('data.length : ' + data.length)
+				beBufferOver = (data.length > 8192) ? true : false
+				if(tcpPos > 0){
+					beBufferOver = ((tcpPos + data.length) > 8192) ? true : false
+					nPos = tcpPos
+				}
+				// if(beBufferOver) {
+				// 	console.log('beBufferOver : ' + beBufferOver +', data.length : ' + data.length + ', nPos : ' + nPos)
+				// }
+				if (beBufferOver) {
+					loopCnt = 1
+					// console.log('buffPos : ' + buffPos +', (8192-buffPos) : ' + (8192-buffPos))
+					data.copy(recvBuff, buffPos, 0, (8192-buffPos));
+					while((nLoopPos = (data.length - (8192*loopCnt))) > 0){
+					// console.log('nLoopPos: '+ nLoopPos+', data.length : ' + data.length +', (8192*loopCnt) : ' + (8192*loopCnt))
+						nInnerPos = 0
+						while(beLoop){
+						// if(data.length >= ems_msg_header_t.size()) {
+							decodeDat = ems_msg_header_t.decode(recvBuff, nInnerPos, {endian:"BE"});
+							pktLen = decodeDat.Length
 							if(decodeDat.MsgType == ems_msg_type_e.Msg_Type_Auth) {
-		            console.log("if Auth!!!!!")
-		          } else if(decodeDat.MsgType  == ems_msg_type_e.Msg_Type_OAM) {
-		            console.log("if OAM!!!!")
-		            processOAMmsg(recvBuff, nPos, decodeDat.SeqNo)
-		          }
-							beLoop = false
-						} else if (recvBuff.length > pktLen){
-							if(decodeDat.MsgType == ems_msg_type_e.Msg_Type_Auth) {
-								console.log("else if Auth!!!!!")
+								console.log("buffer size over Auth!!!!!")
 							} else if(decodeDat.MsgType  == ems_msg_type_e.Msg_Type_OAM) {
-								console.log("else if OAM!!!!")
-								processOAMmsg(recvBuff, nPos, decodeDat.SeqNo)
-								nPos = nPos + pktLen
+								processOAMmsg(recvBuff, nInnerPos, decodeDat.SeqNo)
 							}
-						} else {
-							beLoop = false
+							nInnerPos = nInnerPos + pktLen
+							if(nInnerPos > recvBuff.length) {
+								buffPos = nInnerPos - pktLen
+								beLoop = false
+							}
 						}
-						if(nPos > data.length) {
-							tcpPos = nPos - pktLen
-							beLoop = false
+						loopCnt++
+						nSize = ((data.length - (nLoopPos-nPos)) > 8192 ) ? 8192 : (data.length - (nLoopPos-nPos))
+						data.copy(recvBuff, 0, (nLoopPos-nPos), nSize);
+					}
+					tcpPos = nSize
+				} else {
+					if (data.length >= ems_msg_header_t.size()) {
+						data.copy(recvBuff, 0, 0, data.length);
+						// console.log(recvBuff)
+						while(beLoop){
+							decodeDat = ems_msg_header_t.decode(recvBuff, loopPos, {endian:"BE"});
+							pktLen = decodeDat.Length
+							if(decodeDat.MsgType == ems_msg_type_e.Msg_Type_Auth) {
+								console.log("Auth!!!!!")
+							} else if(decodeDat.MsgType  == ems_msg_type_e.Msg_Type_OAM) {
+								console.log("nomal buffer OAM!!!")
+								processOAMmsg(recvBuff, loopPos, decodeDat.SeqNo)
+							}
+							loopPos = loopPos + pktLen
+							if(loopPos >= data.length) {
+								buffPos = loopPos - pktLen
+								beLoop = false
+							}
+							loopCnt++
 						}
 					}
 				}
 
-        // if(data.length > 0) {
+				// if(data.length > 0) {
+        //     //bufTestRevc = new Buffer.alloc(6);
         //   var decodeDat = ems_msg_header_t.decode(data, 0, {endian:"BE"});
-				// 	// console.log("decodeDat seqNo : " + decodeDat.SeqNo)
+				// 	console.log("decodeDat seqNo : " + decodeDat.SeqNo)
         //   if(decodeDat.MsgType == ems_msg_type_e.Msg_Type_Auth) {
         //     console.log("Auth!!!!!")
         //   } else if(decodeDat.MsgType  == ems_msg_type_e.Msg_Type_OAM) {
         //     console.log("OAM!!!!")
-        //     processOAMmsg(data, decodeDat.SeqNo)
+        //     processOAMmsg(data, 0, decodeDat.SeqNo)
         //   }
-				// }
-
+				//
+        // }
     });
 
     client.on('end', function() {
@@ -205,7 +225,7 @@ var alarm = null
 var processOAMmsg = function (data, pos, seq) {
   var ret = 0
 	let res
-	console.log("data.length : " + data.length + ", pos : " + pos + ", pos+ems_msg_header_t.size() : " + (parseInt(pos)+ems_msg_header_t.size()))
+	// console.log("data.length : " + data.length + ", pos : " + pos + ", pos+ems_msg_header_t.size() : " + (parseInt(pos)+ems_msg_header_t.size()))
   var oamMsgDat = oam_msg_t.decode(data, (parseInt(pos)+ems_msg_header_t.size()), {endian:"BE"});
 	var size = 0
 
@@ -326,7 +346,11 @@ var processOAMmsg = function (data, pos, seq) {
   else {
     size = 'else'
   }
-	console.log("seq : " + seq + ", oamMsgDat : " + oamMsgDat.OAMMsgType +", oamMsgDat.DataLen : " + oamMsgDat.DataLen +", oamMsgDat.Data : "  + oamMsgDat.Data + ", size() : " + size);
+	console.log(
+		"seq : " + seq +
+		", oamMsgDat.OAMMsgType : " + oamMsgDat.OAMMsgType +
+		", oamMsgDat.DataLen : " + oamMsgDat.DataLen +
+		", size() : " + size);
   return ret;
 }
 // var ems_alarm_t = new struct("ems_alarm_t", [
