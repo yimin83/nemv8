@@ -145,7 +145,7 @@
                           </v-list-item>
                           <v-list-item>
                             <v-list-item-content>
-                              <v-list-item-subtitle style="cursor: pointer" @click="openRoomGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
+                              <v-list-item-subtitle style="cursor: pointer" @click="selectGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
                             </v-list-item-content>
                           </v-list-item>
                         </v-list>
@@ -252,7 +252,7 @@
                           </v-list-item>
                           <v-list-item>
                             <v-list-item-content>
-                              <v-list-item-subtitle style="cursor: pointer" @click="openRoomGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
+                              <v-list-item-subtitle style="cursor: pointer" @click="selectGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
                             </v-list-item-content>
                           </v-list-item>
                         </v-list>
@@ -359,7 +359,7 @@
                           </v-list-item>
                           <v-list-item>
                             <v-list-item-content>
-                              <v-list-item-subtitle style="cursor: pointer" @click="openRoomGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
+                              <v-list-item-subtitle style="cursor: pointer" @click="selectGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
                             </v-list-item-content>
                           </v-list-item>
                         </v-list>
@@ -470,7 +470,7 @@
                       </v-list-item>
                       <v-list-item>
                         <v-list-item-content>
-                          <v-list-item-subtitle style="cursor: pointer" @click="openRoomGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
+                          <v-list-item-subtitle style="cursor: pointer" @click="selectGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
                         </v-list-item-content>
                       </v-list-item>
                     </v-list>
@@ -577,7 +577,7 @@
                       </v-list-item>
                       <v-list-item>
                         <v-list-item-content>
-                          <v-list-item-subtitle style="cursor: pointer" @click="openRoomGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
+                          <v-list-item-subtitle style="cursor: pointer" @click="selectGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
                         </v-list-item-content>
                       </v-list-item>
                     </v-list>
@@ -684,7 +684,7 @@
                       </v-list-item>
                       <v-list-item>
                         <v-list-item-content>
-                          <v-list-item-subtitle style="cursor: pointer" @click="openRoomGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
+                          <v-list-item-subtitle style="cursor: pointer" @click="selectGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
                         </v-list-item-content>
                       </v-list-item>
                     </v-list>
@@ -874,7 +874,7 @@
                 >
                 {{graphTitle2}}
                 </v-chip>
-                <apexchart type='line' width='1300px' height='160' :options='chartOptionsLine2' :series='series2'/>
+                <apexchart type='line' width='1300px' height='200' :options='chartOptionsLine2' :series='series2'/>
               </div>
             </div>
           </div>
@@ -1200,7 +1200,7 @@
                                 </v-list-item>
                               </v-list-item>
                               <v-list-item>
-                                  스케줄러<label v-if="roomStat.MH_SchedulerState === 1">동작</label><label v-if="roomStat.MH_SchedulerState !== 1">정지</label>(그룹번호:{{roomStat.SchGroupIndex+1}},현재난방<label v-if="roomStat.SchHeatingStatus === 1">ON</label><label v-if="roomStat.SchHeatingStatus !== 1">OFF</label>)
+                                  스케줄러<label v-if="roomStat.MH_SchedulerState === 1">동작</label><label v-if="roomStat.MH_SchedulerState !== 1">정지</label>(그룹번호:{{(roomStat.SchGroupIndex < 255)?roomStat.SchGroupIndex+1:' - '}},현재난방<label v-if="roomStat.SchHeatingStatus === 1">ON</label><label v-if="roomStat.SchHeatingStatus !== 1">OFF</label>)
                               </v-list-item>
                               <v-list-item>
                                 <v-list-item-title>바닥온도:</v-list-item-title>
@@ -1422,7 +1422,8 @@ export default {
       curSettingTitle: '-',
       curSchedullerTitle: '스케줄러 동작',
       menuItems: ['create file', 'create directory'],
-      systemTime: '-'
+      systemTime: '-',
+      beFirst: true
     }
   },
   methods: {
@@ -1506,6 +1507,15 @@ export default {
           console.error(e.message)
         })
     },
+    selectGraph (roomNum){
+      this.roomNo = roomNum
+      if (this.beFirst) {
+        this.openRoomGraph(roomNum)
+      } else {
+        this.searchGraph()
+      }
+      this.beFirst = false
+    },
     searchGraph () {
       this.searchloading = true
       this.loading = true
@@ -1574,12 +1584,12 @@ export default {
               data7.push(-2)
             }
             if (this.datas[i].usManHeatingMode !== null && this.datas[i].usManHeatingMode <= 60) {
-              if (this.datas[i].usManHeatingMode === '0') {
+              if (this.datas[i].usManHeatingMode === 0) {
                 data8.push(parseInt(this.datas[i].usManHeatingMode+6))
-              } else if (this.datas[i].usManHeatingMode === '1') {
-                data8.push(parseInt(this.datas[i].usManHeatingMode+5))
-              } else {
+              } else if (this.datas[i].usManHeatingMode === 1) {
                 data8.push(parseInt(this.datas[i].usManHeatingMode+4))
+              } else {
+                data8.push(parseInt(this.datas[i].usManHeatingMode+2))
               }
             } else {
               data8.push(-2)
@@ -1671,6 +1681,7 @@ export default {
           }
           this.searchloading = false
           this.loading = false
+          this.roomGraphModal = true
         })
         .catch((e) => {
           alert(e.message)
@@ -1743,12 +1754,12 @@ export default {
               data7.push(-1)
             }
             if (this.datas[i].usManHeatingMode !== null && this.datas[i].usManHeatingMode < 50) {
-              if (this.datas[i].usManHeatingMode === '0') {
+              if (this.datas[i].usManHeatingMode === 0) {
                 data8.push(parseInt(this.datas[i].usManHeatingMode+6))
-              } else if (this.datas[i].usManHeatingMode === '1') {
-                data8.push(parseInt(this.datas[i].usManHeatingMode+5))
-              } else {
+              } else if (this.datas[i].usManHeatingMode === 1) {
                 data8.push(parseInt(this.datas[i].usManHeatingMode+4))
+              } else {
+                data8.push(parseInt(this.datas[i].usManHeatingMode+2))
               }
             } else {
               data8.push(-1)
@@ -1857,12 +1868,80 @@ export default {
               width: 3,
               //dashArray: [0,10],
             },
+            tooltip: {
+              shared: true,
+              intersect: false,
+              y: [
+              {
+                formatter: function (y) {
+                  if(typeof y !== "undefined") {
+                    if (y === 4/*12*/) {
+                      y = "정지"
+                    } else if (y === 5/*12*/) {
+                      y = "수동"
+                    } else {
+                      y = "자동"
+                    }
+                  }
+                  return y;
+                }
+              }, {
+                formatter: function (y) {
+                  if(typeof y !== "undefined") {
+                    if (y === 2/*9*/) {
+                      y = "정지"
+                    } else {
+                      y = "가동"
+                    }
+                  }
+                  return y;
+                }
+              }, {
+                formatter: function (y) {
+                  if(typeof y !== "undefined") {
+                    if (y === 0/*3*/) {
+                      y = "정지"
+                    } else {
+                      y = "가동"
+                    }
+                  }
+                  return y;
+                }
+              }]
+            },
             yaxis: {
-                labels: {
-                  show: true,
-                  align: 'right',
-                  minWidth: 50,
-                  maxWidth: 50
+              min: 0,
+              max: 6,
+              tickAmount:6,
+              labels: {
+                show: true,
+                align: 'right',
+                minWidth: 50,
+                maxWidth: 50,
+                formatter: function (value) {
+                  var retVal
+                  if(typeof value !== "undefined") {
+                    retVal = ""
+                    switch(value){
+                      case 0:
+                      case 2:
+                      case 4:
+                        retVal = "OFF"
+                      break;
+                      case 1:
+                      case 3:
+                        retVal = "ON"
+                      break;
+                      case 5:
+                        retVal = "M"
+                      break;
+                      case 6:
+                        retVal = "A"
+                      break;
+                    }
+                    return retVal;
+                  }
+                }
               }
             },
             xaxis: {

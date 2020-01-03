@@ -7,7 +7,7 @@
         dark
         color="white"
       >
-      <span class="mt-3">평균 그래프</span>
+      <span class="mt-3">통계 그래프</span>
       </v-bottom-navigation>
       <div>
         <v-row>

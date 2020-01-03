@@ -16,11 +16,12 @@
       </v-bottom-navigation>
       <v-card width="100%" justify="center">
         <div v-if="this.activeBtn === 0" class="ml-1">
-          <v-row justify="center">
-            <template v-for='group in curGroups'>
-              <v-col>
+          <v-row justify="left">
+            <template v-for='(group, idx) in curGroups'>
+              <v-col cols="auto">
                 <v-card
-                  class="ma-0 pa-0"
+                  v-if="idx < 6"
+                  class="ma-1 pa-1"
                   dense
                   max-width="300"
                   min-width="300">
@@ -39,7 +40,7 @@
                     <v-row class="ma-0 pa-0">
                       <template
                         v-for='(roomIdx, i) in group.groupRoomIdxs'>
-                        <v-col class="ma-0 pa-0" cols="3">
+                        <v-col class="ma-0 pa-0">
                           <v-list-item
                             class="ma-0 mr-1 mb-n3 pa-0 pt-0">
                             <v-list-item-action class="mt-0 pt-0">
@@ -80,11 +81,11 @@
                     <th class="ma-0 pa-0 pt-2 text-center black--text config-column" style="width:80px;border-bottom:2px solid lightgrey;">3그룹</th>
                     <th class="ma-0 pa-0 pt-2 text-center black--text config-column" style="width:80px;border-bottom:2px solid lightgrey;">4그룹</th>
                     <th class="ma-0 pa-0 pt-2 text-center black--text config-column" style="width:80px;border-bottom:2px solid lightgrey;">5그룹</th>
-                    <th class="ma-0 pa-0 pt-2 text-center black--text config-column" style="width:80px;border-bottom:2px solid lightgrey;">6그룹</th>
-                    <th class="ma-0 pa-0 pt-2 text-center black--text config-column" style="width:80px;border-bottom:2px solid lightgrey;">7그룹</th>
-                    <th class="ma-0 pa-0 pt-2 text-center black--text config-column" style="width:80px;border-bottom:2px solid lightgrey;">8그룹</th>
-                    <th class="ma-0 pa-0 pt-2 text-center black--text config-column" style="width:80px;border-bottom:2px solid lightgrey;">9그룹</th>
-                    <th class="ma-0 pa-0 pt-2 text-center black--text config-column" style="width:80px;border-bottom:2px solid lightgrey;">10그룹</th>
+                    <th class="ma-0 pa-0 pt-2 text-center black--text config-column right-bold-border" style="width:80px;border-bottom:2px solid lightgrey;color:grey;">6그룹</th>
+                    <th class="ma-0 pa-0 pt-2 text-center blue--text config-column" style="width:80px;border-bottom:2px solid lightgrey;">2F</th>
+                    <th class="ma-0 pa-0 pt-2 text-center blue--text config-column" style="width:80px;border-bottom:2px solid lightgrey;">3F</th>
+                    <th class="ma-0 pa-0 pt-2 text-center blue--text config-column" style="width:80px;border-bottom:2px solid lightgrey;">5F</th>
+                    <th class="ma-0 pa-0 pt-2 text-center blue--text config-column" style="width:80px;border-bottom:2px solid lightgrey;">6F</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -142,7 +143,7 @@
                         class="ma-0 ml-2 pa-0"
                         style="justify-content: center;"
                         ></v-checkbox></td>
-                    <td class="ma-0 pa-0 config-column">
+                    <td class="ma-0 pa-0 config-column right-bold-border">
                       <v-checkbox
                         v-model="data[5]"
                         v-bind:false-value = "0"

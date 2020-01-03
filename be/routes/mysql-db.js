@@ -60,7 +60,7 @@ function startConnection() {
 
   connection.on('error', function(err) {
     console.log('################# MySQL error #################');
-    console.log(error);
+    console.log(err);
     if(err.fatal) {
       connection.destroy()
       startConnection()

@@ -22,6 +22,7 @@
     "hchs-vue-charts": "^1.2.8",
     "jquery": "^3.4.1",
     "jqwidgets-scripts": "^8.2.0",
+    "utf8": "^3.0.0",
     "v-calendar": "^0.9.7",
     "v-scroll-lock": "^1.0.1",
     "vue": "^2.6.10",

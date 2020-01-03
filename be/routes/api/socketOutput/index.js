@@ -49,11 +49,12 @@ const oam_msg_type_e = {
 	oam_get_floorRad_scheduler_group_control: 22
 };
 const MAX_ROOM_CNT = 91
+const EMS_PREAMBLE = 0x1B04
 net.getConnection = function () {
     //서버에 해당 포트로 접속
     var client = ''
     var recvData = []
-		var recvBuff = new Buffer(8192);
+		var recvBuff = new Buffer(4096);
 		var tcpPos = 0
     var local_port = ''
 		var isNotFirst = false;
@@ -94,75 +95,83 @@ net.getConnection = function () {
         console.log("socketOutput data recv log===============================================================================");
 				// client.end();
         // console.log("client end!!!");
-				//
-				var nPktLen = 0
+
 				var beBufferOver = true
 				var beLoop = true
-				var nPos = 0
-				var buffPos = 0
 				var loopPos = 0
-				var nInnerPos = 0
-				var nLoopPos = 0
-				var nSize = 0
 				var pktLen = 0
-				var loopCnt = 1
-				var tmpBuff = new Buffer(4092);
 				var decodeDat = []
+				var dataLen = 0
 				// console.log('data.length : ' + data.length)
-				beBufferOver = (data.length > 8192) ? true : false
-				if(tcpPos > 0){
-					beBufferOver = ((tcpPos + data.length) > 8192) ? true : false
-					nPos = tcpPos
-				}
-				// if(beBufferOver) {
-				// 	console.log('beBufferOver : ' + beBufferOver +', data.length : ' + data.length + ', nPos : ' + nPos)
-				// }
-				if (beBufferOver) {
-					loopCnt = 1
-					// console.log('buffPos : ' + buffPos +', (8192-buffPos) : ' + (8192-buffPos))
-					data.copy(recvBuff, buffPos, 0, (8192-buffPos));
-					while((nLoopPos = (data.length - (8192*loopCnt))) > 0){
-					// console.log('nLoopPos: '+ nLoopPos+', data.length : ' + data.length +', (8192*loopCnt) : ' + (8192*loopCnt))
-						nInnerPos = 0
-						while(beLoop){
-						// if(data.length >= ems_msg_header_t.size()) {
-							decodeDat = ems_msg_header_t.decode(recvBuff, nInnerPos, {endian:"BE"});
-							pktLen = decodeDat.Length
-							if(decodeDat.MsgType == ems_msg_type_e.Msg_Type_Auth) {
-								console.log("buffer size over Auth!!!!!")
-							} else if(decodeDat.MsgType  == ems_msg_type_e.Msg_Type_OAM) {
-								processOAMmsg(recvBuff, nInnerPos, decodeDat.SeqNo)
-							}
-							nInnerPos = nInnerPos + pktLen
-							if(nInnerPos > recvBuff.length) {
-								buffPos = nInnerPos - pktLen
-								beLoop = false
-							}
+				dataLen = data.length + tcpPos
+				// console.log('data.length + tcpPos : ' + dataLen)
+				while(beLoop) {
+					if (tcpPos > 2) {
+						if (recvBuff.readUInt16BE() != EMS_PREAMBLE) {
+							console.log("invalid packet(EMS_PREAMBLE 1 )!!!")
+							beLoop = false
+							tcpPos = 0
+							recvBuff = new Buffer(4092)
+							client.end()
+							break
 						}
-						loopCnt++
-						nSize = ((data.length - (nLoopPos-nPos)) > 8192 ) ? 8192 : (data.length - (nLoopPos-nPos))
-						data.copy(recvBuff, 0, (nLoopPos-nPos), nSize);
 					}
-					tcpPos = nSize
-				} else {
-					if (data.length >= ems_msg_header_t.size()) {
-						data.copy(recvBuff, 0, 0, data.length);
-						// console.log(recvBuff)
-						while(beLoop){
-							decodeDat = ems_msg_header_t.decode(recvBuff, loopPos, {endian:"BE"});
+					if (dataLen + data.length > 8192) {
+						console.log("invalid packet(big buffer)!!!")
+						beLoop = false
+						tcpPos = 0
+						recvBuff = new Buffer(4092)
+						client.end()
+						break
+					} else {
+						if (dataLen < ems_msg_header_t.size()) {
+							// console.log("invalid packet(short header)!!!")
+							data.copy(recvBuff, tcpPos, 0, data.length)
+							tcpPos = dataLen
+							beLoop = false
+						} else {
+							data.copy(recvBuff, tcpPos, 0, dataLen)
+							decodeDat = ems_msg_header_t.decode(recvBuff, 0, {endian:"BE"});
 							pktLen = decodeDat.Length
-							if(decodeDat.MsgType == ems_msg_type_e.Msg_Type_Auth) {
-								console.log("Auth!!!!!")
-							} else if(decodeDat.MsgType  == ems_msg_type_e.Msg_Type_OAM) {
-								console.log("nomal buffer OAM!!!")
-								processOAMmsg(recvBuff, loopPos, decodeDat.SeqNo)
-							}
-							loopPos = loopPos + pktLen
-							if(loopPos >= data.length) {
-								buffPos = loopPos - pktLen
+							if (dataLen == pktLen) {
+								// console.log("data size equals packet length!!!")
+								if(decodeDat.MsgType == ems_msg_type_e.Msg_Type_Auth) {
+									console.log("Auth!!!!!")
+								} else if(decodeDat.MsgType  == ems_msg_type_e.Msg_Type_OAM) {
+									processOAMmsg(recvBuff, loopPos, decodeDat.SeqNo)
+								}
+								tcpPos = 0
+								beLoop = false
+							} else if (dataLen < pktLen) {
+								// console.log("data size less than packet length!!!")
+								tcpPos = dataLen
+								beLoop = false
+							} else if (dataLen > pktLen) {
+								// console.log("data size bigger than packet length!!!")
+								while (loopPos < dataLen) {
+									// console.log("loopPos : " + loopPos)
+									if(loopPos > 0) {
+										if (recvBuff.readUInt16BE(loopPos) != EMS_PREAMBLE) {
+											console.log("invalid packet(EMS_PREAMBLE 2 )!!!")
+											beLoop = false
+											tcpPos = 0
+											recvBuff = new Buffer(4092)
+											client.end()
+											break
+										}
+										decodeDat = ems_msg_header_t.decode(recvBuff, loopPos, {endian:"BE"});
+										pktLen = decodeDat.Length
+									}
+									if(decodeDat.MsgType == ems_msg_type_e.Msg_Type_Auth) {
+										console.log("Auth!!!!!")
+									} else if(decodeDat.MsgType  == ems_msg_type_e.Msg_Type_OAM) {
+										processOAMmsg(recvBuff, loopPos, decodeDat.SeqNo)
+									}
+									loopPos = loopPos + pktLen
+								}
+								tcpPos = dataLen - pktLen
 								beLoop = false
 							}
-							loopCnt++
 						}
 					}
 				}
@@ -175,7 +184,7 @@ net.getConnection = function () {
         //     console.log("Auth!!!!!")
         //   } else if(decodeDat.MsgType  == ems_msg_type_e.Msg_Type_OAM) {
         //     console.log("OAM!!!!")
-        //     processOAMmsg(data, 0, decodeDat.SeqNo)
+        //     processOAMmsg(data, decodeDat.SeqNo)
         //   }
 				//
         // }
@@ -232,6 +241,7 @@ var processOAMmsg = function (data, pos, seq) {
 	if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_sys_config )
    && oamMsgDat.DataLen == ems_sys_config_t.size()) {
      var emsSysConfigDat = ems_sys_config_t.decode(data, ems_msg_header_t.size() +oam_msg_t.size(), {endian:"LE"});
+		 // console.log("emsSysConfigDat : " + JSON.stringify(emsSysConfigDat))
 		 if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_sys_config) {
 			 router.setSeqMap(seq, JSON.stringify(emsSysConfigDat))
 		 }
@@ -242,6 +252,7 @@ var processOAMmsg = function (data, pos, seq) {
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_room_config)
    && oamMsgDat.DataLen == room_config_t.size()) {
       var roomConfigDat = room_config_t.decode(data, ems_msg_header_t.size() +oam_msg_t.size(), {endian:"BE"});
+			// console.log("roomConfigDat : " + JSON.stringify(roomConfigDat))
 			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_config)
       	router.setSeqMap(seq, JSON.stringify(roomConfigDat))
   }
@@ -273,33 +284,35 @@ var processOAMmsg = function (data, pos, seq) {
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_solBeach_damper_scheduler || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_solBeach_damper_scheduler)
    && oamMsgDat.DataLen == damper_scheduler_config_t.size()) {
       var damperScheConfigDat = damper_scheduler_config_t.decode(data, ems_msg_header_t.size() +oam_msg_t.size(), {endian:"BE"});
+			// console.log("damperScheConfigDat : " + JSON.stringify(damperScheConfigDat))
 			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_solBeach_damper_scheduler)
       	router.setSeqMap(seq, JSON.stringify(damperScheConfigDat))
   }
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_state || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_room_state)
    && oamMsgDat.DataLen == floor_rad_room_state_t.size()) {
       var floorRoomStateDat = floor_rad_room_state_t.decode(data, ems_msg_header_t.size() +oam_msg_t.size(), {endian:"BE"});
-			// console.log(JSON.stringify(floorRoomStateDat))
+			// console.log("floorRoomStateDat : " + JSON.stringify(floorRoomStateDat))
 			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_state)
       	router.setSeqMap(seq, JSON.stringify(floorRoomStateDat))
   }
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_priority || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_room_priority)
    && oamMsgDat.DataLen == floor_rad_room_priority_t.size()) {
       var floorRadRoomPriorityDat = floor_rad_room_priority_t.decode(data, ems_msg_header_t.size() +oam_msg_t.size(), {endian:"BE"});
+			// console.log("floorRadRoomPriorityDat : " + JSON.stringify(floorRadSchedulerGroupDat))
 			if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_priority)
       	router.setSeqMap(seq, JSON.stringify(floorRadRoomPriorityDat))
   }
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_group_control || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_scheduler_group_control)
    && oamMsgDat.DataLen == floor_rad_scheduler_group_config_t.size()) {
     var floorRadSchedulerGroupDat = floor_rad_scheduler_group_config_t.decode(data, ems_msg_header_t.size() +oam_msg_t.size(), {endian:"BE"});
-		// console.log(JSON.stringify(floorRadSchedulerGroupDat))
+		// console.log("floorRadSchedulerGroupDat : " + JSON.stringify(floorRadSchedulerGroupDat))
 		if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_group_control)
     	router.setSeqMap(seq, JSON.stringify(floorRadSchedulerGroupDat))
   }
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_time_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_scheduler_time_config)
    && oamMsgDat.DataLen == floor_rad_scheduler_time_config_t.size()) {
 		var floorRadSchedulerTimeConfigDat = floor_rad_scheduler_time_config_t.decode(data, ems_msg_header_t.size() + oam_msg_t.size(), {endian:"BE"});
-		// console.log(JSON.stringify(floorRadSchedulerTimeConfigDat))
+		console.log("floorRadSchedulerTimeConfigDat : " + JSON.stringify(floorRadSchedulerTimeConfigDat))
 		if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_time_config)
     	router.setSeqMap(seq, JSON.stringify(floorRadSchedulerTimeConfigDat))
   }
@@ -353,15 +366,6 @@ var processOAMmsg = function (data, pos, seq) {
 		", size() : " + size);
   return ret;
 }
-// var ems_alarm_t = new struct("ems_alarm_t", [
-// 	"Time", struct.uint32(),
-// 	"Seq", struct.uint16(),
-// 	"SiteInfo", struct.uint16(),
-// 	"Module", struct.uint16(),
-// 	"Level", struct.uint16(),
-// 	"ModuleIndex", struct.uint16(),
-// 	"szContent", struct.char(256)
-// ]);
 
 var siteInfo = ['-', '오션벨리', '양양쏠비치'];
 var moduleType = [

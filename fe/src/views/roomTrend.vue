@@ -115,7 +115,7 @@
             >
             {{graphTitle2}}
             </v-chip>
-            <apexchart type=line width='1300px' height='160px' :options="this.chartOptionsLine2" :series="this.series2" />
+            <apexchart type=line width='1300px' height='200px' :options="this.chartOptionsLine2" :series="this.series2" />
           </div>
         </div>
       </div>
@@ -237,12 +237,12 @@ export default {
               data7.push(-2)
             }
             if (this.datas[i].usManHeatingMode !== null && this.datas[i].usManHeatingMode <= 60) {
-              if (this.datas[i].usManHeatingMode === '0') {
+              if (this.datas[i].usManHeatingMode === 0) {
                 data8.push(parseInt(this.datas[i].usManHeatingMode+6))
-              } else if (this.datas[i].usManHeatingMode === '1') {
-                data8.push(parseInt(this.datas[i].usManHeatingMode+5))
-              } else {
+              } else if (this.datas[i].usManHeatingMode === 1) {
                 data8.push(parseInt(this.datas[i].usManHeatingMode+4))
+              } else {
+                data8.push(parseInt(this.datas[i].usManHeatingMode+2))
               }
             } else {
               data8.push(-2)
@@ -403,12 +403,12 @@ export default {
               data7.push(-2)
             }
             if (this.datas[i].usManHeatingMode !== null && this.datas[i].usManHeatingMode <= 60) {
-              if (this.datas[i].usManHeatingMode === '0') {
+              if (this.datas[i].usManHeatingMode === 0) {
                 data8.push(parseInt(this.datas[i].usManHeatingMode+6))
-              } else if (this.datas[i].usManHeatingMode === '1') {
-                data8.push(parseInt(this.datas[i].usManHeatingMode+5))
-              } else {
+              } else if (this.datas[i].usManHeatingMode === 1) {
                 data8.push(parseInt(this.datas[i].usManHeatingMode+4))
+              } else {
+                data8.push(parseInt(this.datas[i].usManHeatingMode+2))
               }
             } else {
               data8.push(-2)
@@ -517,12 +517,80 @@ export default {
               width: 3,
               //dashArray: [0,10],
             },
+            tooltip: {
+              shared: true,
+              intersect: false,
+              y: [
+              {
+                formatter: function (y) {
+                  if(typeof y !== "undefined") {
+                    if (y === 4/*12*/) {
+                      y = "정지"
+                    } else if (y === 5/*12*/) {
+                      y = "수동"
+                    } else {
+                      y = "자동"
+                    }
+                  }
+                  return y;
+                }
+              }, {
+                formatter: function (y) {
+                  if(typeof y !== "undefined") {
+                    if (y === 2/*9*/) {
+                      y = "정지"
+                    } else {
+                      y = "가동"
+                    }
+                  }
+                  return y;
+                }
+              }, {
+                formatter: function (y) {
+                  if(typeof y !== "undefined") {
+                    if (y === 0/*3*/) {
+                      y = "정지"
+                    } else {
+                      y = "가동"
+                    }
+                  }
+                  return y;
+                }
+              }]
+            },
             yaxis: {
-                labels: {
-                  show: true,
-                  align: 'right',
-                  minWidth: 50,
-                  maxWidth: 50
+              min: 0,
+              max: 6,
+              tickAmount:6,
+              labels: {
+                show: true,
+                align: 'right',
+                minWidth: 50,
+                maxWidth: 50,
+                formatter: function (value) {
+                  var retVal
+                  if(typeof value !== "undefined") {
+                    retVal = ""
+                    switch(value){
+                      case 0:
+                      case 2:
+                      case 4:
+                        retVal = "OFF"
+                      break;
+                      case 1:
+                      case 3:
+                        retVal = "ON"
+                      break;
+                      case 5:
+                        retVal = "M"
+                      break;
+                      case 6:
+                        retVal = "A"
+                      break;
+                    }
+                    return retVal;
+                  }
+                }
               }
             },
             xaxis: {

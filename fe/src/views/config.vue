@@ -388,10 +388,10 @@
                                     value="Nt:1 Ctrl:2 CtrlNt:6 sch:8"
                                   ></v-textarea>
                                 </v-list-item>
-                                <v-list-item>
+                                <!-- <v-list-item>
                                   <v-list-item-title>제어모드:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.DamperCtrlMode"></v-text-field></v-list-item-title>
-                                </v-list-item>
+                                </v-list-item> -->
                                 <v-list-item>
                                   <v-list-item-title>댐퍼설정값:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.Rdamp_set"></v-text-field></v-list-item-title>

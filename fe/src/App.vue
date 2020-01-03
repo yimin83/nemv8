@@ -192,7 +192,7 @@ export default {
               },
               {
                 icon: 'help',
-                title: '평균그래프',
+                title: '통계그래프',
                 to: { path: '/roomAvgTrend' }
               }
             ]
@@ -228,7 +228,7 @@ export default {
               },
               {
                 icon: 'help',
-                title: '평균그래프',
+                title: '통계그래프',
                 to: { path: '/ahuAvgTrend' }
               }
             ]
