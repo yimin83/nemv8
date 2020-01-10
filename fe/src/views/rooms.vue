@@ -1502,7 +1502,7 @@ export default {
             this.roomNos.push(this.roomsStats[i].usRoomNo)
           }
           this.roomsOldStats = this.roomsStats
-          // this.getRoomsGroup()
+          this.getRoomsGroup()
         })
         .catch((e) => {
           alert(e.message)

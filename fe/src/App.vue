@@ -65,11 +65,11 @@
               <!-- <tr>
                 <td>사이트정보</td>
                 <td>{{alram.SiteInfo}}</td>
-              </tr> -->
+              </tr>
               <tr>
                 <td style="border-right: 1px solid lightgrey;">발생구역</td>
                 <td>{{alram.Module}}</td>
-              </tr>
+              </tr> -->
               <tr>
                 <td style="border-right: 1px solid lightgrey;">알람등급</td>
                 <td>

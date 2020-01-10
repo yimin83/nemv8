@@ -100,7 +100,7 @@
             <apexchart type=line width='1283px' height=300 :options="chartOptionsLine1" :series="series1" />
           </div>
           <div class="ma-0 pa-0 mb-n3">
-            <apexchart type=line width='1399px' height=210 :options="chartOptionsLine2" :series="series2" />
+            <apexchart type=line width='1415px' height=210 :options="chartOptionsLine2" :series="series2" />
           </div>
           <div class="ma-0 pa-0 mb-n3">
             <apexchart type=line width='1273px' height=250 class='ml-3' :options="chartOptionsLine3" :series="series3" />
@@ -237,6 +237,7 @@ export default {
           var data9 = []
           var data10 = []
           var data11 = []
+          var data12 = []
           var date = []
           var nCnt = 0
           this.graphTitle1 = '온도 정보'
@@ -303,6 +304,11 @@ export default {
             } else {
               data11.push(-1)
             }
+            if (this.datas[i].nKHAIValue !== null) {
+              data12.push(this.mergeDatas[i].ahu.nKHAIValue.toFixed(2))
+            } else {
+              data12.push(-1)
+            }
             if (this.time.value === 0 ){
               date.push(new Date((this.datas[i].m + (9 * 60 * 60)) * 1000).toISOString())
               nCnt = 3
@@ -341,6 +347,10 @@ export default {
             {
               name: '외기현재값',
               data: data11
+            },
+            {
+              name: '통합대기지수',
+              data: data12
             }
           ]
           this.series3 = [
@@ -430,7 +440,7 @@ export default {
               //dashArray: [0,10],
             },
             title: {
-                text: 'CO2',
+                text: '외기 비율 & 대기질',
                 align: 'center',
                 margin: -20,
                 offsetX: -55,
@@ -453,14 +463,17 @@ export default {
                   style: {
                       color: "#008ffb",
                   },
-                  minWidth: 199,
-                  maxWidth: 199,
+                  minWidth: 215,
+                  maxWidth: 215,
+                  formatter: function (value) {
+                    return parseInt(value)
+                  }
                 },
               },
               {
                 opposite: true,
                 title: {
-                  text: '외기설정값'
+                  text: '외기비율'
                 },
                 labels: {
                   show: true,
@@ -475,14 +488,27 @@ export default {
               },
               {
                 opposite: true,
+                labels: {
+                  show: false,
+                  align: 'right',
+                  style: {
+                      color: "#feb019",
+                  },
+                  formatter: function (value) {
+                    return parseInt(value)
+                  }
+                },
+              },
+              {
+                opposite: true,
                 title: {
-                  text: '외기현재값'
+                  text: '통합대기지수'
                 },
                 labels: {
                   show: true,
                   align: 'right',
                   style: {
-                      color: "#feb019",
+                      color: "#fd8697",
                   },
                   formatter: function (value) {
                     return parseInt(value)
@@ -720,6 +746,7 @@ export default {
           var data9 = []
           var data10 = []
           var data11 = []
+          var data12 = []
           var date = []
           var nCnt = 0
           this.graphTitle1 = '온도 정보'
@@ -786,6 +813,11 @@ export default {
             } else {
               data11.push(-1)
             }
+            if (this.datas[i].nKHAIValue !== null) {
+              data12.push(this.mergeDatas[i].ahu.nKHAIValue.toFixed(2))
+            } else {
+              data12.push(-1)
+            }
             if (this.time.value === 0 ){
               date.push(new Date((this.datas[i].m + (9 * 60 * 60)) * 1000).toISOString())
               nCnt = 3
@@ -824,6 +856,10 @@ export default {
             {
               name: '외기현재값',
               data: data11
+            },
+            {
+              name: '통합대기지수',
+              data: data12
             }
           ]
           this.series3 = [

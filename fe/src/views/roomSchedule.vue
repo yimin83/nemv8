@@ -602,10 +602,6 @@ export default {
           }
         }
       }
-      var nStartDate = Math.round((new Date(this.startDate + " " + this.startTime).getTime()) / 1000)
-      var nEndDate = Math.round((new Date(this.endDate + " " + this.endTime).getTime()) / 1000)
-      this.groupDatas.StartTime = nStartDate
-      this.groupDatas.EndTime = nEndDate
       // alert(JSON.stringify(this.groupDatas))
     },
     openGroup(grpId) {
@@ -795,8 +791,10 @@ export default {
     },
     startScheduleGroup() {
       // alert("startScheduleGroup")
-      this.groupDatas.SchedulerState = 1
-      this.makeSaveScheduleGroup();
+      var nStartDate = Math.round((new Date(this.startDate + " " + this.startTime).getTime()) / 1000)
+      var nEndDate = Math.round((new Date(this.endDate + " " + this.endTime).getTime()) / 1000)
+      this.groupDatas.StartTime = nStartDate
+      this.groupDatas.EndTime = nEndDate
       if (this.groupDatas.StartTime >= this.groupDatas.EndTime) {
           alert("스케줄링 시작시간이 종료시간보다 늦습니다.")
           return
@@ -805,6 +803,8 @@ export default {
           alert("스케줄링 종료시간이 현재시간보다 빠릅니다.")
           return
       }
+      this.groupDatas.SchedulerState = 1
+      this.makeSaveScheduleGroup();
       this.startLoading = true
       this.stopLoading = false
       this.saveloading = false

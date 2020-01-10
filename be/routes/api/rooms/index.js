@@ -570,7 +570,7 @@ console.log("############ put /solAhuTrend req.body : " + JSON.stringify(req.bod
 	const time = req.body.time
 	var beforeTime = new Date().getTime();
 	if(time != 0){
-		mysqlDB.query("SELECT * FROM ( SELECT nLastUpdateTime DIV ? AS m, AVG(fData_damper_manual_set) AS fData_damper_manual_set, AVG(fData_temp_supply) AS fData_temp_supply, AVG(cState_supplay_fan) AS cState_supplay_fan, AVG(fData_hc_set_temp) AS fData_hc_set_temp, AVG(fData_temp_return) AS fData_temp_return, AVG(fData_damper_outer_set) AS fData_damper_outer_set, cMode_damper_auto_manual, AVG(nPPMco2_cur) AS nPPMco2_cur, cMode_manual_mode, cMode_auto_mode, cMode_auto_manual FROM solbeach_zone_record WHERE nZoneIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, ahuNo, startTime, endTime], function(err, result, fields) {
+		mysqlDB.query("SELECT * FROM ( SELECT nLastUpdateTime DIV ? AS m, AVG(nKHAIValue) AS nKHAIValue, AVG(fData_damper_manual_set) AS fData_damper_manual_set, AVG(fData_temp_supply) AS fData_temp_supply, AVG(cState_supplay_fan) AS cState_supplay_fan, AVG(fData_hc_set_temp) AS fData_hc_set_temp, AVG(fData_temp_return) AS fData_temp_return, AVG(fData_damper_outer_set) AS fData_damper_outer_set, cMode_damper_auto_manual, AVG(nPPMco2_cur) AS nPPMco2_cur, cMode_manual_mode, cMode_auto_mode, cMode_auto_manual FROM solbeach_zone_record WHERE nZoneIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, ahuNo, startTime, endTime], function(err, result, fields) {
 			if(err) {
 				console.log("############ put /solAhuTrend error : " + err)
 			}
@@ -581,7 +581,7 @@ console.log("############ put /solAhuTrend req.body : " + JSON.stringify(req.bod
 			}
 		})
 	} else {
-		mysqlDB.query("SELECT nLastUpdateTime AS m, fData_damper_manual_set, fData_temp_supply, cState_supplay_fan, fData_hc_set_temp, fData_temp_return, fData_damper_outer_set, cMode_damper_auto_manual, nPPMco2_cur, cMode_manual_mode, cMode_auto_mode, cMode_auto_manual FROM solbeach_zone_record WHERE nZoneIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) ORDER BY m DESC", [ahuNo, startTime, endTime], function(err, result, fields) {
+		mysqlDB.query("SELECT nLastUpdateTime AS m, nKHAIValue, fData_damper_manual_set, fData_temp_supply, cState_supplay_fan, fData_hc_set_temp, fData_temp_return, fData_damper_outer_set, cMode_damper_auto_manual, nPPMco2_cur, cMode_manual_mode, cMode_auto_mode, cMode_auto_manual FROM solbeach_zone_record WHERE nZoneIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) ORDER BY m DESC", [ahuNo, startTime, endTime], function(err, result, fields) {
 			if(err) {
 				console.log("############ put /solAhuTrend error : " + err)
 			}
