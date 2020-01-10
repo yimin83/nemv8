@@ -1423,7 +1423,9 @@ export default {
       curSchedullerTitle: '스케줄러 동작',
       menuItems: ['create file', 'create directory'],
       systemTime: '-',
-      beFirst: true
+      beFirst: true,
+      envDatas: [],
+      mergeDatas: []
     }
   },
   methods: {
@@ -1500,7 +1502,50 @@ export default {
             this.roomNos.push(this.roomsStats[i].usRoomNo)
           }
           this.roomsOldStats = this.roomsStats
-          this.getRoomsGroup()
+          // this.getRoomsGroup()
+        })
+        .catch((e) => {
+          alert(e.message)
+          console.error(e.message)
+        })
+    },
+    mergeData () {
+      var Tout = 0
+      this.mergeDatas = []
+      for (var i = 0; i < this.datas.length; i++) {
+        Tout = 0
+        for (var j = 0; j < this.envDatas.length; j++) {
+          if (this.datas[i].m === this.envDatas[j].m) {
+            Tout = this.envDatas[j].fTout
+            break
+          }
+        }
+        if (Tout > 50 || Tout < -50) Tout = 0
+        this.mergeDatas.push({ 'room': this.datas[i], 'Tout': Tout })
+      }
+    },
+    getSiteEnv (roomNo) {
+      var startDateTime = this.startDate + ' ' + this.startTime
+      var endDateTime = this.endDate + ' ' + this.endTime
+      axios.put(`${this.$apiRootPath}rooms/siteEnv`, { startTime: startDateTime, endTime: endDateTime, time: this.time.value })
+        .then((r) => {
+          this.envDatas = r.data
+          // alert("getSiteEnv : " + JSON.stringify(this.envDatas))
+          this.openRoomGraph(roomNo)
+        })
+        .catch((e) => {
+          alert(e.message)
+          console.error(e.message)
+        })
+    },
+    getSiteEnvSearch (roomNo) {
+      var startDateTime = this.startDate + ' ' + this.startTime
+      var endDateTime = this.endDate + ' ' + this.endTime
+      axios.put(`${this.$apiRootPath}rooms/siteEnv`, { startTime: startDateTime, endTime: endDateTime, time: this.time.value })
+        .then((r) => {
+          this.envDatas = r.data
+          // alert("getSiteEnv : " + JSON.stringify(this.envDatas))
+          this.getTrendRoomSearch(roomNo)
         })
         .catch((e) => {
           alert(e.message)
@@ -1510,7 +1555,7 @@ export default {
     selectGraph (roomNum){
       this.roomNo = roomNum
       if (this.beFirst) {
-        this.openRoomGraph(roomNum)
+        this.getSiteEnv(roomNum)
       } else {
         this.searchGraph()
       }
@@ -1519,7 +1564,7 @@ export default {
     searchGraph () {
       this.searchloading = true
       this.loading = true
-      this.getTrendRoomSearch(this.roomNo)
+      this.getSiteEnvSearch(this.roomNo)
     },
     getTrendRoomSearch (usRoomNo) {
       // axios.put(`http://localhost:3000/api/rooms/getRoomTrend`, { usRoomNo: usRoomNo, startTime: this.startTime, endTime: this.endTime, time: this.time.value })
@@ -1528,6 +1573,7 @@ export default {
       axios.put(`${this.$apiRootPath}rooms/getRoomTrend`, { usRoomNo: usRoomNo, startTime: startDateTime, endTime: endDateTime, time: this.time.value })
         .then((r) => {
           this.datas = r.data
+          this.mergeData()
           var data0 = []
           var data1 = []
           var data2 = []
@@ -1538,66 +1584,72 @@ export default {
           var data7 = []
           var data8 = []
           var data9 = []
+          var data10 = []
           var date = []
           var nCnt = 0
           this.graphTitle1 = '온도 정보'
           this.graphTitle2 = '상태 정보'
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].ucRoomState !== null) {
-              data0.push(parseInt(this.datas[i].ucRoomState)+7)
+              data0.push(parseInt(this.mergeDatas[i].room.ucRoomState)+7)
             } else {
               data0.push(-1)
             }
             if (this.datas[i].ucSetStatus !== null) {
-              data1.push(parseInt(this.datas[i].ucSetStatus)+2)
+              data1.push(parseInt(this.mergeDatas[i].room.ucSetStatus)+2)
             } else {
               data1.push(-1)
             }
             if (this.datas[i].ucCurStatus !== null) {
-              data2.push(parseInt(this.datas[i].ucCurStatus))
+              data2.push(parseInt(this.mergeDatas[i].room.ucCurStatus))
             } else {
               data2.push(-1)
             }
             if (this.datas[i].fTset !== null && this.datas[i].fTset <= 60) {
-              data3.push((this.datas[i].fTset).toFixed(2))
+              data3.push((this.mergeDatas[i].room.fTset).toFixed(2))
             } else {
               data3.push(-2)
             }
             if (this.datas[i].fTsurf_cur !== null && this.datas[i].fTsurf_cur <= 60) {
-              data4.push((this.datas[i].fTsurf_cur).toFixed(2))
+              data4.push((this.mergeDatas[i].room.fTsurf_cur).toFixed(2))
             } else {
               data4.push(-2)
             }
             if (this.datas[i].fTroom_cur !== null && this.datas[i].fTroom_cur <= 60) {
-              data5.push((this.datas[i].fTroom_cur).toFixed(2))
+              data5.push((this.mergeDatas[i].room.fTroom_cur).toFixed(2))
             } else {
               data5.push(-2)
             }
             if (this.datas[i].fTroom_set !== null && this.datas[i].fTroom_set <= 60) {
-              data6.push((this.datas[i].fTroom_set).toFixed(2))
+              data6.push((this.mergeDatas[i].room.fTroom_set).toFixed(2))
             } else {
               data6.push(-2)
             }
             if (this.datas[i].fTsurf_set !== null && this.datas[i].fTsurf_set <= 60) {
-              data7.push((this.datas[i].fTsurf_set).toFixed(2))
+              data7.push((this.mergeDatas[i].room.fTsurf_set).toFixed(2))
             } else {
               data7.push(-2)
             }
             if (this.datas[i].usManHeatingMode !== null && this.datas[i].usManHeatingMode <= 60) {
               if (this.datas[i].usManHeatingMode === 0) {
-                data8.push(parseInt(this.datas[i].usManHeatingMode+6))
+                data8.push(parseInt(this.mergeDatas[i].usManHeatingMode+6))
               } else if (this.datas[i].usManHeatingMode === 1) {
-                data8.push(parseInt(this.datas[i].usManHeatingMode+4))
+                data8.push(parseInt(this.mergeDatas[i].room.usManHeatingMode+4))
               } else {
-                data8.push(parseInt(this.datas[i].usManHeatingMode+2))
+                data8.push(parseInt(this.mergeDatas[i].room.usManHeatingMode+2))
               }
             } else {
               data8.push(-2)
             }
             if (this.datas[i].fTset_cur !== null && this.datas[i].fTset_cur <= 60) {
-              data9.push((this.datas[i].fTset_cur).toFixed(2))
+              data9.push((this.mergeDatas[i].room.fTset_cur).toFixed(2))
             } else {
               data9.push(-2)
+            }
+            if (this.datas[i].fTset_cur !== null && this.datas[i].fTset_cur <= 60) {
+              data10.push((this.mergeDatas[i].Tout).toFixed(2))
+            } else {
+              data10.push(-2)
             }
             if (this.time.value === 0 ){
               date.push(new Date((this.datas[i].m + (9 * 60 * 60)) * 1000).toISOString())
@@ -1631,6 +1683,10 @@ export default {
             {
               name: '현재실내온도',
               data: data5
+            },
+            {
+              name: '외부온도',
+              data: data10
             }
           ]
           this.series2 = [
@@ -1698,6 +1754,7 @@ export default {
       axios.put(`${this.$apiRootPath}rooms/getRoomTrend`, { usRoomNo: roomNo, startTime: startDateTime, endTime: endDateTime, time: this.time.value })
         .then((r) => {
           this.datas = r.data
+          this.mergeData()
           var data0 = []
           var data1 = []
           var data2 = []
@@ -1708,66 +1765,72 @@ export default {
           var data7 = []
           var data8 = []
           var data9 = []
+          var data10 = []
           var date = []
           var nCnt = 0
           this.graphTitle1 = '온도 정보'
           this.graphTitle2 = '상태 정보'
           for (var i = 0; i < this.datas.length; i++) {
             if (this.datas[i].ucRoomState !== null) {
-              data0.push(parseInt(this.datas[i].ucRoomState)+7)
+              data0.push(parseInt(this.mergeDatas[i].room.ucRoomState)+7)
             } else {
               data0.push(-1)
             }
             if (this.datas[i].ucSetStatus !== null) {
-              data1.push(parseInt(this.datas[i].ucSetStatus)+2)
+              data1.push(parseInt(this.mergeDatas[i].room.ucSetStatus)+2)
             } else {
               data1.push(-1)
             }
             if (this.datas[i].ucCurStatus !== null) {
-              data2.push(parseInt(this.datas[i].ucCurStatus))
+              data2.push(parseInt(this.mergeDatas[i].room.ucCurStatus))
             } else {
               data2.push(-1)
             }
-            if (this.datas[i].fTset !== null && this.datas[i].fTset < 50) {
-              data3.push((this.datas[i].fTset).toFixed(2))
+            if (this.datas[i].fTset !== null && this.datas[i].fTset <= 60) {
+              data3.push((this.mergeDatas[i].room.fTset).toFixed(2))
             } else {
-              data3.push(-1)
+              data3.push(-2)
             }
-            if (this.datas[i].fTsurf_cur !== null && this.datas[i].fTsurf_cur < 50) {
-              data4.push((this.datas[i].fTsurf_cur).toFixed(2))
+            if (this.datas[i].fTsurf_cur !== null && this.datas[i].fTsurf_cur <= 60) {
+              data4.push((this.mergeDatas[i].room.fTsurf_cur).toFixed(2))
             } else {
-              data4.push(-1)
+              data4.push(-2)
             }
-            if (this.datas[i].fTroom_cur !== null && this.datas[i].fTroom_cur < 50) {
-              data5.push((this.datas[i].fTroom_cur).toFixed(2))
+            if (this.datas[i].fTroom_cur !== null && this.datas[i].fTroom_cur <= 60) {
+              data5.push((this.mergeDatas[i].room.fTroom_cur).toFixed(2))
             } else {
-              data5.push(-1)
+              data5.push(-2)
             }
-            if (this.datas[i].fTroom_set !== null && this.datas[i].fTroom_set < 50) {
-              data6.push((this.datas[i].fTroom_set).toFixed(2))
+            if (this.datas[i].fTroom_set !== null && this.datas[i].fTroom_set <= 60) {
+              data6.push((this.mergeDatas[i].room.fTroom_set).toFixed(2))
             } else {
-              data6.push(-1)
+              data6.push(-2)
             }
-            if (this.datas[i].fTsurf_set !== null && this.datas[i].fTsurf_set < 50) {
-              data7.push((this.datas[i].fTsurf_set).toFixed(2))
+            if (this.datas[i].fTsurf_set !== null && this.datas[i].fTsurf_set <= 60) {
+              data7.push((this.mergeDatas[i].room.fTsurf_set).toFixed(2))
             } else {
-              data7.push(-1)
+              data7.push(-2)
             }
-            if (this.datas[i].usManHeatingMode !== null && this.datas[i].usManHeatingMode < 50) {
+            if (this.datas[i].usManHeatingMode !== null && this.datas[i].usManHeatingMode <= 60) {
               if (this.datas[i].usManHeatingMode === 0) {
-                data8.push(parseInt(this.datas[i].usManHeatingMode+6))
+                data8.push(parseInt(this.mergeDatas[i].usManHeatingMode+6))
               } else if (this.datas[i].usManHeatingMode === 1) {
-                data8.push(parseInt(this.datas[i].usManHeatingMode+4))
+                data8.push(parseInt(this.mergeDatas[i].room.usManHeatingMode+4))
               } else {
-                data8.push(parseInt(this.datas[i].usManHeatingMode+2))
+                data8.push(parseInt(this.mergeDatas[i].room.usManHeatingMode+2))
               }
             } else {
-              data8.push(-1)
+              data8.push(-2)
             }
-            if (this.datas[i].fTset_cur !== null && this.datas[i].fTset_cur < 50) {
-              data9.push((this.datas[i].fTset_cur).toFixed(2))
+            if (this.datas[i].fTset_cur !== null && this.datas[i].fTset_cur <= 60) {
+              data9.push((this.mergeDatas[i].room.fTset_cur).toFixed(2))
             } else {
-              data9.push(-1)
+              data9.push(-2)
+            }
+            if (this.datas[i].fTset_cur !== null && this.datas[i].fTset_cur <= 60) {
+              data10.push((this.mergeDatas[i].Tout).toFixed(2))
+            } else {
+              data10.push(-2)
             }
             if (this.time.value === 0 ){
               date.push(new Date((this.datas[i].m + (9 * 60 * 60)) * 1000).toISOString())
@@ -1801,6 +1864,10 @@ export default {
             {
               name: '현재실내온도',
               data: data5
+            },
+            {
+              name: '외부온도',
+              data: data10
             }
           ]
           this.series2 = [

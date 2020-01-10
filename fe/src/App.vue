@@ -51,27 +51,27 @@
       <span></span>
     </v-footer>
     <v-dialog v-model="alarmModal" persistent max-width="400px">
-      <v-card>
+      <v-card class="ma-0 pa-1">
         <v-card-title>
           <span class="headline">알람팝업창</span>
         </v-card-title>
-        <v-card-text>
-          <v-simple-table>
+        <v-card-text class="ma-1 pa-1">
+          <v-simple-table dense class="elevation-3">
             <tbody>
               <tr>
-                <td width="120px">알람발생시간</td>
+                <td width="120px" style="border-right: 1px solid lightgrey;">알람발생시간</td>
                 <td>{{alram.Time}}</td>
               </tr>
-              <tr>
+              <!-- <tr>
                 <td>사이트정보</td>
                 <td>{{alram.SiteInfo}}</td>
-              </tr>
+              </tr> -->
               <tr>
-                <td>발생구역</td>
+                <td style="border-right: 1px solid lightgrey;">발생구역</td>
                 <td>{{alram.Module}}</td>
               </tr>
               <tr>
-                <td>알람등급</td>
+                <td style="border-right: 1px solid lightgrey;">알람등급</td>
                 <td>
                   <v-card
                     v-if="this.alram.Level === 1"
@@ -79,7 +79,7 @@
                     color="red lighten-1"
                     outlined
                   >
-                    <div>Critica</div>
+                    <div>Critical</div>
                   </v-card>
                   <v-card
                     v-if="this.alram.Level === 2"
@@ -104,17 +104,11 @@
                   >
                     <div>Information</div>
                   </v-card>
-                  <v-card
-                    v-if="this.alram.Level === 0"
-                    class="d-inline-flex  ma-0 pa-0"
-                    outlined
-                  >
-                    <div> - </div>
-                  </v-card>
+                  <div v-if="this.alram.Level === 0">&nbsp;-&nbsp;</div>
                 </td>
               </tr>
               <tr>
-                <td>알람내역</td>
+                <td style="border-right: 1px solid lightgrey;">알람내역</td>
                 <td>{{alram.szContent}}</td>
               </tr>
             </tbody>

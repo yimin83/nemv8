@@ -1145,7 +1145,7 @@ router.get('/getRoomStat/:roomNo', function(req, res, next) {
 exports.setSeqMap = function (seq, jsonData) {
     // res.redirect("/")
     seqMap.set(seq, jsonData)
-    console.log('setSeqMap seq : '+seq+' seqMap.get(seq) : ' + seqMap.get(seq))
+    // console.log('setSeqMap seq : '+seq+' seqMap.get(seq) : ' + seqMap.get(seq))
 }
 
 exports.reconnectAuth = function () {
