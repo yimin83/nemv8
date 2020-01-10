@@ -4,11 +4,6 @@ var struct = require("cpp-struct-js");
 const config = require('./../../../config.js')
 var net = {};
 var iconv = require('iconv-lite')
-// var Iconv = require('iconv').Iconv;
-// var iconv = new Iconv('EUC-KR', 'UTF-8//TRANSLIT//IGNORE');
-var Iconv  = require('iconv').Iconv;
-var euckr2utf8 = new Iconv('EUC-KR', 'UTF-8');
-var utf82euckr = new Iconv('UTF-8', 'EUC-KR');
 const ems_msg_type_e = {
 	Msg_Type_Auth : 0x10,
 	Msg_Type_Status : 0x20,
