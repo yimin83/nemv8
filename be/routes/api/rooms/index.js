@@ -550,16 +550,30 @@ console.log("############ put /siteEnv req.body : " + JSON.stringify(req.body))
 	const time = req.body.time
 	var beforeTime = new Date().getTime();
   // console.log("######################### getRoomConfig ######################### ")
-	mysqlDB.query("SELECT * FROM ( SELECT  nLastUpdateTime DIV ? AS m, AVG(fTout) AS fTout FROM site_env_record WHERE nSiteIdx = 2 AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, startTime, endTime], function(err, result, fields) {
-		if(err) {
-			console.log("############ put /siteEnv error : " + err)
-		}
-		else{
-			// console.log("############ get /solAhuTrend :" + JSON.stringify(result))
-			res.json(result)
-      // console.log("############ get siteEnv from db res: " + JSON.stringify(result))
-		}
-	})
+	if(time != 0){
+		mysqlDB.query("SELECT * FROM ( SELECT  nLastUpdateTime DIV ? AS m, AVG(fTout) AS fTout FROM site_env_record WHERE nSiteIdx = 2 AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, startTime, endTime], function(err, result, fields) {
+			if(err) {
+				console.log("############ put /siteEnv error : " + err)
+			}
+			else{
+				// console.log("############ get /solAhuTrend :" + JSON.stringify(result))
+				res.json(result)
+	      // console.log("############ get siteEnv from db res: " + JSON.stringify(result))
+			}
+		})
+	} else {
+		mysqlDB.query("SELECT nLastUpdateTime AS m, fTout FROM site_env_record WHERE nSiteIdx = 2 AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) ORDER BY m DESC", [startTime, endTime], function(err, result, fields) {
+			if(err) {
+				console.log("############ put /siteEnv error : " + err)
+			}
+			else{
+				// console.log("############ get /solAhuTrend :" + JSON.stringify(result))
+				res.json(result)
+	      // console.log("############ get siteEnv from db res: " + JSON.stringify(result))
+			}
+		})
+
+	}
 })
 
 router.put('/solAhuTrend', (req, res, next) => { // 수정

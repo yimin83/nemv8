@@ -202,17 +202,32 @@ export default {
     },
     mergeData () {
       var Tout = 0
+      var prevTout = 0
+      var isFind = false
+      var timeValue = 1
+      if (this.time.value === 0) {
+        timeValue = 1
+      } else {
+        timeValue = this.time.value
+      }
       this.mergeDatas = []
       for (var i = 0; i < this.datas.length; i++) {
         Tout = 0
+        isFind = false
         for (var j = 0; j < this.envDatas.length; j++) {
-          if (this.datas[i].m === this.envDatas[j].m) {
+          if (new Date(((this.datas[i].m * timeValue) + (9 * 60 * 60)) * 1000).toISOString().substr(0, 16) === new Date(((this.envDatas[j].m * timeValue) + (9 * 60 * 60)) * 1000).toISOString().substr(0, 16)) {
             Tout = this.envDatas[j].fTout
-            break
+            prevTout = Tout
+            isFind = true
+            break;
           }
         }
         if (Tout > 50 || Tout < -50) Tout = 0
-        this.mergeDatas.push({ 'ahu': this.datas[i], 'Tout': Tout })
+        if (isFind !== true){
+          this.mergeDatas.push({ 'ahu': this.datas[i], 'Tout': prevTout })
+        } else {
+          this.mergeDatas.push({ 'ahu': this.datas[i], 'Tout': Tout })
+        }
       }
     },
     getAhuTrend () {
