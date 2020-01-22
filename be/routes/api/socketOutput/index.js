@@ -1170,9 +1170,10 @@ var ahu_zone_config_msg_t = new struct("ahu_zone_config_msg_t", [
 	"Rdamp_max", struct.float32(),
 	"HCInitTimeMin", struct.uint16(),
 	"PPMco2_init", struct.int32(),
-	"Desc", struct.char(17)
+	"DamperCtrlOption", struct.uint8(),
+	"Desc", struct.char(16)
 ]);
-net.makeAhuZoneConfigMsg_t = function(ahuIndex, useScheduler, notifyOccupantsState, economizerCycle, usePID, varTempControl, hcMode, fanAutoManual, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, rdamp_min, rdamp_max, hcInitTimeMin, ppmCo2_init, desc) {
+net.makeAhuZoneConfigMsg_t = function(ahuIndex, useScheduler, notifyOccupantsState, economizerCycle, usePID, varTempControl, hcMode, fanAutoManual, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, rdamp_min, rdamp_max, hcInitTimeMin, ppmCo2_init, damperCtrlOption, desc) {
   var buffer = new Buffer(ahu_zone_config_msg_t.size());
   ahu_zone_config_msg_t.encode(buffer,0, {
     AhuIndex: ahuIndex,
@@ -1191,6 +1192,7 @@ net.makeAhuZoneConfigMsg_t = function(ahuIndex, useScheduler, notifyOccupantsSta
 		Rdamp_max: rdamp_max,
 		HCInitTimeMin: hcInitTimeMin,
 		PPMco2_init: ppmCo2_init,
+		DamperCtrlOption: damperCtrlOption,
     Desc: desc
   },{endian:"BE"})
   return buffer;
@@ -1200,25 +1202,26 @@ net.getSizeAhuZoneConfigMsg_t = function() {
 }
 
 var ahu_zone_config_t = new struct("ahu_zone_config_t", [
-    "AhuIndex", struct.uint16(),
-		"UseScheduler", struct.uint8(),
-    "NotifyOccupantsState", struct.uint8(),
-		"EconomizerCycle", struct.uint8(),
-		"UsePID", struct.uint8(),
-		"VarTempControl", struct.char(),
-    "HCMode", struct.char(),
-		"FanAutoManual", struct.char(),
-    "DamperAutoManual", struct.char(),
-    "Tzone_set", struct.float32(),
-    "Rdamp_set", struct.float32(),
-    "PPMco2_set", struct.int32(),
-		"Rdamp_min", struct.float32(),
-		"Rdamp_max", struct.float32(),
-		"HCInitTimeMin", struct.uint16(),
-		"PPMco2_init", struct.int32(),
-    "Desc", struct.char(17)
+	"AhuIndex", struct.uint16(),
+	"UseScheduler", struct.uint8(),
+	"NotifyOccupantsState", struct.uint8(),
+	"EconomizerCycle", struct.uint8(),
+	"UsePID", struct.uint8(),
+	"VarTempControl", struct.int8(),
+	"HCMode", struct.int8(),
+	"FanAutoManual", struct.int8(),
+	"DamperAutoManual", struct.int8(),
+	"Tzone_set", struct.float32(),
+	"Rdamp_set", struct.float32(),
+	"PPMco2_set", struct.int32(),
+	"Rdamp_min", struct.float32(),
+	"Rdamp_max", struct.float32(),
+	"HCInitTimeMin", struct.uint16(),
+	"PPMco2_init", struct.int32(),
+	"DamperCtrlOption", struct.uint8(),
+	"Desc", struct.char(16)
 ]);
-net.makeAhuZoneConfig_t = function(ahuIndex, useScheduler, notifyOccupantsState, economizerCycle, usePID, varTempControl, hcMode, fanAutoManual, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, rdamp_min, rdamp_max, hcInitTimeMin, ppmCo2_init, desc) {
+net.makeAhuZoneConfig_t = function(ahuIndex, useScheduler, notifyOccupantsState, economizerCycle, usePID, varTempControl, hcMode, fanAutoManual, damperAutoManual, tzone_set, rdamp_set, ppmCo2_set, rdamp_min, rdamp_max, hcInitTimeMin, ppmCo2_init, damperCtrlOption, desc) {
   var buffer = new Buffer(ahu_zone_config_t.size());
   ahu_zone_config_t.encode(buffer,0, {
     AhuIndex: ahuIndex,
@@ -1237,6 +1240,7 @@ net.makeAhuZoneConfig_t = function(ahuIndex, useScheduler, notifyOccupantsState,
 		Rdamp_max: rdamp_max,
 		HCInitTimeMin: hcInitTimeMin,
 		PPMco2_init: ppmCo2_init,
+		DamperCtrlOption: damperCtrlOption,
     Desc: desc
   },{endian:"BE"})
   return buffer;

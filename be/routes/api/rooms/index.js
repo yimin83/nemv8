@@ -81,6 +81,36 @@ var requestAuth = function () {
 	net.writeData(client, fullBuffer, null)
 }
 requestAuth()
+
+
+
+// var makeDataTout = function () {
+// 	console.log("################ makeDataTout start!!! ################")
+// 	mysqlDB.query("SELECT fTout, nLastUpdateTime FROM site_temp_record where nSiteIdx = 2", function(err, result, fields) {
+//     if(err) {
+//       console.log("############ makeDataTout error : " + err)
+//     }
+//     else{
+// 			if(result!=null) {
+// 				var cnt = 0
+// 				console.log("################ makeDataTout start!!! ################ result : " + result.length)
+// 				for ( var i = 0; i < result.length; i++ ) {
+// 					mysqlDB.query("UPDATE solbeach_tout_record SET fTout = ? WHERE FROM_UNIXTIME(nLastUpdateTime, '%Y %m %d %H:%i') = FROM_UNIXTIME(?, '%Y %m %d %H:%i')",
+// 					[ result[i].fTout, result[i].nLastUpdateTime], function (err, rows, fields) {
+// 						console.log(" makeDataTout cnt : " + (cnt++) + ", len : " + result.length)
+// 						if (err) {
+// 				        res.send('############ roomschedule update error : ' + err)
+// 				        console.log(err)
+// 				    }
+// 			    })
+// 				}
+// 				console.log("################ makeDataTout end!!! #######################")
+// 			}
+// 		}
+//   })
+// }
+requestAuth()
+// makeDataTout()
 var dataLen = 0
 
 // const startCallback = Date.now()
@@ -414,6 +444,7 @@ router.put('/ahusConfig', (req, res, next) => { // 수정
 					req.body.config[i].Rdamp_max,
 					req.body.config[i].HCInitTimeMin,
 					req.body.config[i].PPMco2_init,
+					req.body.config[i].DamperCtrlOption,
 					req.body.config[i].Desc
 				)
 				dataLen = net.getSizeAhuZoneConfig_t()
