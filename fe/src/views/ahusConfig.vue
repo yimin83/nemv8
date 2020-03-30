@@ -19,13 +19,14 @@
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">댐퍼 수동<br>설정값</th>
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">댐퍼 수동<br>최대값</th>
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">댐퍼 수동<br>최소값</th>
+            <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="border-bottom:4px solid lightgrey;">댐퍼<br>옵션</th>
             <th class="text-center black--text ma-0 pa-0 pt-3 config-column" style="width:60px;border-bottom:4px solid lightgrey;">PID</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="datas in ahuConfigs" class="ma-0 pa-0">
             <td class="text-center black--text font-weight-bold ma-0 pa-0 pt-3 pb-2 config-column right-bold-border" style="background-color:rgb(294, 294, 189);border-bottom:2px solid grey;">{{ahuNos[datas.AhuIndex-1].name}}({{ahuNos[datas.AhuIndex-1].desc}})</td>
-            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;">
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:2px solid grey;">
               <v-select
               v-if="datas.UseScheduler !== 1"
               v-model="datas.UseScheduler"
@@ -204,7 +205,7 @@
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Rdamp_set" @change="saveAhuConfig()"></v-text-field></td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Rdamp_max" @change="saveAhuConfig()"></v-text-field></td>
             <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.Rdamp_min" @change="saveAhuConfig()"></v-text-field></td>
-            <!-- <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240)"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.UsePID" @change="saveAhuConfig()"></v-text-field></td> -->
+            <td class="text-center ma-0 pa-0 config-column" style="background-color:rgb(240, 240, 240);border-bottom:1px solid grey;"><v-text-field class="centered-input font-weight-bold body-2 config-column-margin" dense v-model="datas.DamperCtrlOption" @change="saveAhuConfig()"></v-text-field></td>
             <td class="text-center ma-0 pa-0 font-weight-bold body-2 config-column" style="background-color:rgb(240, 240, 240);border-bottom:2px solid grey;">
               <v-checkbox
                 v-model="datas.UsePID"
@@ -339,6 +340,7 @@ export default {
           this.ahuConfigs[i].Rdamp_max === this.tempAhuConfigs[i].Rdamp_max &&
           this.ahuConfigs[i].HCInitTimeMin === this.tempAhuConfigs[i].HCInitTimeMin &&
           this.ahuConfigs[i].PPMco2_init === this.tempAhuConfigs[i].PPMco2_init &&
+          this.ahuConfigs[i].DamperCtrlOption === this.tempAhuConfigs[i].DamperCtrlOption &&
           this.ahuConfigs[i].Desc === this.tempAhuConfigs[i].Desc)) {
           ahuIdxs.push(this.ahuConfigs[i].AhuIndex)
         }

@@ -3,7 +3,7 @@
     <v-divider class='my-3 mt-0 mb-3'></v-divider>
       <div class="text--primary" width="1000px">
         <v-row class="ma-0 pa-0">
-          <v-col cols="12" sm="4" class="ma-0 pa-0">난방(보일러 on) : {{SetStatus}}({{CurStatus}}) - {{curSchedullerTitle}}</v-col><v-col cols="12" sm="6" class="ma-0 pa-0" >시스템 시간 : {{systemTime}}</v-col>
+          <v-col class="ma-0 pa-0">난방설정({{SetStatus}})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;보일러가동({{CurStatus}})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;스케줄러({{curSchedullerTitle}})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;사용객실[오늘({{todayReserved}})/내일({{tomorrowReserved}})]<v-icon :loading="refreshLoading" :disabled="refreshLoading" @click="cmdFloorRadCmData()" style="cursor: pointer">refresh</v-icon>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{systemTime}}</v-col>
         </v-row>
       </div>
     <v-divider class='my-3'></v-divider>
@@ -26,6 +26,13 @@
         small
       >
         재실
+      </v-chip>
+      <v-chip
+        class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
+        color="purple lighten-3"
+        small
+      >
+        외출
       </v-chip>)&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;난방모드(&nbsp;
       <v-chip
         class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
@@ -152,7 +159,7 @@
                       </v-menu>
                       <div class="text-center ma-0 pa-0">
                         <v-chip
-                          v-if='room.ucRoomState === 0'
+                          v-if='room.ucRoomState === 0 && (room.ucTotalStatus % 2 === 0)'
                           class="d-inline-flex ma-0 mr-1 pa-0"
                           color="blue-grey lighten-4"
                           small>공실
@@ -165,7 +172,14 @@
                           예비
                         </v-chip>
                         <v-chip
-                          v-if='room.ucRoomState === 2'
+                          v-if='room.ucRoomState === 2 && (room.ucTotalStatus % 2 === 0)'
+                          class="d-inline-flex ma-0 mr-1 pa-0"
+                          color="purple lighten-3"
+                          small>
+                          외출
+                        </v-chip>
+                        <v-chip
+                          v-if='room.ucTotalStatus % 2 === 1'
                           class="d-inline-flex ma-0 mr-1 pa-0"
                           color="pink lighten-2"
                           small>
@@ -259,7 +273,7 @@
                       </v-menu>
                       <div class="text-center ma-0 pa-0">
                         <v-chip
-                          v-if='room.ucRoomState === 0'
+                          v-if='room.ucRoomState === 0 && (room.ucTotalStatus % 2 === 0)'
                           class="d-inline-flex ma-0 mr-1 pa-0"
                           color="blue-grey lighten-4"
                           small>공실
@@ -272,7 +286,14 @@
                           예비
                         </v-chip>
                         <v-chip
-                          v-if='room.ucRoomState === 2'
+                          v-if='room.ucRoomState === 2 && (room.ucTotalStatus % 2 === 0)'
+                          class="d-inline-flex ma-0 mr-1 pa-0"
+                          color="purple lighten-3"
+                          small>
+                          외출
+                        </v-chip>
+                        <v-chip
+                          v-if='room.ucTotalStatus % 2 === 1'
                           class="d-inline-flex ma-0 mr-1 pa-0"
                           color="pink lighten-2"
                           small>
@@ -366,7 +387,7 @@
                       </v-menu>
                       <div class="text-center ma-0 pa-0">
                         <v-chip
-                          v-if='room.ucRoomState === 0'
+                          v-if='room.ucRoomState === 0 && (room.ucTotalStatus % 2 === 0)'
                           class="d-inline-flex ma-0 mr-1 pa-0"
                           color="blue-grey lighten-4"
                           small>공실
@@ -379,7 +400,14 @@
                           예비
                         </v-chip>
                         <v-chip
-                          v-if='room.ucRoomState === 2'
+                          v-if='room.ucRoomState === 2 && (room.ucTotalStatus % 2 === 0)'
+                          class="d-inline-flex ma-0 mr-1 pa-0"
+                          color="purple lighten-3"
+                          small>
+                          외출
+                        </v-chip>
+                        <v-chip
+                          v-if='room.ucTotalStatus % 2 === 1'
                           class="d-inline-flex ma-0 mr-1 pa-0"
                           color="pink lighten-2"
                           small>
@@ -477,7 +505,7 @@
                   </v-menu>
                   <div class="text-center ma-0 pa-0">
                     <v-chip
-                      v-if='room.ucRoomState === 0'
+                      v-if='room.ucRoomState === 0 && (room.ucTotalStatus % 2 === 0)'
                       class="d-inline-flex ma-0 mr-1 pa-0"
                       color="blue-grey lighten-4"
                       small>공실
@@ -490,7 +518,14 @@
                       예비
                     </v-chip>
                     <v-chip
-                      v-if='room.ucRoomState === 2'
+                      v-if='room.ucRoomState === 2 && (room.ucTotalStatus % 2 === 0)'
+                      class="d-inline-flex ma-0 mr-1 pa-0"
+                      color="purple lighten-3"
+                      small>
+                      외출
+                    </v-chip>
+                    <v-chip
+                      v-if='room.ucTotalStatus % 2 === 1'
                       class="d-inline-flex ma-0 mr-1 pa-0"
                       color="pink lighten-2"
                       small>
@@ -584,7 +619,7 @@
                   </v-menu>
                   <div class="text-center ma-0 pa-0">
                     <v-chip
-                      v-if='room.ucRoomState === 0'
+                      v-if='room.ucRoomState === 0 && (room.ucTotalStatus % 2 === 0)'
                       class="d-inline-flex ma-0 mr-1 pa-0"
                       color="blue-grey lighten-4"
                       small>공실
@@ -597,7 +632,14 @@
                       예비
                     </v-chip>
                     <v-chip
-                      v-if='room.ucRoomState === 2'
+                      v-if='room.ucRoomState === 2 && (room.ucTotalStatus % 2 === 0)'
+                      class="d-inline-flex ma-0 mr-1 pa-0"
+                      color="purple lighten-3"
+                      small>
+                      외출
+                    </v-chip>
+                    <v-chip
+                      v-if='room.ucTotalStatus % 2 === 1'
                       class="d-inline-flex ma-0 mr-1 pa-0"
                       color="pink lighten-2"
                       small>
@@ -691,7 +733,7 @@
                   </v-menu>
                   <div class="text-center ma-0 pa-0">
                     <v-chip
-                      v-if='room.ucRoomState === 0'
+                      v-if='room.ucRoomState === 0 && (room.ucTotalStatus % 2 === 0)'
                       class="d-inline-flex ma-0 mr-1 pa-0"
                       color="blue-grey lighten-4"
                       small>공실
@@ -704,7 +746,14 @@
                       예비
                     </v-chip>
                     <v-chip
-                      v-if='room.ucRoomState === 2'
+                      v-if='room.ucRoomState === 2 && (room.ucTotalStatus % 2 === 0)'
+                      class="d-inline-flex ma-0 mr-1 pa-0"
+                      color="purple lighten-3"
+                      small>
+                      외출
+                    </v-chip>
+                    <v-chip
+                      v-if='room.ucTotalStatus % 2 === 1'
                       class="d-inline-flex ma-0 mr-1 pa-0"
                       color="pink lighten-2"
                       small>
@@ -1353,6 +1402,7 @@ export default {
     return {
       timer: null,
       refreshTimer: null,
+      buttonTimer: null,
       datas: [],
       CurStatus: 0,
       SetStatus: 0,
@@ -1420,12 +1470,15 @@ export default {
       graphTitle2: '상태 정보',
       curStatTitle: '-',
       curSettingTitle: '-',
-      curSchedullerTitle: '스케줄러 동작',
+      curSchedullerTitle: '동작',
       menuItems: ['create file', 'create directory'],
       systemTime: '-',
       beFirst: true,
       envDatas: [],
-      mergeDatas: []
+      mergeDatas: [],
+      todayReserved: 0,
+      tomorrowReserved: 0,
+      refreshLoading: false,
     }
   },
   methods: {
@@ -1446,16 +1499,38 @@ export default {
           console.error(e.message)
         })
     },
+    cmdFloorRadCmData () {
+      // axios.get(`http://localhost:3000/api/rooms`)
+      clearTimeout(this.buttonTimer)
+      this.refreshLoading = true;
+      axios.get(`${this.$apiRootPath}/rooms/cmdFloorRadCmData`)
+        .then((r) => {
+          // this.refreshLoading = false;
+          // this.getRoomsGroup()
+            this.buttonTimer = setTimeout(this.loadingButton, 3000)
+        })
+        .catch((e) => {
+          // this.refreshLoading = false;
+          alert(e.message)
+          console.error(e.message)
+        })
+      //
+    },
+    loadingButton () {
+      this.refreshLoading = false;
+    },
     getRoomsGroup () {
       // axios.get(`http://localhost:3000/api/rooms`)
       axios.get(`${this.$apiRootPath}/rooms/groupSchedule`)
         .then((r) => {
           this.groupDatas = JSON.parse(r.data)
           if (this.groupDatas.SchedulerState === 1) {
-            this.curSchedullerTitle = '스케줄러 동작'
+            this.curSchedullerTitle = '동작'
           } else {
-            this.curSchedullerTitle = '스케줄러 정지'
+            this.curSchedullerTitle = '정지'
           }
+          this.todayReserved = this.groupDatas.OccupiedRoomCnt
+          this.tomorrowReserved = this.groupDatas.ReservedRoomCnt
           // alert(JSON.stringify(this.curGroups))
         })
         .catch((e) => {
@@ -1600,6 +1675,8 @@ export default {
           var data8 = []
           var data9 = []
           var data10 = []
+          var data11 = []
+          var totalStat = 0
           var date = []
           var nCnt = 0
           this.graphTitle1 = '온도 정보'
@@ -1666,6 +1743,12 @@ export default {
             } else {
               data10.push(-2)
             }
+            if (this.datas[i].ucTotalStatus !== null) {
+              totalStat = (this.mergeDatas[i].room.ucTotalStatus % 2)
+              data11.push(totalStat+7)
+            } else {
+              data11.push(-2)
+            }
             if (this.time.value === 0 ){
               date.push(new Date((this.datas[i].m + (9 * 60 * 60)) * 1000).toISOString())
               nCnt = 3
@@ -1705,6 +1788,10 @@ export default {
             }
           ]
           this.series2 = [
+            {
+              name: '재실정보',
+              data: data11
+            },
             {
               name: '난방모드',
               data: data8
@@ -1781,6 +1868,8 @@ export default {
           var data8 = []
           var data9 = []
           var data10 = []
+          var data11 = []
+          var totalStat = 0
           var date = []
           var nCnt = 0
           this.graphTitle1 = '온도 정보'
@@ -1847,6 +1936,12 @@ export default {
             } else {
               data10.push(-2)
             }
+            if (this.datas[i].ucTotalStatus !== null) {
+              totalStat = (this.mergeDatas[i].room.ucTotalStatus % 2)
+              data11.push(totalStat+7)
+            } else {
+              data11.push(-2)
+            }
             if (this.time.value === 0 ){
               date.push(new Date((this.datas[i].m + (9 * 60 * 60)) * 1000).toISOString())
               nCnt = 3
@@ -1886,6 +1981,10 @@ export default {
             }
           ]
           this.series2 = [
+            {
+              name: '재실정보',
+              data: data11
+            },
             {
               name: '난방모드',
               data: data8
@@ -1957,6 +2056,18 @@ export default {
               {
                 formatter: function (y) {
                   if(typeof y !== "undefined") {
+                    if (y === 7/*12*/) {
+                      y = "공실"
+                    } else {
+                      y = "재실"
+                    }
+                  }
+                  return y;
+                }
+              },
+              {
+                formatter: function (y) {
+                  if(typeof y !== "undefined") {
                     if (y === 4/*12*/) {
                       y = "정지"
                     } else if (y === 5/*12*/) {
@@ -1993,8 +2104,8 @@ export default {
             },
             yaxis: {
               min: 0,
-              max: 6,
-              tickAmount:6,
+              max: 8,
+              tickAmount:8,
               labels: {
                 show: true,
                 align: 'right',
@@ -2019,6 +2130,12 @@ export default {
                       break;
                       case 6:
                         retVal = "A"
+                      break;
+                      case 7:
+                        retVal = "E"
+                      break;
+                      case 8:
+                        retVal = "I"
                       break;
                     }
                     return retVal;

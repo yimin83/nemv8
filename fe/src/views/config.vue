@@ -97,15 +97,15 @@
                             <v-list>
                               <v-card-title class="subheading font-weight-bold">바닥난방</v-card-title>
                               <v-divider></v-divider>
-                              <v-list-item>
+                              <v-list-item class='mb-n8 pb-0'>
                                 <v-textarea
-                                  name="input-3-3"
                                   filled
                                   auto-grow
                                   readonly
-                                  class="overflow-y-auto ma-0 pa-0"
-                                  max-height="130"
-                                  value="ManualHeating:1 (기본 설정), Scheduler:2 (기본 설정), PeakDemand:4 (최대 난방 수 조절), VariableTemp:8(가변온도), PreHeating:16 (사전난방), DemandResp:64 (부하시간대 온도조절)"
+                                  rows="1"
+                                  row-height="15"
+                                  label="제어옵션"
+                                  value="수동난방: 1, 스케쥴러: 2, 최대 난방수 조절: 4, 가변온도: 8, 사전난방: 16, 최적정지: 32, 부하시간대 온도 조절: 64"
                                 ></v-textarea>
                               </v-list-item>
                               <v-list-item>
@@ -147,6 +147,17 @@
                               <v-list-item>
                                 <v-list-item-title>예비객실 거주시간:</v-list-item-title>
                                 <v-list-item-title><v-text-field height=13 v-model="configs.tFloorRadConf.RR_StayHour"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item class='mb-n8 pb-0'>
+                                <v-textarea
+                                  filled
+                                  auto-grow
+                                  readonly
+                                  rows="1"
+                                  row-height="15"
+                                  label="구동옵션"
+                                  value="PD_Max_Strict: 1, RapidTroomCh: 2, CheckSetCurState: 4, CheckTotal: 8, OverHeating: 16, PeakCtrlLowLoad: 32, CheckState: 64"
+                                ></v-textarea>
                               </v-list-item>
                               <v-list-item>
                                 <v-list-item-title>구동옵션:</v-list-item-title>
@@ -211,15 +222,15 @@
                           <v-card-title class="subheading font-weight-bold">예열제어</v-card-title>
                           <v-divider></v-divider>
                           <v-list dense>
-                            <v-list-item>
+                            <v-list-item class='mb-n8 pb-0'>
                               <v-textarea
-                                name="input-3-3"
                                 filled
                                 auto-grow
                                 readonly
-                                height=100
-                                class='ma-0 pa-0'
-                                value="1:ML 2:온도기울기통계 4:난방룸 수 8:경부하시간"
+                                rows="1"
+                                row-height="15"
+                                label="PH_Opt"
+                                value="ML: 1, 온도기울기통계: 2, 난방가동객실수: 4, 경부하시간: 8 "
                               ></v-textarea>
                             </v-list-item>
                             <v-list-item>
@@ -318,15 +329,16 @@
                               <v-list dense>
                                 <v-card-title class="subheading font-weight-bold">기본설정</v-card-title>
                                 <v-divider></v-divider>
-                                <v-list-item>
+                                <v-list-item class='mb-n8 pb-0'>
                                   <v-textarea
-                                    name="input-3-3"
-                                    filled
-                                    auto-grow
-                                    readonly
-                                    height=100
-                                    class='ma-0 pa-0'
-                                    value="DamperCtrl:128 (외부환기비율), OccupantCtrl:256(재실자 판단)"
+                                  name="input-7-1"
+                                  filled
+                                  auto-grow
+                                  readonly
+                                  rows="1"
+                                  row-height="15"
+                                  label="제어옵션"
+                                  value="가변온도: 8, 외부환기비율: 128, 재실자 판단: 256"
                                   ></v-textarea>
                                 </v-list-item>
                                 <v-list-item>
@@ -361,9 +373,32 @@
                                   <v-list-item-title>CO2 측정주기(초):</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.CO2LoadPeriodSec"></v-text-field></v-list-item-title>
                                 </v-list-item>
+                                <v-list-item class='mb-n8 pb-0'>
+                                  <v-textarea
+                                    name="input-7-1"
+                                    filled
+                                    auto-grow
+                                    readonly
+                                    rows="1"
+                                    row-height="15"
+                                    label="비동작옵션"
+                                    value="NoCtrl_damper100: 1, NoCtrl_CheckHC: 2, NoCtrl_CheckFan 판단: 4"
+                                  ></v-textarea>
+                                </v-list-item>
                                 <v-list-item>
                                   <v-list-item-title>비동작 옵션:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.NoControlOption"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item class='mb-n8 pb-0'>
+                                  <v-textarea
+                                    filled
+                                    auto-grow
+                                    readonly
+                                    rows="1"
+                                    row-height="15"
+                                    label="스케쥴러옵션"
+                                    value="Sch_Damper: 1, Sch_Fan: 2, Sch_Temp: 4, Sch_Econo: 8"
+                                  ></v-textarea>
                                 </v-list-item>
                                 <v-list-item>
                                   <v-list-item-title>스케줄러 옵션:</v-list-item-title>
@@ -377,21 +412,6 @@
                               <v-card-title class="subheading font-weight-bold">댐퍼제어</v-card-title>
                               <v-divider></v-divider>
                               <v-list dense>
-                                <v-list-item>
-                                  <v-textarea
-                                    name="input-3-3"
-                                    filled
-                                    auto-grow
-                                    readonly
-                                    height=100
-                                    class='ma-0 pa-0'
-                                    value="Nt:1 Ctrl:2 CtrlNt:6 sch:8"
-                                  ></v-textarea>
-                                </v-list-item>
-                                <!-- <v-list-item>
-                                  <v-list-item-title>제어모드:</v-list-item-title>
-                                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.DamperCtrlMode"></v-text-field></v-list-item-title>
-                                </v-list-item> -->
                                 <v-list-item>
                                   <v-list-item-title>댐퍼설정값:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.Rdamp_set"></v-text-field></v-list-item-title>
@@ -412,6 +432,26 @@
                                   <v-list-item-title>댐퍼 비동작 옵션:</v-list-item-title>
                                   <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.Rdamp_noctrl_max"></v-text-field></v-list-item-title>
                                 </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>Tdiff_hc_decision:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.Tdiff_hc_decision"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>Rpm_deg:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.Rpm_degrade"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>Rdr_deg:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.Rdr_degrade"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>Rtemp_deg:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.Rtemp_degrade"></v-text-field></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item>
+                                  <v-list-item-title>Tair_supply_high:</v-list-item-title>
+                                  <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tRdamp.Tair_supply_high"></v-text-field></v-list-item-title>
+                                </v-list-item>
                               </v-list>
                             </v-card>
                           </v-col>
@@ -420,17 +460,6 @@
                             <v-card-title class="subheading font-weight-bold">재실자 제어</v-card-title>
                             <v-divider></v-divider>
                             <v-list dense>
-                              <v-list-item>
-                                <v-textarea
-                                  name="input-3-3"
-                                  filled
-                                  auto-grow
-                                  readonly
-                                  height=100
-                                  class='ma-0 pa-0'
-                                  value="Ntfy:1 CtrlFan:2"
-                                ></v-textarea>
-                              </v-list-item>
                               <v-list-item>
                                 <v-list-item-title>Control Mode:</v-list-item-title>
                                 <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tC02Conf.ControlMode"></v-text-field></v-list-item-title>
@@ -466,6 +495,33 @@
                               <v-list-item>
                                 <v-list-item-title>CO2_dec_time:</v-list-item-title>
                                 <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.tC02Conf.PPMco2_dec_time"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item class='mb-n8 pb-0'>
+                                <v-textarea
+                                  filled
+                                  auto-grow
+                                  readonly
+                                  rows="1"
+                                  row-height="15"
+                                  label="DecisionOpt"
+                                  value="Ntfy:1, CtrlFan:2"
+                                ></v-textarea>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>DecisionOpt:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.OccupantsDecisionOption"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>MaxCO2IncMF:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.MaxCO2IncMF"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>MaxCO2DecMF:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.MaxCO2DecMF"></v-text-field></v-list-item-title>
+                              </v-list-item>
+                              <v-list-item>
+                                <v-list-item-title>MaxCO2DecTimeMF:</v-list-item-title>
+                                <v-list-item-title class="align-end"><v-text-field height=13 v-model="configs.tSolBeachConf.MaxCO2DecTimeMF"></v-text-field></v-list-item-title>
                               </v-list-item>
                             </v-list>
                           </v-card>

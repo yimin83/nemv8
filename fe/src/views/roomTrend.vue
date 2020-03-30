@@ -253,6 +253,8 @@ export default {
           var data8 = []
           var data9 = []
           var data10 = []
+          var data11 = []
+          var totalStat = 0
           var date = []
           var nCnt = 0
           this.graphTitle1 = '온도 정보'
@@ -319,6 +321,12 @@ export default {
             } else {
               data10.push(-2)
             }
+            if (this.datas[i].ucTotalStatus !== null) {
+              totalStat = (this.mergeDatas[i].room.ucTotalStatus % 2)
+              data11.push(totalStat+7)
+            } else {
+              data11.push(-2)
+            }
             if (this.time.value === 0 ){
               date.push(new Date((this.datas[i].m + (9 * 60 * 60)) * 1000).toISOString())
               nCnt = 3
@@ -358,6 +366,10 @@ export default {
             }
           ]
           this.series2 = [
+            {
+              name: '재실정보',
+              data: data11
+            },
             {
               name: '난방모드',
               data: data8
@@ -430,6 +442,8 @@ export default {
           var data8 = []
           var data9 = []
           var data10 = []
+          var data11 = []
+          var totalStat = 0
           var date = []
           var nCnt = 0
           this.graphTitle1 = '온도 정보'
@@ -496,6 +510,12 @@ export default {
             } else {
               data10.push(-2)
             }
+            if (this.datas[i].ucTotalStatus !== null) {
+              totalStat = (this.mergeDatas[i].room.ucTotalStatus % 2)
+              data11.push(totalStat+7)
+            } else {
+              data11.push(-2)
+            }
             if (this.time.value === 0 ){
               date.push(new Date((this.datas[i].m + (9 * 60 * 60)) * 1000).toISOString())
               nCnt = 3
@@ -535,6 +555,10 @@ export default {
             }
           ]
           this.series2 = [
+            {
+              name: '재실정보',
+              data: data11
+            },
             {
               name: '난방모드',
               data: data8
@@ -606,6 +630,18 @@ export default {
               {
                 formatter: function (y) {
                   if(typeof y !== "undefined") {
+                    if (y === 7/*12*/) {
+                      y = "공실"
+                    } else {
+                      y = "재실"
+                    }
+                  }
+                  return y;
+                }
+              },
+              {
+                formatter: function (y) {
+                  if(typeof y !== "undefined") {
                     if (y === 4/*12*/) {
                       y = "정지"
                     } else if (y === 5/*12*/) {
@@ -642,8 +678,8 @@ export default {
             },
             yaxis: {
               min: 0,
-              max: 6,
-              tickAmount:6,
+              max: 8,
+              tickAmount:8,
               labels: {
                 show: true,
                 align: 'right',
@@ -668,6 +704,12 @@ export default {
                       break;
                       case 6:
                         retVal = "A"
+                      break;
+                      case 7:
+                        retVal = "E"
+                      break;
+                      case 8:
+                        retVal = "I"
                       break;
                     }
                     return retVal;

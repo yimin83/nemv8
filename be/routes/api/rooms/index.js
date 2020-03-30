@@ -47,7 +47,9 @@ const oam_msg_type_e = {
 	oam_get_floorRad_scheduler_time_config: 20,
 
 	oam_set_floorRad_scheduler_group_control: 21,
-	oam_get_floorRad_scheduler_group_control: 22
+	oam_get_floorRad_scheduler_group_control: 22,
+
+	oam_cmd_floorRad_cm_data:23
 }
 
 var client = net.getConnection()
@@ -68,49 +70,52 @@ var msgHeaderBuffer
 var fullBuffer
 
 var requestAuth = function () {
-	console.log("################ requestAuth start!!! ################")
+	console.log("["+(new Date().toISOString())+"]################ requestAuth start!!! ################")
 	nSeq = counter.get()
 	totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeEmsAuthReq_t()
 	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_Auth, Msg_Status_OK)
 	msgBuffer = net.makeEmsAuthReq_t(EMS_ID, EMS_PASSWORD, UserLevel, web_interface)
-	// console.log("############msgBuffer hex : " + msgBuffer.toString('hex'))
+	// console.log("["+(new Date().toISOString())+"]############msgBuffer hex : " + msgBuffer.toString('hex'))
 	var fullBuffer = new Buffer(totalSize)
 	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
 	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeEmsAuthReq_t())
-	console.log("################ requestAuth end!!! ################")
+	console.log("["+(new Date().toISOString())+"]################ requestAuth end!!! ################")
 	net.writeData(client, fullBuffer, null)
 }
 requestAuth()
 
 
 
-// var makeDataTout = function () {
-// 	console.log("################ makeDataTout start!!! ################")
-// 	mysqlDB.query("SELECT fTout, nLastUpdateTime FROM site_temp_record where nSiteIdx = 2", function(err, result, fields) {
-//     if(err) {
-//       console.log("############ makeDataTout error : " + err)
-//     }
-//     else{
-// 			if(result!=null) {
-// 				var cnt = 0
-// 				console.log("################ makeDataTout start!!! ################ result : " + result.length)
-// 				for ( var i = 0; i < result.length; i++ ) {
-// 					mysqlDB.query("UPDATE solbeach_tout_record SET fTout = ? WHERE FROM_UNIXTIME(nLastUpdateTime, '%Y %m %d %H:%i') = FROM_UNIXTIME(?, '%Y %m %d %H:%i')",
-// 					[ result[i].fTout, result[i].nLastUpdateTime], function (err, rows, fields) {
-// 						console.log(" makeDataTout cnt : " + (cnt++) + ", len : " + result.length)
-// 						if (err) {
-// 				        res.send('############ roomschedule update error : ' + err)
-// 				        console.log(err)
-// 				    }
-// 			    })
-// 				}
-// 				console.log("################ makeDataTout end!!! #######################")
-// 			}
-// 		}
-//   })
-// }
-requestAuth()
+var makeDataTout = function () {
+	console.log("["+(new Date().toISOString())+"]################ makeDataTout start!!! ################")
+	mysqlDB.query("SELECT fTout, nLastUpdateTime FROM site_temp_record where nSiteIdx = 2 AND nLastUpdateTime >= UNIX_TIMESTAMP('2020-03-01') AND nLastUpdateTime < UNIX_TIMESTAMP('2020-03-13')", function(err, result, fields) {
+    if(err) {
+      console.log("["+(new Date().toISOString())+"]############ makeDataTout error : " + err)
+    }
+    else{
+			if(result!=null) {
+				var cnt = 0
+				console.log("["+(new Date().toISOString())+"]################ makeDataTout start!!! ################ result : " + result.length)
+				for ( var i = 0; i < result.length; i++ ) {
+					mysqlDB.query("UPDATE solbeach_tout_record SET fTout = ? WHERE FROM_UNIXTIME(nLastUpdateTime, '%Y %m %d %H:%i') = FROM_UNIXTIME(?, '%Y %m %d %H:%i')",
+					[ result[i].fTout, result[i].nLastUpdateTime], function (err, rows, fields) {
+						console.log("["+(new Date().toISOString())+"] makeDataTout cnt : " + (cnt++) + ", len : " + result.length)
+						if (err) {
+				        res.send('############ roomschedule update error : ' + err)
+				        console.log(err)
+				    }
+			    })
+					// if( i == result.length-1) {
+					// 	console.log(" makeDataTout cnt : " + (i) + ", len : " + result.length)
+					// }
+				}
+				console.log("["+(new Date().toISOString())+"]################ makeDataTout end!!! #######################")
+			}
+		}
+  })
+}
 // makeDataTout()
+requestAuth()
 var dataLen = 0
 
 // const startCallback = Date.now()
@@ -120,7 +125,7 @@ var roomsArr = []
 var makeRsvRoomsArr = function () {
 	mysqlDB.query("SELECT * FROM floor_rad_room", function(err, result, fields) {
     if(err) {
-      console.log("############ makeRsvRoomsArr error : " + err)
+      console.log("["+(new Date().toISOString())+"]############ makeRsvRoomsArr error : " + err)
     }
     else{
 			if(result!=null) {
@@ -134,7 +139,7 @@ var makeRsvRoomsArr = function () {
 	// console.log(roomsArr)
 }
 var clearRsvRoomsArr = function (usRoomNo) {
-	// console.log("################ clearRsvRooms start!!! ################")
+	// console.log("["+(new Date().toISOString())+"]################ clearRsvRooms start!!! ################")
 	for ( var i = 0; i < roomsArr.length; i++ ) {
 		if(usRoomNo == roomsArr[i].usRoomNo) {
 			roomsArr[i].nCheckInOutEnable = 0
@@ -146,7 +151,7 @@ var clearRsvRoomsArr = function (usRoomNo) {
 }
 
 function refreshRsvRoomsArr (result, option, callback) {
-	// console.log("################ refreshRsvRoomsArr start!!! ################ result : " + JSON.stringify(result))
+	// console.log("["+(new Date().toISOString())+"]################ refreshRsvRoomsArr start!!! ################ result : " + JSON.stringify(result))
 	for ( var i = 0; i < roomsArr.length; i++) {
 		if(result.usRoomNo == roomsArr[i].usRoomNo) {
 			roomsArr[i].nCheckInOutEnable = result.nCheckInOutEnable
@@ -159,11 +164,11 @@ function refreshRsvRoomsArr (result, option, callback) {
 }
 
 function refreshRsvRooms (option, callback) {
-	// console.log("################ refreshRsvRooms start!!! ################")
+	// console.log("["+(new Date().toISOString())+"]################ refreshRsvRooms start!!! ################")
 	for ( var i = 0; i < roomsArr.length; i++) {
 		mysqlDB.query("SELECT * FROM roomsschedule where usRoomNo = ? ORDER BY nCheckInTime asc limit 1", [roomsArr[i].usRoomNo], function(err, result, fields) {
 	    if(err) {
-	      console.log("############ refreshRsvRooms error : " + err)
+	      console.log("["+(new Date().toISOString())+"]############ refreshRsvRooms error : " + err)
 	    }
 	    else{
 				if(result.length != 0  ) {
@@ -175,9 +180,9 @@ function refreshRsvRooms (option, callback) {
 }
 var processRsvRoom = function(result) {
 	for ( var i = 0; i < roomsArr.length; i++) {
-		//console.log("################ processRsvRoom start!!! ################ : "+roomsArr[i].usRoomNo+", roomsArr[i].nCheckInTime : " + roomsArr[i].nCheckInTime +", result.nCheckInTime : " + result.nCheckInTime )
+		//console.log("["+(new Date().toISOString())+"]################ processRsvRoom start!!! ################ : "+roomsArr[i].usRoomNo+", roomsArr[i].nCheckInTime : " + roomsArr[i].nCheckInTime +", result.nCheckInTime : " + result.nCheckInTime )
 		if(roomsArr[i].usRoomNo == result.usRoomNo && ((roomsArr[i].nCheckInTime == 0) || (roomsArr[i].nCheckInTime > result.nCheckInTime))) {
-			// console.log("############ cycle processRsvRoom : " + JSON.stringify(result))
+			// console.log("["+(new Date().toISOString())+"]############ cycle processRsvRoom : " + JSON.stringify(result))
 			roomsArr[i].nCheckInOutEnable = result.nCheckInOutEnable
 			roomsArr[i].nCheckInTime = result.nCheckInTime
 			roomsArr[i].nCheckOutTime = result.nCheckOutTime
@@ -198,15 +203,15 @@ var processRsvRoom = function(result) {
 	}
 }
 var checkRsvRoomsArr = function () {
-	// console.log("################ checkRsvRoomsArr start!!! ################")
+	// console.log("["+(new Date().toISOString())+"]################ checkRsvRoomsArr start!!! ################")
 	for ( var i = 0; i < roomsArr.length; i++) {
 		mysqlDB.query("SELECT * FROM roomsschedule where usRoomNo = ? ORDER BY nCheckInTime asc limit 1", [roomsArr[i].usRoomNo], function(err, result, fields) {
 	    if(err) {
-	      console.log("############ checkRsvRoomsArr error : " + err)
+	      console.log("["+(new Date().toISOString())+"]############ checkRsvRoomsArr error : " + err)
 	    }
 	    else{
 				if(result.length != 0  ) {
-					// console.log("################ checkRsvRoomsArr result not zero ################ : " + JSON.stringify(result[0]))
+					// console.log("["+(new Date().toISOString())+"]################ checkRsvRoomsArr result not zero ################ : " + JSON.stringify(result[0]))
 					processRsvRoom(result[0])
 				}
 				else{
@@ -225,32 +230,32 @@ const timerMap = new Map()
 
 
 router.get('/', function(req, res, next) {
-	console.log("############ get floor_rad_room ############")
+	console.log("["+(new Date().toISOString())+"]############ get floor_rad_room ############")
   mysqlDB.query("SELECT * FROM floor_rad_room", function(err, result, fields) {
     if(err) {
-      console.log("############ get floor_rad_room error : " + err)
+      console.log("["+(new Date().toISOString())+"]############ get floor_rad_room error : " + err)
     }
     else{
       res.json(result)
-      // console.log("############ get floor_rad_room from db res: " + JSON.stringify(result))
+      // console.log("["+(new Date().toISOString())+"]############ get floor_rad_room from db res: " + JSON.stringify(result))
     }
   })
 })
 
 router.get('/getSiteInfo', function(req, res, next) {
-	// console.log("############ getSiteInfo ############")
+	// console.log("["+(new Date().toISOString())+"]############ getSiteInfo ############")
   res.json({'siteInfo':config.siteInfo})
-	// console.log("############ get getSiteInfo from db res: " + JSON.stringify(config))
+	// console.log("["+(new Date().toISOString())+"]############ get getSiteInfo from db res: " + JSON.stringify(config))
 })
 
 router.get('/getTime', (req, res, next) => { // 수정
-	// console.log("############ get /getTime ")
+	// console.log("["+(new Date().toISOString())+"]############ get /getTime ")
 	var curTime = new Date().toISOString()
 	res.json({"curTime": curTime})
 })
 
 router.get('/groupSchedule', (req, res, next) => { // 수정
-	console.log("############ get /groupSchedule ")
+	console.log("["+(new Date().toISOString())+"]############ get /groupSchedule ")
 	dataLen = 0
 	msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_scheduler_group_control, dataLen, null)
 	totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
@@ -265,7 +270,7 @@ router.get('/groupSchedule', (req, res, next) => { // 수정
 })
 
 router.put('/groupSchedule', (req, res, next) => { // 수정
-	console.log("############ put groupSchedule values : " + JSON.stringify(req.body))
+	console.log("["+(new Date().toISOString())+"]############ put groupSchedule values : " + JSON.stringify(req.body))
 	var prioArr = []
 	var dataBuffer = new Buffer(net.makeFloorRadSchedulerGroupConfig_t())
 	dataBuffer = net.makeFloorRadSchedulerGroupConfig_t(
@@ -274,6 +279,8 @@ router.put('/groupSchedule', (req, res, next) => { // 수정
 		req.body.config.GroupIndex,
 		req.body.config.Use,
 		req.body.config.SchedulerState,
+		req.body.config.OccupiedRoomCnt,
+		req.body.config.ReservedRoomCnt,
 		req.body.config.Reserved
 	)
 	dataLen = net.getSizeFloorRadSchedulerGroupConfig_t()
@@ -290,7 +297,7 @@ router.put('/groupSchedule', (req, res, next) => { // 수정
 })
 
 router.get('/timeSchedule', (req, res, next) => { // 수정
-	console.log("############ get /timeSchedule ")
+	console.log("["+(new Date().toISOString())+"]############ get /timeSchedule ")
 	dataLen = 0
 	msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_scheduler_time_config, dataLen, null)
 	totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
@@ -305,7 +312,7 @@ router.get('/timeSchedule', (req, res, next) => { // 수정
 })
 
 router.put('/timeSchedule', (req, res, next) => { // 수정
-	console.log("############ put timeSchedule values : " + JSON.stringify(req.body))
+	console.log("["+(new Date().toISOString())+"]############ put timeSchedule values : " + JSON.stringify(req.body))
 	var prioArr = []
 	var dataBuffer = new Buffer(net.getSizeFloorRadSchedulerTimeConfig_t())
 	dataBuffer = net.makeFloorRadSchedulerTimeConfig_t(
@@ -335,7 +342,7 @@ router.put('/timeSchedule', (req, res, next) => { // 수정
 
 
 router.get('/roomPriority', (req, res, next) => { // 수정
-	console.log("############ get /roomPriority ")
+	console.log("["+(new Date().toISOString())+"]############ get /roomPriority ")
 	dataLen = 0
 	msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_priority, dataLen, null)
 	totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
@@ -350,7 +357,7 @@ router.get('/roomPriority', (req, res, next) => { // 수정
 })
 
 router.put('/roomStat', (req, res, next) => { // 수정
-	console.log("############ put roomStat values : " + JSON.stringify(req.body))
+	console.log("["+(new Date().toISOString())+"]############ put roomStat values : " + JSON.stringify(req.body))
 	var dataBuffer = new Buffer(net.getSizeFloorRadRoomState())
 
 	for (var key in req.body.roomNos) {
@@ -415,7 +422,7 @@ router.put('/roomStat', (req, res, next) => { // 수정
 		msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
 		dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
 		net.writeData(client, fullBuffer, nSeq)
-		// console.log("############ put roomStat (" + req.body.roomNos[key] + ") fullBuffer hex : " + fullBuffer.toString('hex'))
+		// console.log("["+(new Date().toISOString())+"]############ put roomStat (" + req.body.roomNos[key] + ") fullBuffer hex : " + fullBuffer.toString('hex'))
 	}
 	res.send({ success: true })
 })
@@ -423,7 +430,7 @@ router.put('/roomStat', (req, res, next) => { // 수정
 
 router.put('/ahusConfig', (req, res, next) => { // 수정
 	var dataBuffer = new Buffer(net.getSizeAhuZoneConfig_t())
-	console.log("############ put ahusConfig values : " + JSON.stringify(req.body))
+	console.log("["+(new Date().toISOString())+"]############ put ahusConfig values : " + JSON.stringify(req.body))
 	for (var key in req.body.ahuIdxs) {
 		for (var i in req.body.config) {
 			if (req.body.ahuIdxs[key] == req.body.config[i].AhuIndex){
@@ -465,7 +472,7 @@ router.put('/ahusConfig', (req, res, next) => { // 수정
 })
 
 router.put('/roomPrio', (req, res, next) => { // 수정
-	console.log("############ put roomPrio values : " + JSON.stringify(req.body))
+	console.log("["+(new Date().toISOString())+"]############ put roomPrio values : " + JSON.stringify(req.body))
 	var prioArr = []
 	for (var key in req.body.config) {
 		var room_priority_t = {
@@ -486,121 +493,121 @@ router.put('/roomPrio', (req, res, next) => { // 수정
 	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
 	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
 	dataBuffer.copy(fullBuffer, (net.getSizeEmsMsgHeader_t() +net.getSizeOamMsg_t()), 0, dataLen)
-	// console.log("############ put roomPrio fullBuffer hex : " + fullBuffer.toString('hex'))
+	// console.log("["+(new Date().toISOString())+"]############ put roomPrio fullBuffer hex : " + fullBuffer.toString('hex'))
 	net.writeData(client, fullBuffer, nSeq)
 	res.send({ success: true })
 })
 
 router.get('/getAlarm', (req, res, next) => { // 수정
-	// console.log("############ get /getAlarm ")
-  // console.log("######################### getRoomConfig ######################### ")
+	// console.log("["+(new Date().toISOString())+"]############ get /getAlarm ")
+  // console.log("["+(new Date().toISOString())+"]######################### getRoomConfig ######################### ")
 	res.json(net.getAlarm())
-	// console.log("############ get getAlarm from memory: " + JSON.stringify(net.getAlarm()))
+	// console.log("["+(new Date().toISOString())+"]############ get getAlarm from memory: " + JSON.stringify(net.getAlarm()))
 	if(net.getAlarm() != null) {
 		net.chkAlarm()
 	}
 })
 
 router.put('/roomStatTrend', (req, res, next) => { // 수정
-	console.log("############ put /roomStatTrend : " + JSON.stringify(req.body))
+	console.log("["+(new Date().toISOString())+"]############ put /roomStatTrend : " + JSON.stringify(req.body))
 	const startTime = req.body.startTime
 	const endTime = req.body.endTime
 	const time = req.body.time
 	var beforeTime = new Date().getTime();
-  // console.log("######################### getRoomConfig ######################### ")
+  // console.log("["+(new Date().toISOString())+"]######################### getRoomConfig ######################### ")
 	mysqlDB.query("SELECT * FROM ( SELECT CurTime DIV ? AS m, AVG(HeatingCnt) AS HeatingCnt, AVG(HeatingRoomCnt) AS HeatingRoomCnt, AVG(Tsurf_avg) AS Tsurf_avg, AVG(Troom_avg) AS Troom_avg, AVG(Tout) AS Tout FROM floor_rad_stat WHERE CurTime >= UNIX_TIMESTAMP(?) AND CurTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, startTime, endTime], function(err, result, fields) {
 		if(err) {
-			console.log("############ put /roomStatTrend error : " + err)
+			console.log("["+(new Date().toISOString())+"]############ put /roomStatTrend error : " + err)
 		}
 		else{
-			//console.log("############ get /roomStatTrend :" + JSON.stringify(result))
+			//console.log("["+(new Date().toISOString())+"]############ get /roomStatTrend :" + JSON.stringify(result))
 			res.json(result)
-      // console.log("############ get roomStatTrend from db res: " + JSON.stringify(result))
+      // console.log("["+(new Date().toISOString())+"]############ get roomStatTrend from db res: " + JSON.stringify(result))
 		}
 	})
 })
 
 router.put('/getRoomTrend', (req, res, next) => { // 수정
-	console.log("############ put /getRoomTrend : "+JSON.stringify(req.body))
+	console.log("["+(new Date().toISOString())+"]############ put /getRoomTrend : "+JSON.stringify(req.body))
 	const startTime = req.body.startTime
 	const endTime = req.body.endTime
 	const time = req.body.time
 	const usRoomNo = req.body.usRoomNo
 	var beforeTime = new Date().getTime();
-  // console.log("######################### getRoomConfig ######################### ")
+  // console.log("["+(new Date().toISOString())+"]######################### getRoomConfig ######################### ")
 	if(time != 0){
 		mysqlDB.query(
-			"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m, ucRoomState, ucSetStatus, ucCurStatus, usManHeatingMode, AVG(fTset) AS fTset, AVG(fTset_cur) AS fTset_cur, AVG(fTsurf_set) AS fTsurf_set, AVG(fTroom_set) AS fTroom_set, AVG(fTsurf_cur) AS fTsurf_cur, AVG(fTroom_cur) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
+			"SELECT * FROM ( SELECT nSetLastTime DIV ? AS m, ucRoomState, ucTotalStatus, ucSetStatus, ucCurStatus, usManHeatingMode, AVG(fTset) AS fTset, AVG(fTset_cur) AS fTset_cur, AVG(fTsurf_set) AS fTsurf_set, AVG(fTroom_set) AS fTroom_set, AVG(fTsurf_cur) AS fTsurf_cur, AVG(fTroom_cur) AS fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, usRoomNo, startTime, endTime], function(err, result, fields) {
 			if(err) {
-				console.log("############ put /getRoomTrend error : " + err)
+				console.log("["+(new Date().toISOString())+"]############ put /getRoomTrend error : " + err)
 			}
 			else{
-				// console.log("############ put /getRoomTrend :" + JSON.stringify(result))
+				// console.log("["+(new Date().toISOString())+"]############ put /getRoomTrend :" + JSON.stringify(result))
 				res.json(result)
-	      // console.log("############ get getRoomTrend from db res: " + JSON.stringify(result))
+	      // console.log("["+(new Date().toISOString())+"]############ get getRoomTrend from db res: " + JSON.stringify(result))
 			}
 		})
 	} else {
 		mysqlDB.query(
-			"SELECT nSetLastTime AS m, ucRoomState, ucSetStatus, ucCurStatus, usManHeatingMode, fTset, fTset_cur, fTsurf_set, fTroom_set, fTsurf_cur, fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) ORDER BY m DESC", [usRoomNo, startTime, endTime], function(err, result, fields) {
+			"SELECT nSetLastTime AS m, ucRoomState, ucTotalStatus, ucSetStatus, ucCurStatus, usManHeatingMode, fTset, fTset_cur, fTsurf_set, fTroom_set, fTsurf_cur, fTroom_cur FROM floor_rad_room_record WHERE usRoomNo = ? AND nSetLastTime >= UNIX_TIMESTAMP(?) AND nSetLastTime < UNIX_TIMESTAMP(?) ORDER BY m DESC", [usRoomNo, startTime, endTime], function(err, result, fields) {
 			if(err) {
-				console.log("############ put /getRoomTrend error : " + err)
+				console.log("["+(new Date().toISOString())+"]############ put /getRoomTrend error : " + err)
 			}
 			else{
-				// console.log("############ put /getRoomTrend :" + JSON.stringify(result))
+				// console.log("["+(new Date().toISOString())+"]############ put /getRoomTrend :" + JSON.stringify(result))
 				res.json(result)
-	      // console.log("############ get getRoomTrend from db res: " + JSON.stringify(result))
+	      // console.log("["+(new Date().toISOString())+"]############ get getRoomTrend from db res: " + JSON.stringify(result))
 			}
 		})
 	}
 })
 
 router.put('/solTrend', (req, res, next) => { // 수정
-	console.log("############ put /getSolTrend : "+JSON.stringify(req.body))
+	console.log("["+(new Date().toISOString())+"]############ put /getSolTrend : "+JSON.stringify(req.body))
 	const startTime = req.body.startTime
 	const endTime = req.body.endTime
 	const time = req.body.time
 	var beforeTime = new Date().getTime();
-  // console.log("######################### getRoomConfig ######################### ")
+  // console.log("["+(new Date().toISOString())+"]######################### getRoomConfig ######################### ")
 	mysqlDB.query("SELECT * FROM ( SELECT CurTime DIV ? AS m, AVG(HCOnCnt) AS HCOnCnt, AVG(HCOffCnt) AS HCOffCnt, AVG(VentilationCnt) AS VentilationCnt, AVG(Tzone) AS Tzone, AVG(Rdamp) AS Rdamp, AVG(PPMco2) AS PPMco2 FROM solbeach_stat WHERE CurTime >= UNIX_TIMESTAMP(?) AND CurTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m", [time, startTime, endTime], function(err, result, fields) {
 		if(err) {
-			console.log("############ put /solTrend error : " + err)
+			console.log("["+(new Date().toISOString())+"]############ put /solTrend error : " + err)
 		}
 		else{
-			// console.log("############ get /getSolTrend :" + JSON.stringify(result))
+			// console.log("["+(new Date().toISOString())+"]############ get /getSolTrend :" + JSON.stringify(result))
 			res.json(result)
-      // console.log("############ get solTrend from db res: " + JSON.stringify(result))
+      // console.log("["+(new Date().toISOString())+"]############ get solTrend from db res: " + JSON.stringify(result))
 		}
 	})
 })
 
 router.put('/siteEnv', (req, res, next) => { // 수정
-console.log("############ put /siteEnv req.body : " + JSON.stringify(req.body))
+console.log("["+(new Date().toISOString())+"]############ put /siteEnv req.body : " + JSON.stringify(req.body))
 	const startTime = req.body.startTime
 	const endTime = req.body.endTime
 	const time = req.body.time
 	var beforeTime = new Date().getTime();
-  // console.log("######################### getRoomConfig ######################### ")
+  // console.log("["+(new Date().toISOString())+"]######################### getRoomConfig ######################### ")
 	if(time != 0){
 		mysqlDB.query("SELECT * FROM ( SELECT  nLastUpdateTime DIV ? AS m, AVG(fTout) AS fTout FROM site_env_record WHERE nSiteIdx = 2 AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, startTime, endTime], function(err, result, fields) {
 			if(err) {
-				console.log("############ put /siteEnv error : " + err)
+				console.log("["+(new Date().toISOString())+"]############ put /siteEnv error : " + err)
 			}
 			else{
-				// console.log("############ get /solAhuTrend :" + JSON.stringify(result))
+				// console.log("["+(new Date().toISOString())+"]############ get /solAhuTrend :" + JSON.stringify(result))
 				res.json(result)
-	      // console.log("############ get siteEnv from db res: " + JSON.stringify(result))
+	      // console.log("["+(new Date().toISOString())+"]############ get siteEnv from db res: " + JSON.stringify(result))
 			}
 		})
 	} else {
 		mysqlDB.query("SELECT nLastUpdateTime AS m, fTout FROM site_env_record WHERE nSiteIdx = 2 AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) ORDER BY m DESC", [startTime, endTime], function(err, result, fields) {
 			if(err) {
-				console.log("############ put /siteEnv error : " + err)
+				console.log("["+(new Date().toISOString())+"]############ put /siteEnv error : " + err)
 			}
 			else{
-				// console.log("############ get /solAhuTrend :" + JSON.stringify(result))
+				// console.log("["+(new Date().toISOString())+"]############ get /solAhuTrend :" + JSON.stringify(result))
 				res.json(result)
-	      // console.log("############ get siteEnv from db res: " + JSON.stringify(result))
+	      // console.log("["+(new Date().toISOString())+"]############ get siteEnv from db res: " + JSON.stringify(result))
 			}
 		})
 
@@ -608,7 +615,7 @@ console.log("############ put /siteEnv req.body : " + JSON.stringify(req.body))
 })
 
 router.put('/solAhuTrend', (req, res, next) => { // 수정
-console.log("############ put /solAhuTrend req.body : " + JSON.stringify(req.body))
+console.log("["+(new Date().toISOString())+"]############ put /solAhuTrend req.body : " + JSON.stringify(req.body))
 	const ahuNo = req.body.ahuNo
 	const startTime = req.body.startTime
 	const endTime = req.body.endTime
@@ -617,23 +624,23 @@ console.log("############ put /solAhuTrend req.body : " + JSON.stringify(req.bod
 	if(time != 0){
 		mysqlDB.query("SELECT * FROM ( SELECT nLastUpdateTime DIV ? AS m, AVG(nKHAIValue) AS nKHAIValue, AVG(fData_damper_manual_set) AS fData_damper_manual_set, AVG(fData_temp_supply) AS fData_temp_supply, AVG(cState_supplay_fan) AS cState_supplay_fan, AVG(fData_hc_set_temp) AS fData_hc_set_temp, AVG(fData_temp_return) AS fData_temp_return, AVG(fData_damper_outer_set) AS fData_damper_outer_set, cMode_damper_auto_manual, AVG(nPPMco2_cur) AS nPPMco2_cur, cMode_manual_mode, cMode_auto_mode, cMode_auto_manual FROM solbeach_zone_record WHERE nZoneIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, ahuNo, startTime, endTime], function(err, result, fields) {
 			if(err) {
-				console.log("############ put /solAhuTrend error : " + err)
+				console.log("["+(new Date().toISOString())+"]############ put /solAhuTrend error : " + err)
 			}
 			else{
-				// console.log("############ get /solAhuTrend :" + JSON.stringify(result))
+				// console.log("["+(new Date().toISOString())+"]############ get /solAhuTrend :" + JSON.stringify(result))
 				res.json(result)
-	      // console.log("############ get solAhuTrend from db res: " + JSON.stringify(result))
+	      // console.log("["+(new Date().toISOString())+"]############ get solAhuTrend from db res: " + JSON.stringify(result))
 			}
 		})
 	} else {
 		mysqlDB.query("SELECT nLastUpdateTime AS m, nKHAIValue, fData_damper_manual_set, fData_temp_supply, cState_supplay_fan, fData_hc_set_temp, fData_temp_return, fData_damper_outer_set, cMode_damper_auto_manual, nPPMco2_cur, cMode_manual_mode, cMode_auto_mode, cMode_auto_manual FROM solbeach_zone_record WHERE nZoneIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) ORDER BY m DESC", [ahuNo, startTime, endTime], function(err, result, fields) {
 			if(err) {
-				console.log("############ put /solAhuTrend error : " + err)
+				console.log("["+(new Date().toISOString())+"]############ put /solAhuTrend error : " + err)
 			}
 			else{
-				// console.log("############ get /solAhuTrend :" + JSON.stringify(result))
+				// console.log("["+(new Date().toISOString())+"]############ get /solAhuTrend :" + JSON.stringify(result))
 				res.json(result)
-	      // console.log("############ get solAhuTrend from db res: " + JSON.stringify(result))
+	      // console.log("["+(new Date().toISOString())+"]############ get solAhuTrend from db res: " + JSON.stringify(result))
 			}
 		})
 	}
@@ -644,7 +651,7 @@ router.get('/emsSysConfig', function(req, res, next) {
   msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_sys_config, dataLen, null)
   totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
   nSeq = counter.get()
-	console.log("############ get emsSysConfig ########## nSeq : " + nSeq)
+	console.log("["+(new Date().toISOString())+"]############ get emsSysConfig ########## nSeq : " + nSeq)
   msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
   fullBuffer = new Buffer(totalSize)
   msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
@@ -655,8 +662,8 @@ router.get('/emsSysConfig', function(req, res, next) {
 })
 
 router.put('/emsSysConfig', (req, res, next) => { // 수정
-	// console.log("############ put emsSysConfig values : " + JSON.stringify(req.body))
-	console.log("############ put emsSysConfig req.body.configs : " + JSON.stringify(req.body.configs))
+	// console.log("["+(new Date().toISOString())+"]############ put emsSysConfig values : " + JSON.stringify(req.body))
+	console.log("["+(new Date().toISOString())+"]############ put emsSysConfig req.body.configs : " + JSON.stringify(req.body.configs))
 	var dataBuffer = new Buffer(net.getSizeEmsSysConf_t())
 	dataBuffer = net.makeEmsSysConf_t(
 		req.body.configs.PacketMinIntervalSec,
@@ -764,10 +771,18 @@ router.put('/emsSysConfig', (req, res, next) => { // 수정
 			NoControlOption:req.body.configs.tSolBeachConf.NoControlOption,
 			SchedulerOption:req.body.configs.tSolBeachConf.SchedulerOption,
 			Reserved1:req.body.configs.tSolBeachConf.Reserved1,
-			Reserved2:req.body.configs.tSolBeachConf.Reserved2,
+			ControlChangeHour:req.body.configs.tSolBeachConf.ControlChangeHour,
+			Tdiff_hc_decision:req.body.configs.tSolBeachConf.Tdiff_hc_decision,
+			OccupantsDecisionOption:req.body.configs.tSolBeachConf.OccupantsDecisionOption,
+			MaxCO2IncMF:req.body.configs.tSolBeachConf.MaxCO2IncMF,
+			MaxCO2DecMF:req.body.configs.tSolBeachConf.MaxCO2DecMF,
+			MaxCO2DecTimeMF:req.body.configs.tSolBeachConf.MaxCO2DecTimeMF,
 			Reserved3:req.body.configs.tSolBeachConf.Reserved3,
 			tRdamp:{
-				DamperCtrlMode:req.body.configs.tSolBeachConf.tRdamp.DamperCtrlMode,
+				Rpm_degrade:req.body.configs.tSolBeachConf.tRdamp.Rpm_degrade,
+				Rdr_degrade:req.body.configs.tSolBeachConf.tRdamp.Rdr_degrade,
+				Rtemp_degrade:req.body.configs.tSolBeachConf.tRdamp.Rtemp_degrade,
+				Tair_supply_high:req.body.configs.tSolBeachConf.tRdamp.Tair_supply_high,
 				Rdamp_set:req.body.configs.tSolBeachConf.tRdamp.Rdamp_set,
 				Rdamp_min:req.body.configs.tSolBeachConf.tRdamp.Rdamp_min,
 				Rdamp_max:req.body.configs.tSolBeachConf.tRdamp.Rdamp_max,
@@ -826,27 +841,27 @@ router.put('/emsSysConfig', (req, res, next) => { // 수정
 
 
 router.get('/ahusConfigDB', function(req, res, next) {
-	console.log("############ get ahusConfigDB ")
+	console.log("["+(new Date().toISOString())+"]############ get ahusConfigDB ")
   mysqlDB.query("SELECT * FROM ahu_info", function(err, result, fields) {
     if(err) {
-      console.log("############ get ahusConfigDB error : " + err)
+      console.log("["+(new Date().toISOString())+"]############ get ahusConfigDB error : " + err)
     }
     else{
       res.json(result)
-      // console.log("############ get ahusConfigDB from db res: " + JSON.stringify(result))
+      // console.log("["+(new Date().toISOString())+"]############ get ahusConfigDB from db res: " + JSON.stringify(result))
     }
   })
 })
 router.get('/zones', function(req, res, next) {
-	console.log("############ get zones ")
+	console.log("["+(new Date().toISOString())+"]############ get zones ")
   mysqlDB.query("SELECT * FROM solbeach_zone", function(err, result, fields) {
     if(err) {
-      console.log("############ get zones error : " + err)
+      console.log("["+(new Date().toISOString())+"]############ get zones error : " + err)
     }
     else{
 			// console.log(JSON.stringify(result))
       res.json(result)
-      // console.log("############ get zones from db res: " + JSON.stringify(result))
+      // console.log("["+(new Date().toISOString())+"]############ get zones from db res: " + JSON.stringify(result))
     }
   })
 })
@@ -859,7 +874,7 @@ router.get('/ahusConfig/:ahuIndex', function(req, res, next) {
 	var data = new Uint16Array(2)
 	data[0] = ahuIndex
   dataLen = 0
-	console.log("############ get /ahusConfig/:ahuIndex : " + ahuIndex)
+	console.log("["+(new Date().toISOString())+"]############ get /ahusConfig/:ahuIndex : " + ahuIndex)
   msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_solBeach_zone_config, dataLen, data)
   totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
   nSeq = counter.get()
@@ -873,20 +888,20 @@ router.get('/ahusConfig/:ahuIndex', function(req, res, next) {
 })
 
 var pushMap = function(seq, res, idx) {
-  // console.log("######################### checkMap ######################### ")
+  // console.log("["+(new Date().toISOString())+"]######################### checkMap ######################### ")
 	if(idx == 1) 	clearInterval(IntervalB)
 	if (idx <= 20) {
 		var json = seqMap.get(seq)
 	  if(json != '' && json != null) {
 			try {
-				// console.log("############ pushMap push!!!!!! ############# ")
+				// console.log("["+(new Date().toISOString())+"]############ pushMap push!!!!!! ############# ")
 	    	ahusConfigData.push(JSON.parse(seqMap.get(nSeq)))
 				// throw new Error('오류 핸들링 테스트')
 			}
 			catch (exception) {
-				console.log("############ exception!!!!!! ############# ")
+				console.log("["+(new Date().toISOString())+"]############ exception!!!!!! ############# ")
 				console.log(exception)
-				console.log("########################################## ")
+				console.log("["+(new Date().toISOString())+"]########################################## ")
 				return true
 			}
 			var data = new Uint16Array(2)
@@ -900,19 +915,19 @@ var pushMap = function(seq, res, idx) {
 		  msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
 		  msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
 		  net.writeData(client, fullBuffer, nSeq)
-			// console.log("############ pushMap len : " + ahusConfigData.length)
+			// console.log("["+(new Date().toISOString())+"]############ pushMap len : " + ahusConfigData.length)
 		  clearInterval(IntervalC)
 		  IntervalC = setInterval(pushMap, 10, nSeq, res, idx+1)
 	  }
 	} else {
 		clearInterval(IntervalC)
-		console.log("############ pushMap end len : " + ahusConfigData.length)
+		console.log("["+(new Date().toISOString())+"]############ pushMap end len : " + ahusConfigData.length)
 		res.json(ahusConfigData)
 	}
 
 }
 router.get('/damperConfig/:ahuIndex', function(req, res, next) {
-	console.log("############ get /damperConfig/:ahuIndex values : " + JSON.stringify(req.body))
+	console.log("["+(new Date().toISOString())+"]############ get /damperConfig/:ahuIndex values : " + JSON.stringify(req.body))
   const ahuIndex = req.params.ahuIndex
 	var data = new Uint16Array(2)
 	data[0] = ahuIndex
@@ -930,7 +945,7 @@ router.get('/damperConfig/:ahuIndex', function(req, res, next) {
 })
 
 router.put('/damperConfig', (req, res, next) => { // 수정
-	console.log("############ put damperConfig values : " + JSON.stringify(req.body))
+	console.log("["+(new Date().toISOString())+"]############ put damperConfig values : " + JSON.stringify(req.body))
 	var dataBuffer = new Buffer(net.getSizeDamperSchedulerConfig_t())
 	// "Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},
 	dataBuffer = net.makeDamperSchedulerConfig_t(
@@ -952,7 +967,7 @@ router.put('/damperConfig', (req, res, next) => { // 수정
 
 
 router.put('/cmdManualHeating', (req, res, next) => { // 수정
-	console.log("############ put cmdManualHeating values : " + JSON.stringify(req.body))
+	console.log("["+(new Date().toISOString())+"]############ put cmdManualHeating values : " + JSON.stringify(req.body))
 	var dataBuffer = new Buffer(net.getSizeManualHeating_t())
 	// "Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},{"Mode":0,"Hour":0,"Min":0,"Ratio":0},
 	dataBuffer = net.makeManualHeating_t(
@@ -973,7 +988,7 @@ router.put('/cmdManualHeating', (req, res, next) => { // 수정
 })
 
 router.put('/cmdRoomState', (req, res, next) => { // 수정
-	console.log("############ put cmdRoomState values : " + JSON.stringify(req.body))
+	console.log("["+(new Date().toISOString())+"]############ put cmdRoomState values : " + JSON.stringify(req.body))
   var data = new Uint16Array(2)
 	data[0] = req.body.RoomNo
 	data[1] = req.body.RoomState
@@ -993,7 +1008,7 @@ router.put('/cmdRoomState', (req, res, next) => { // 수정
 
 
 var checkMap = function(seq, res) {
-  // console.log("######################### checkMap ######################### ")
+  // console.log("["+(new Date().toISOString())+"]######################### checkMap ######################### ")
   var json = seqMap.get(seq)
   if(json != '' && json != null) {
 		try {
@@ -1012,23 +1027,10 @@ var checkMap = function(seq, res) {
     timerMap.delete(seq)
   }
 }
-router.get('/:usRoomNo', (req, res, next) => { // 수정
-  const usRoomNo = req.params.usRoomNo
-	// console.log("get room schedule : " + usRoomNo)
-    mysqlDB.query("SELECT * FROM RoomsSchedule where usRoomNo = ?", [usRoomNo], function(err, result, fields) {
-      if(err) {
-        console.log("###### /:usRoomNo error : " + err)
-      }
-      else{
-        res.json(result)
-	      // console.log("############ get /:usRoomNo from db res: " + JSON.stringify(result))
-      }
-    })
-})
 router.get('/getRoomConfig/:roomNo', (req, res, next) => { // 수정
 	const roomNo = req.params.roomNo
-	console.log("############ get /getRoomConfig/:roomNo  roomNo : "+roomNo+", body : " + JSON.stringify(req.body))
-  // console.log("######################### getRoomConfig ######################### ")
+	console.log("["+(new Date().toISOString())+"]############ get /getRoomConfig/:roomNo  roomNo : "+roomNo+", body : " + JSON.stringify(req.body))
+  // console.log("["+(new Date().toISOString())+"]######################### getRoomConfig ######################### ")
 	var data = new Uint16Array(2)
 	data[0] = roomNo
 	dataLen = 0
@@ -1173,7 +1175,7 @@ router.get('/getRoomStat/:roomNo', function(req, res, next) {
   const roomNo = req.params.roomNo
 	var data = new Uint16Array(2)
 	data[0] = roomNo
-	console.log("############ get /getRoomStat/:roomNo : " + roomNo)
+	console.log("["+(new Date().toISOString())+"]############ get /getRoomStat/:roomNo : " + roomNo)
   dataLen = 0
   msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_get_floorRad_room_state, dataLen, data)
   totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
@@ -1185,6 +1187,20 @@ router.get('/getRoomStat/:roomNo', function(req, res, next) {
   net.writeData(client, fullBuffer, nSeq)
   var timer = setInterval(checkMap, 100, nSeq, res)
 	timerMap.set(nSeq, timer)
+})
+
+router.get('/cmdFloorRadCmData', (req, res, next) => { // 수정
+	console.log("["+(new Date().toISOString())+"]############ put cmdFloorRadCmData start ! ")
+	dataLen = 0
+	msgBuffer = net.makeOamMsg_t(oam_msg_type_e.oam_cmd_floorRad_cm_data, dataLen, null)
+	totalSize = net.getSizeEmsMsgHeader_t() + net.getSizeOamMsg_t() + dataLen
+	nSeq = counter.get()
+	msgHeaderBuffer = net.makeEmsMsgHeader_t(EMS_PREAMBLE, EMS_VERSION, totalSize, 0, nSeq, Msg_Type_OAM, Msg_Status_OK)
+	fullBuffer = new Buffer(totalSize)
+	msgHeaderBuffer.copy(fullBuffer, 0, 0, net.getSizeEmsMsgHeader_t())
+	msgBuffer.copy(fullBuffer, net.getSizeEmsMsgHeader_t(), 0, net.getSizeOamMsg_t())
+	net.writeData(client, fullBuffer, nSeq)
+	res.send({ success: true })
 })
 
 exports.setSeqMap = function (seq, jsonData) {

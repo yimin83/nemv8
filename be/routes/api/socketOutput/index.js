@@ -47,7 +47,10 @@ const oam_msg_type_e = {
 	oam_get_floorRad_scheduler_time_config: 20,
 
 	oam_set_floorRad_scheduler_group_control: 21,
-	oam_get_floorRad_scheduler_group_control: 22
+	oam_get_floorRad_scheduler_group_control: 22,
+
+	oam_cmd_floorRad_cm_data:23
+
 };
 const MAX_ROOM_CNT = 91
 const EMS_PREAMBLE = 0x1B04
@@ -323,7 +326,11 @@ var processOAMmsg = function (data, pos, seq) {
 			 router.setSeqMap(seq, JSON.stringify(emsSysConfigDat))
 		 }
   }
-  else if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_cmd_floorRad_manual_heating && oamMsgDat.DataLen == manual_heating_msg_t.size()) {
+  else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_cmd_floorRad_manual_heating && oamMsgDat.DataLen == manual_heating_msg_t.size()) ||
+					(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_cmd_floorRad_cm_data)) {
+      console.log("oamMsgDat.OAMMsgType = " + oamMsgDa.OAMMsgType)
+  }
+  else if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_cmd_floorRad_cm_data && oamMsgDat.DataLen == manual_heating_msg_t.size()) {
       console.log("oamMsgDat.OAMMsgType = " + oamMsgDa.OAMMsgType)
   }
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_room_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_room_config)
@@ -391,8 +398,10 @@ var processOAMmsg = function (data, pos, seq) {
    && oamMsgDat.DataLen == floor_rad_scheduler_group_config_t.size()) {
     var floorRadSchedulerGroupDat = floor_rad_scheduler_group_config_t.decode(data, (proPos + oam_msg_t.size()), {endian:"BE"});
 		// console.log("floorRadSchedulerGroupDat : " + JSON.stringify(floorRadSchedulerGroupDat))
-		if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_group_control)
+		if(oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_group_control){
     	router.setSeqMap(seq, JSON.stringify(floorRadSchedulerGroupDat))
+			// console.log("floorRadSchedulerGroupDat : " + JSON.stringify(floorRadSchedulerGroupDat))
+		}
   }
   else if((oamMsgDat.OAMMsgType == oam_msg_type_e.oam_get_floorRad_scheduler_time_config || oamMsgDat.OAMMsgType == oam_msg_type_e.oam_set_floorRad_scheduler_time_config)
    && oamMsgDat.DataLen == floor_rad_scheduler_time_config_t.size()) {
@@ -841,7 +850,10 @@ net.getSizeFloorRadConf_t = function() {
 
 
 var damp_control_conf_t = new struct("damp_control_conf_t", [
-    "DamperCtrlMode", struct.int32(),
+	  "Rpm_degrade", struct.uint8(),
+	  "Rdr_degrade", struct.uint8(),
+	  "Rtemp_degrade", struct.uint8(),
+	  "Tair_supply_high", struct.uint8(),
     "Rdamp_set", struct.float32(),
     "Rdamp_min", struct.float32(),
     "Rdamp_max", struct.float32(),
@@ -850,11 +862,15 @@ var damp_control_conf_t = new struct("damp_control_conf_t", [
     "PPMco2_set", struct.int32(),
     "DamperAutoManual", struct.uint32()
 ]);
-net.makeDampControlConf_t = function( damperCtrlMode, rdamp_set, rdamp_min, rdamp_max, rdamp_ctrl_res, rdamp_noctrl_max, ppmCo2_set, damperAutoManual) {
+net.makeDampControlConf_t = function(
+	rpm_degrade, rdr_degrade, rtemp_degrade, tair_supply_high, rdamp_set, rdamp_min,
+	rdamp_max, rdamp_ctrl_res, rdamp_noctrl_max, ppmCo2_set, damperAutoManual) {
   var buffer = new Buffer(damp_control_conf_t.size());
   damp_control_conf_t.encode(buffer,0, {
-
-    DamperCtrlMode: damperCtrlMode,
+		Rpm_degrade: rpm_degrade,
+		Rdr_degrade: rdr_degrade,
+		Rtemp_degrade: rtemp_degrade,
+		Tair_supply_high: tair_supply_high,
     Rdamp_set: rdamp_set,
     Rdamp_min: rdamp_min,
     Rdamp_max: rdamp_max,
@@ -955,8 +971,13 @@ var solbeach_conf_t = new struct("solbeach_conf_t", [
 		"CO2LoadPeriodSec", struct.uint32(),
 		"NoControlOption", struct.uint32(),
 		"SchedulerOption", struct.uint32(),
-		"Reserved1", struct.uint32(),
-		"Reserved2", struct.uint32(),
+		"Reserved1", struct.uint16(),
+		"ControlChangeHour", struct.uint8(),
+		"Tdiff_hc_decision", struct.uint8(),
+		"OccupantsDecisionOption", struct.uint8(),
+		"MaxCO2IncMF", struct.uint8(),
+		"MaxCO2DecMF", struct.uint8(),
+		"MaxCO2DecTimeMF", struct.uint8(),
 		"Reserved3", struct.uint32(10),
     "tRdamp", damp_control_conf_t,
 	  "tPID", pid_control_conf_t,
@@ -967,8 +988,9 @@ var solbeach_conf_t = new struct("solbeach_conf_t", [
 ]);
 net.makeSolbeachConf_t = function(controlOption, zoneCnt, hcMode, tzone_set, tctrl_res,
 	telNumber0, telNumber1, telNumber2, telNumber3, telNumber4, co2LoadPeriodSec,
-	noControlOption, schedulerOption, reserved1, reserved2, reserved3, tRdamp, tPID,
-	tC02Conf, tVariableTemp, tEconomizerCycle, tNotify) {
+	noControlOption, schedulerOption, reserved1, controlChangeHour, tdiff_hc_decision,
+	occupantsDecisionOption, maxCO2IncMF, maxCO2DecMF, maxCO2DecTimeMF, reserved3,
+	tRdamp, tPID,tC02Conf, tVariableTemp, tEconomizerCycle, tNotify) {
   var buffer = new Buffer(solbeach_conf_t.size());
   solbeach_conf_t.encode(buffer,0, {
     ControlOption: controlOption,
@@ -985,7 +1007,12 @@ net.makeSolbeachConf_t = function(controlOption, zoneCnt, hcMode, tzone_set, tct
 		NoControlOption: noControlOption,
 		SchedulerOption: schedulerOption,
 		Reserved1: reserved1,
-		Reserved2: reserved2,
+		ControlChangeHour: controlChangeHour,
+		Tdiff_hc_decision: tdiff_hc_decision,
+		OccupantsDecisionOption: occupantsDecisionOption,
+		MaxCO2IncMF: maxCO2IncMF,
+		MaxCO2DecMF: maxCO2DecMF,
+		MaxCO2DecTimeMF: maxCO2DecTimeMF,
 		Reserved3: reserved3,
     tRdamp: tRdamp,
     tPID: tPID,
@@ -1488,9 +1515,11 @@ var floor_rad_scheduler_group_config_t = new struct("floor_rad_scheduler_group_c
     "GroupIndex", struct.uint8(MAX_ROOM_CNT),
     "Use", struct.uint8(MAX_ROOM_CNT),
     "SchedulerState", struct.uint8(),
-    "Reserved", struct.uint8(5)
+    "OccupiedRoomCnt", struct.uint8(),
+    "ReservedRoomCnt", struct.uint8(),
+    "Reserved", struct.uint8(3)
 ]);
-net.makeFloorRadSchedulerGroupConfig_t = function(startTime, endTime, groupIndex, use, schedulerState, reserved) {
+net.makeFloorRadSchedulerGroupConfig_t = function(startTime, endTime, groupIndex, use, schedulerState, occupiedRoomCnt, reservedRoomCnt, reserved) {
   var buffer = new Buffer(floor_rad_scheduler_group_config_t.size());
   floor_rad_scheduler_group_config_t.encode(buffer,0, {
 		StartTime: startTime,
@@ -1498,6 +1527,8 @@ net.makeFloorRadSchedulerGroupConfig_t = function(startTime, endTime, groupIndex
 		GroupIndex: groupIndex,
 		Use: use,
 		SchedulerState: schedulerState,
+		OccupiedRoomCnt: occupiedRoomCnt,
+		ReservedRoomCnt: reservedRoomCnt,
     Reserved: reserved
   },{endian:"BE"})
   return buffer;
