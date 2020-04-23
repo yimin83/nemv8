@@ -88,7 +88,7 @@ requestAuth()
 
 var makeDataTout = function () {
 	console.log("["+(new Date().toISOString())+"]################ makeDataTout start!!! ################")
-	mysqlDB.query("SELECT fTout, nLastUpdateTime FROM site_temp_record where nSiteIdx = 2 AND nLastUpdateTime >= UNIX_TIMESTAMP('2020-03-01') AND nLastUpdateTime < UNIX_TIMESTAMP('2020-03-13')", function(err, result, fields) {
+	mysqlDB.query("SELECT fHout, nLastUpdateTime FROM site_temp_record where nSiteIdx = 2 AND nLastUpdateTime >= UNIX_TIMESTAMP('2020-02-17 23:25:00') AND nLastUpdateTime < UNIX_TIMESTAMP('2020-03-01')", function(err, result, fields) {
     if(err) {
       console.log("["+(new Date().toISOString())+"]############ makeDataTout error : " + err)
     }
@@ -96,10 +96,11 @@ var makeDataTout = function () {
 			if(result!=null) {
 				var cnt = 0
 				console.log("["+(new Date().toISOString())+"]################ makeDataTout start!!! ################ result : " + result.length)
-				for ( var i = 0; i < result.length; i++ ) {
-					mysqlDB.query("UPDATE solbeach_tout_record SET fTout = ? WHERE FROM_UNIXTIME(nLastUpdateTime, '%Y %m %d %H:%i') = FROM_UNIXTIME(?, '%Y %m %d %H:%i')",
-					[ result[i].fTout, result[i].nLastUpdateTime], function (err, rows, fields) {
-						console.log("["+(new Date().toISOString())+"] makeDataTout cnt : " + (cnt++) + ", len : " + result.length)
+				var resultSize = result.length
+				for ( var i = 0; i < resultSize; i++ ) {
+					mysqlDB.query("UPDATE solbeach_tout_record SET fHout = ? WHERE nLastUpdateTime >= UNIX_TIMESTAMP('2020-01-01') AND nLastUpdateTime < UNIX_TIMESTAMP('2020-04-01') AND FROM_UNIXTIME(nLastUpdateTime, '%Y %m %d %H:%i') = FROM_UNIXTIME(?, '%Y %m %d %H:%i')",
+					[ result[i].fHout, result[i].nLastUpdateTime], function (err, rows, fields) {
+						console.log("["+(new Date().toISOString())+"] makeDataTout cnt : " + (cnt++) + ", len : " + resultSize)
 						if (err) {
 				        res.send('############ roomschedule update error : ' + err)
 				        console.log(err)
@@ -114,7 +115,7 @@ var makeDataTout = function () {
 		}
   })
 }
-// makeDataTout()
+//makeDataTout()
 requestAuth()
 var dataLen = 0
 
@@ -281,6 +282,8 @@ router.put('/groupSchedule', (req, res, next) => { // 수정
 		req.body.config.SchedulerState,
 		req.body.config.OccupiedRoomCnt,
 		req.body.config.ReservedRoomCnt,
+		req.body.config.SessionCnt,
+		req.body.config.SessionState,
 		req.body.config.Reserved
 	)
 	dataLen = net.getSizeFloorRadSchedulerGroupConfig_t()
@@ -589,23 +592,23 @@ console.log("["+(new Date().toISOString())+"]############ put /siteEnv req.body 
 	var beforeTime = new Date().getTime();
   // console.log("["+(new Date().toISOString())+"]######################### getRoomConfig ######################### ")
 	if(time != 0){
-		mysqlDB.query("SELECT * FROM ( SELECT  nLastUpdateTime DIV ? AS m, AVG(fTout) AS fTout FROM site_env_record WHERE nSiteIdx = 2 AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, startTime, endTime], function(err, result, fields) {
+		mysqlDB.query("SELECT * FROM ( SELECT  nLastUpdateTime DIV ? AS m, AVG(fTout) AS fTout FROM site_env_record WHERE nSiteIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) GROUP BY m ORDER BY m DESC) TMP ORDER BY m ", [time, config.siteInfo, startTime, endTime], function(err, result, fields) {
 			if(err) {
 				console.log("["+(new Date().toISOString())+"]############ put /siteEnv error : " + err)
 			}
 			else{
-				// console.log("["+(new Date().toISOString())+"]############ get /solAhuTrend :" + JSON.stringify(result))
+				// console.log("["+(new Date().toISOString())+"]############ get /siteEnv :" + JSON.stringify(result))
 				res.json(result)
 	      // console.log("["+(new Date().toISOString())+"]############ get siteEnv from db res: " + JSON.stringify(result))
 			}
 		})
 	} else {
-		mysqlDB.query("SELECT nLastUpdateTime AS m, fTout FROM site_env_record WHERE nSiteIdx = 2 AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) ORDER BY m DESC", [startTime, endTime], function(err, result, fields) {
+		mysqlDB.query("SELECT nLastUpdateTime AS m, fTout FROM site_env_record WHERE nSiteIdx = ? AND nLastUpdateTime >= UNIX_TIMESTAMP(?) AND nLastUpdateTime < UNIX_TIMESTAMP(?) ORDER BY m DESC", [config.siteInfo, startTime, endTime], function(err, result, fields) {
 			if(err) {
 				console.log("["+(new Date().toISOString())+"]############ put /siteEnv error : " + err)
 			}
 			else{
-				// console.log("["+(new Date().toISOString())+"]############ get /solAhuTrend :" + JSON.stringify(result))
+				// console.log("["+(new Date().toISOString())+"]############ get /siteEnv else :" + JSON.stringify(result))
 				res.json(result)
 	      // console.log("["+(new Date().toISOString())+"]############ get siteEnv from db res: " + JSON.stringify(result))
 			}

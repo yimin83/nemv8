@@ -3,7 +3,21 @@
     <v-divider class='my-3 mt-0 mb-3'></v-divider>
       <div class="text--primary" width="1000px">
         <v-row class="ma-0 pa-0">
-          <v-col class="ma-0 pa-0">난방설정({{SetStatus}})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;보일러가동({{CurStatus}})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;스케줄러({{curSchedullerTitle}})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;사용객실[오늘({{todayReserved}})/내일({{tomorrowReserved}})]<v-icon :loading="refreshLoading" :disabled="refreshLoading" @click="cmdFloorRadCmData()" style="cursor: pointer">refresh</v-icon>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{systemTime}}</v-col>
+          <v-col class="ma-0 pa-0">
+            <v-chip
+              v-if='sessionState === 4'
+              color='light-green accent-3'
+              class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
+              style="font-size:15px"
+              small>&nbsp;&nbsp;{{sessionCnt}}&nbsp;&nbsp;
+            </v-chip>
+            <v-chip
+              v-if='sessionState !== 4'
+              color='red accent-3'
+              class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
+              style="font-size:15px"
+              small>&nbsp;&nbsp;{{sessionCnt}}&nbsp;&nbsp;
+            </v-chip>&nbsp;&nbsp;&nbsp;난방설정({{SetStatus}})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;보일러가동({{CurStatus}})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;스케줄러({{curSchedullerTitle}})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;사용객실[오늘({{todayReserved}})/내일({{tomorrowReserved}})]<v-icon :loading="refreshLoading" :disabled="refreshLoading" @click="cmdFloorRadCmData()" style="cursor: pointer">refresh</v-icon>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{systemTime}}</v-col>
         </v-row>
       </div>
     <v-divider class='my-3'></v-divider>
@@ -1479,6 +1493,8 @@ export default {
       todayReserved: 0,
       tomorrowReserved: 0,
       refreshLoading: false,
+      sessionState: 0,
+      sessionCnt: 0,
     }
   },
   methods: {
@@ -1531,6 +1547,8 @@ export default {
           }
           this.todayReserved = this.groupDatas.OccupiedRoomCnt
           this.tomorrowReserved = this.groupDatas.ReservedRoomCnt
+          this.sessionState = this.groupDatas.SessionState
+          this.sessionCnt = this.groupDatas.SessionCnt
           // alert(JSON.stringify(this.curGroups))
         })
         .catch((e) => {

@@ -1517,9 +1517,11 @@ var floor_rad_scheduler_group_config_t = new struct("floor_rad_scheduler_group_c
     "SchedulerState", struct.uint8(),
     "OccupiedRoomCnt", struct.uint8(),
     "ReservedRoomCnt", struct.uint8(),
-    "Reserved", struct.uint8(3)
+    "SessionCnt", struct.uint8(),
+    "SessionState", struct.uint8(),
+    "Reserved", struct.uint8()
 ]);
-net.makeFloorRadSchedulerGroupConfig_t = function(startTime, endTime, groupIndex, use, schedulerState, occupiedRoomCnt, reservedRoomCnt, reserved) {
+net.makeFloorRadSchedulerGroupConfig_t = function(startTime, endTime, groupIndex, use, schedulerState, occupiedRoomCnt, reservedRoomCnt, reserved, sessionCnt, sessionState) {
   var buffer = new Buffer(floor_rad_scheduler_group_config_t.size());
   floor_rad_scheduler_group_config_t.encode(buffer,0, {
 		StartTime: startTime,
@@ -1529,6 +1531,8 @@ net.makeFloorRadSchedulerGroupConfig_t = function(startTime, endTime, groupIndex
 		SchedulerState: schedulerState,
 		OccupiedRoomCnt: occupiedRoomCnt,
 		ReservedRoomCnt: reservedRoomCnt,
+		SessionCnt: sessionCnt,
+		SessionState: sessionState,
     Reserved: reserved
   },{endian:"BE"})
   return buffer;
