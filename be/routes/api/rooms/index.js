@@ -617,6 +617,24 @@ console.log("["+(new Date().toISOString())+"]############ put /siteEnv req.body 
 	}
 })
 
+
+
+router.get('/getTemps', (req, res, next) => { // 수정
+console.log("["+(new Date().toISOString())+"]############ get /getTemps start !!!! ")
+	// console.log("["+(new Date().toISOString())+"]######################### getRoomConfig ######################### ")
+	mysqlDB.query("SELECT fTout, fHout, nForecastIcons FROM site_env WHERE nSiteIdx = 1 limit 1", function(err, result, fields) {
+		if(err) {
+			console.log("["+(new Date().toISOString())+"]############ get /getTemps error : " + err)
+		}
+		else{
+			// console.log("["+(new Date().toISOString())+"]############ get /getTemps :" + JSON.stringify(result))
+			res.json(result)
+			// console.log("["+(new Date().toISOString())+"]############ get siteEnv from db res: " + JSON.stringify(result))
+		}
+	})
+})
+
+
 router.put('/solAhuTrend', (req, res, next) => { // 수정
 console.log("["+(new Date().toISOString())+"]############ put /solAhuTrend req.body : " + JSON.stringify(req.body))
 	const ahuNo = req.body.ahuNo

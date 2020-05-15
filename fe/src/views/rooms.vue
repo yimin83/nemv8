@@ -1,109 +1,173 @@
 <template>
   <v-container grid-list-md>
-    <v-divider class='my-3 mt-0 mb-3'></v-divider>
-      <div class="text--primary" width="1000px">
-        <v-row class="ma-0 pa-0">
-          <v-col class="ma-0 pa-0">
-            <v-chip
-              v-if='sessionState === 4'
-              color='light-green accent-3'
-              class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
-              style="font-size:15px"
-              small>&nbsp;&nbsp;{{sessionCnt}}&nbsp;&nbsp;
-            </v-chip>
-            <v-chip
-              v-if='sessionState !== 4'
-              color='red accent-3'
-              class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
-              style="font-size:15px"
-              small>&nbsp;&nbsp;{{sessionCnt}}&nbsp;&nbsp;
-            </v-chip>&nbsp;&nbsp;&nbsp;난방설정({{SetStatus}})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;보일러가동({{CurStatus}})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;스케줄러({{curSchedullerTitle}})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;사용객실[오늘({{todayReserved}})/내일({{tomorrowReserved}})]<v-icon :loading="refreshLoading" :disabled="refreshLoading" @click="cmdFloorRadCmData()" style="cursor: pointer">refresh</v-icon>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{systemTime}}</v-col>
-        </v-row>
-      </div>
-    <v-divider class='my-3'></v-divider>
-    <v-layout row wrap class='ml-0'>
-      재실모드(&nbsp;
-      <v-chip
-        class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
-        color="blue-grey lighten-4"
-        small>공실
-      </v-chip>
-      <v-chip
-        class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
-        color="orange lighten-3"
-        small>
-        예비
-      </v-chip>
-      <v-chip
-        class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
-        color="pink lighten-2"
-        small
-      >
-        재실
-      </v-chip>
-      <v-chip
-        class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
-        color="purple lighten-3"
-        small
-      >
-        외출
-      </v-chip>)&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;난방모드(&nbsp;
-      <v-chip
-        class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
-        color="light-green accent-2"
-        small
-      >자동
-      </v-chip>
-      <v-chip
-        class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
-        color="indigo lighten-2"
-        small
-      >수동
-      </v-chip>
-      <v-chip
-        class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
-        color="blue-grey lighten-4"
-        small
-      >정지
-    </v-chip>)&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;보일러상태(&nbsp;
-      &nbsp;가동:
-      <v-chip
-        class="d-inline-flex ma-0 mr-1 ml-1 pa-1 font-weight-bold"
-        color="deep-orange lighten-2"
-        small
-      >&nbsp;
-      </v-chip>
-      &nbsp;가동준비:
-      <v-chip
-        class="d-inline-flex ma-0 mr-1 ml-1 pa-1 font-weight-bold"
-        color="deep-orange lighten-4"
-        small
-      >&nbsp;
-      </v-chip>
-      &nbsp;중지:
-      <v-chip
-        class="d-inline-flex ma-0 mr-1 ml-1 pa-1 font-weight-bold"
-        color="blue-grey lighten-5"
-        small
-      >&nbsp;
-      </v-chip>)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
-      <v-card
-        class="d-inline-flex ma-0 pa-0 font-weight-bold"
-        color="blue lighten-4"
-        outlined
-      >
-        <div class="text--primary">실내온도</div>
-      </v-card>
-      &nbsp;
-      <v-card
-        class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
-        color="brown lighten-4"
-        outlined
-      >
-        <div class="text--primary">바닥온도</div>
-      </v-card>
-    </v-layout>
-    <v-divider class='my-3'></v-divider>
+    <div class="text--primary" width="100%">
+      <v-row class="ma-0 pa-0 ml-n2">
+        <v-col class="ma-0 pa-0">
+          <!--<v-chip
+            :color="sessStatColor"
+            class="d-inline-flex ma-0 mr-1 pa-0 font-weight-bold"
+            style="font-size:15px"
+            small>&nbsp;&nbsp;{{sessionCnt}}&nbsp;&nbsp;
+          </v-chip>-->
+          <v-chip
+            :color="sessStatColor"
+            class="ma-0 pa-0 pr-1 pl-1 font-weight-bold"
+            style="font-size:15px"
+            title="세션정보"
+            label>{{sessionCnt}}
+          </v-chip>
+          <v-chip
+            class="ma-0 pa-0 pr-1 pl-1"
+            color="grey"
+            title="난방설정수"
+            label
+            outlined>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="#10ac84" enable-background="new 0 0 511.718 511.718" width="25" height="25" viewBox="0 0 511.718 511.718" class="svg" src="src/views/svg/fan_home.svg">
+              <path d="M233.272,0.002C104.443,0.002,0,104.443,0,233.271c0,128.835,104.435,233.272,233.272,233.272
+            		c128.833,0,233.274-104.445,233.274-233.272C466.546,104.438,362.105,0.002,233.272,0.002z M209.72,61.401
+            		c0-13.01,10.546-23.552,23.552-23.552c13.01,0,23.55,10.542,23.55,23.552V223.58c0,13.006-10.54,23.554-23.55,23.554
+            		c-13.006,0-23.552-10.548-23.552-23.554V61.401z M233.272,405.56c-91.006,0-165.046-74.05-165.046-165.05
+            		c0-59.038,31.897-113.976,83.247-143.338c11.289-6.45,25.677-2.533,32.141,8.756c6.458,11.289,2.533,25.678-8.756,32.138
+            		c-36.722,21.001-59.528,60.254-59.528,102.444c0,65.036,52.912,117.946,117.942,117.946c65.035,0,117.949-52.91,117.949-117.946
+            		c0-42.19-22.818-81.443-59.539-102.444c-11.293-6.452-15.216-20.843-8.756-32.138c6.464-11.297,20.847-15.214,32.147-8.756
+            		c51.347,29.362,83.246,84.284,83.246,143.338C398.32,331.51,324.287,405.56,233.272,405.56z"/>
+            </svg>
+          </v-chip>
+          <v-chip
+            class="ma-0 pa-0 pr-1 pl-1 font-weight-bold"
+            style="font-size:15px"
+            color="grey"
+            label
+            outlined>{{SetStatus}}
+          </v-chip>
+          <v-chip
+            class="ma-0 pa-0 pr-1 pl-1"
+            color="grey"
+            title="보일러가동수"
+            label
+            outlined>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="red" enable-background="new 0 0 511.718 511.718" width="25" height="25" viewBox="0 0 511.718 511.718" class="svg" src="src/views/svg/flame-active.svg">
+              <path d="M312.47,369.975c-10.807,7.864-21.116,8.395-27.276,7.709c-15.68-1.753-29.748-13.574-37.631-31.62
+          			c-5.29-12.109-8.104-28.372-4.929-45.535c-24.917,13.338-56.887,43.622-56.887,111.224c0,38.738,31.515,70.252,70.252,70.252
+          			s70.252-31.515,70.252-70.252C326.252,396.618,321.339,381.977,312.47,369.975z"/>
+              <path d="M465.097,290.749l-2.262-40.346l-24.63,32.035c-1.961,2.55-6.137,7.061-11.466,11.173
+          			c2.106-6.978,3.987-14.937,5.23-23.715c4.302-30.4,1.623-77.058-35.558-126.701l-15.601-20.83l-10.222,23.932
+          			c-11.792,27.606-30.871,41.455-48.603,35.283c-13.651-4.75-24.746-20.373-30.439-42.866c-5.31-20.979-8.396-57.897,7.065-114.636
+          			L305.169,0l-24.345,5.484c-82.12,18.5-137.457,76.817-160.03,168.647c-9.489,38.602-11.276,75.173-11.01,99.908
+          			c-19.404-15.687-29.093-29.451-29.346-29.815L61.955,217.07l-8.419,31.794c-4.627,17.475-6.972,35.553-6.972,53.732
+          			c0,114.62,92.556,208.012,206.852,209.404c-54.105-1.375-97.695-45.816-97.695-100.247c0-70.168,30.144-107.552,55.432-126.557
+          			c27.593-20.738,55.42-24.423,56.591-24.57l34.73-4.352l-20.784,28.164c-13.097,17.747-12.001,37.262-6.609,49.607
+          			c3.901,8.929,9.567,13.364,13.45,13.798c4.897,0.557,9.823-5.063,12.321-8.455l9.809-13.326l12.313,11.054
+          			c21.165,19.004,33.305,46.209,33.305,74.637c0,54.43-43.59,98.871-97.695,100.247c114.296-1.391,206.852-94.784,206.852-209.404
+          			C465.437,298.762,465.323,294.775,465.097,290.749z"/>
+            </svg>
+          </v-chip>
+          <v-chip
+            class="ma-0 pa-0 pr-1 pl-1 font-weight-bold"
+            style="font-size:15px"
+            color="grey"
+            label
+            outlined>{{CurStatus}}
+          </v-chip>
+          <v-chip
+            class="ma-0 pa-0 pr-1 pl-1"
+            color="grey"
+            title="스케쥴러상태"
+            label
+            outlined>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="#84817a" enable-background="new 0 0 511.718 511.718" width="25" height="25" viewBox="0 0 511.718 511.718" class="svg" src="src/views/svg/calendar.svg.svg">
+              <path d="M432,32h-32V16c0-8.844-7.156-16-16-16c-8.844,0-16,7.156-16,16v16h-64V16c0-8.844-7.156-16-16-16
+          			c-8.844,0-16,7.156-16,16v16h-64V16c0-8.844-7.156-16-16-16s-16,7.156-16,16v16h-64V16c0-8.844-7.156-16-16-16S80,7.156,80,16v16
+          			H48C21.532,32,0,53.532,0,80v384c0,8.844,7.156,16,16,16h264.377C265.011,457.098,256,429.591,256,400
+          			c0-79.406,64.594-144,144-144c29.591,0,57.098,9.011,80,24.377V80C480,53.532,458.468,32,432,32z M112,416H80
+          			c-8.844,0-16-7.156-16-16c0-8.844,7.156-16,16-16h32c8.844,0,16,7.156,16,16C128,408.844,120.844,416,112,416z M112,352H80
+          			c-8.844,0-16-7.156-16-16c0-8.844,7.156-16,16-16h32c8.844,0,16,7.156,16,16C128,344.844,120.844,352,112,352z M112,288H80
+          			c-8.844,0-16-7.156-16-16c0-8.844,7.156-16,16-16h32c8.844,0,16,7.156,16,16S120.844,288,112,288z M112,224H80
+          			c-8.844,0-16-7.156-16-16s7.156-16,16-16h32c8.844,0,16,7.156,16,16S120.844,224,112,224z M208,416h-32c-8.844,0-16-7.156-16-16
+          			c0-8.844,7.156-16,16-16h32c8.844,0,16,7.156,16,16C224,408.844,216.844,416,208,416z M208,352h-32c-8.844,0-16-7.156-16-16
+          			c0-8.844,7.156-16,16-16h32c8.844,0,16,7.156,16,16C224,344.844,216.844,352,208,352z M208,288h-32c-8.844,0-16-7.156-16-16
+          			c0-8.844,7.156-16,16-16h32c8.844,0,16,7.156,16,16S216.844,288,208,288z M208,224h-32c-8.844,0-16-7.156-16-16s7.156-16,16-16h32
+          			c8.844,0,16,7.156,16,16S216.844,224,208,224z M304,288h-32c-8.844,0-16-7.156-16-16c0-8.844,7.156-16,16-16h32
+          			c8.844,0,16,7.156,16,16S312.844,288,304,288z M304,224h-32c-8.844,0-16-7.156-16-16s7.156-16,16-16h32c8.844,0,16,7.156,16,16
+          			S312.844,224,304,224z M400,224h-32c-8.844,0-16-7.156-16-16s7.156-16,16-16h32c8.844,0,16,7.156,16,16S408.844,224,400,224z
+          			 M448,128H32V80c0-8.828,7.172-16,16-16h32v16c0,8.844,7.156,16,16,16s16-7.156,16-16V64h64v16c0,8.844,7.156,16,16,16
+          			s16-7.156,16-16V64h64v16c0,8.844,7.156,16,16,16c8.844,0,16-7.156,16-16V64h64v16c0,8.844,7.156,16,16,16c8.844,0,16-7.156,16-16
+          			V64h32c8.828,0,16,7.172,16,16V128z"/>
+                <path d="M400,288c-61.75,0-112,50.25-112,112s50.25,112,112,112s112-50.25,112-112S461.75,288,400,288z M464,416h-64
+            			c-8.844,0-16-7.156-16-16v-64c0-8.844,7.156-16,16-16c8.844,0,16,7.156,16,16v48h48c8.844,0,16,7.156,16,16
+            			C480,408.844,472.844,416,464,416z"/>
+            </svg>
+          </v-chip>
+          <v-chip
+            class="ma-0 pa-0 pr-1 pl-1 font-weight-bold"
+            style="font-size:15px"
+            color="grey"
+            label
+            outlined>{{curSchedullerTitle}}
+          </v-chip>
+        </v-col>
+        <v-col class="ma-0 pa-0">
+          <v-chip
+            class="ma-0 pa-0 pr-1 pl-1 font-weight-bold"
+            style="font-size:15px"
+            color="grey"
+            label
+            outlined>{{systemTime}}
+          </v-chip>
+        </v-col>
+        <v-col class="ma-0 pa-0" cols="auto">
+          <v-chip
+            :loading="refreshLoading"
+            :disabled="refreshLoading"
+            @click="cmdFloorRadCmData()"
+            style="cursor: pointer"
+            color="#4ecdc4"
+            class="ma-0 pa-0 pr-1 pl-1"
+            title="객실정보갱신"
+            label>
+            <font-awesome-icon :icon="['fas', 'sync-alt']" color="white"/>
+          </v-chip>
+          <v-chip
+            class="ma-0 pa-0 pr-1 pl-1 font-weight-bold"
+            color="grey"
+            text-color="white"
+            title="오늘사용객실"
+            label
+            outlined>
+            <v-img
+                :src="require('./svg/days.png')"
+                :aspect-ratio="undefined"
+            ><div class="ml-1 mt-2">{{todayTxt}}</div></v-img>
+          </v-chip>
+          <v-chip
+            class="ma-0 pa-0 pr-1 pl-1 font-weight-bold"
+            style="font-size:15px"
+            color="grey"
+            label
+            outlined>{{todayReserved}}
+          </v-chip>
+          <v-chip
+            class="ma-0 pa-0 pr-1 pl-1 font-weight-bold"
+            color="grey"
+            text-color="white"
+            title="내일사용객실"
+            label
+            outlined>
+            <v-img
+                :src="require('./svg/days.png')"
+                :aspect-ratio="undefined"
+            ><div class="ml-1 mt-2">{{tomorrowTxt}}</div></v-img>
+          </v-chip>
+          <v-chip
+            class="ma-0 pa-0 pr-1 pl-1 font-weight-bold"
+            style="font-size:15px"
+            color="grey"
+            label
+            outlined>{{tomorrowReserved}}
+          </v-chip>
+        </v-col>
+      </v-row>
+    </div>
     <v-layout row wrap>
       <v-flex
           text-xs-left
@@ -115,11 +179,11 @@
             cols="auto"
             class='ma-1 pa-0'
           >
-            <div v-if='room.usRoomNo === 201 || room.usRoomNo === 301 || room.usRoomNo === 501 || room.usRoomNo === 601'>
-              <v-row justify="center" class='ma-0 pa-0'>
+            <v-row justify="center" class='ma-0 pa-0'>
+              <div v-if='room.usRoomNo === 201 || room.usRoomNo === 301 || room.usRoomNo === 501 || room.usRoomNo === 601'>
                 <v-col class='ma-0 mr-2 pa-0'>
                   <v-card
-                    color='light-blue lighten-4'
+                    color='#337ab7'
                     class='ma-0 pa-0 font-weight-bold'
                     outlined
                     width='94px'
@@ -128,701 +192,122 @@
                     md=12
                     sm=3
                     xs=3>
-                    <v-card-text class="text-center font-weight-bold display-1 mt-4" >
+                    <v-card-text class="text-center white--text font-weight-bold display-1 mt-4">
                       {{(room.usRoomNo+'').substr(0, 1)}}F
                     </v-card-text>
                   </v-card>
                 </v-col>
-                <v-col class='ma-0 pa-0'>
-                  <v-card
-                    v-if='room.ucCurStatus === 1'
-                    color='deep-orange lighten-2'
-                    class='ma-0 pa-0 font-weight-bold'
-                    outlined
-                    width='94px'
-                    lg=12
-                    md=12
-                    sm=3
-                    xs=3>
-                    <v-card-text class="text-center ma-0 mt-1 mb-3 pa-0">
-                      <v-menu
-                        :value="showMenu"
-                        class="ma-0 pa-0"
-                      >
-                        <template v-slot:activator="{ on }" class="ma-0 pa-0">
-                          <div
-                            class="text--primary font-weight-bold title mb-1"
-                            style="cursor: pointer"
-                            v-on="on">
-                            <label v-if='((room.ucTotalStatus & 8) !== 0)' style="color: #78909C;cursor: pointer;">{{room.usRoomNo}}호</label>
-                            <label v-if='((room.ucTotalStatus & 8) === 0)' style="cursor: pointer;">{{room.usRoomNo}}호</label>
-                          </div>
-                        </template>
-                        <v-list>
-                          <v-list-item>
-                            <v-list-item-content>
-                              <v-list-item-subtitle style="cursor: pointer" @click="openRoomStat(room.usRoomNo)" >객실난방설정</v-list-item-subtitle>
-                            </v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>
-                              <v-list-item-subtitle style="cursor: pointer" @click="selectGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
-                            </v-list-item-content>
-                          </v-list-item>
-                        </v-list>
-                      </v-menu>
-                      <div class="text-center ma-0 pa-0">
-                        <v-chip
-                          v-if='room.ucRoomState === 0 && (room.ucTotalStatus % 2 === 0)'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="blue-grey lighten-4"
-                          small>공실
-                        </v-chip>
-                        <v-chip
-                          v-if='room.ucRoomState === 1'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="orange lighten-3"
-                          small>
-                          예비
-                        </v-chip>
-                        <v-chip
-                          v-if='room.ucRoomState === 2 && (room.ucTotalStatus % 2 === 0)'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="purple lighten-3"
-                          small>
-                          외출
-                        </v-chip>
-                        <v-chip
-                          v-if='room.ucTotalStatus % 2 === 1'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="pink lighten-2"
-                          small>
-                          재실
-                        </v-chip>
-                        <v-chip
-                          v-if='room.usManHeatingMode === 0'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="light-green accent-2"
-                          small>
-                          자동
-                        </v-chip>
-                        <v-chip
-                          v-if='room.usManHeatingMode === 1'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="indigo lighten-2"
-                          small>
-                          수동
-                        </v-chip>
-                        <v-chip
-                          v-if='room.usManHeatingMode === 2'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="blue-grey lighten-4"
-                          small>
-                          정지
-                        </v-chip>
-                      </div>
-                      <div class="text-center ma-0 pa-0">
-                        <v-card
-                          class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                          color="blue lighten-4"
-                          label="실내온도"
-                          small>
-                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{(!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
-                        </v-card>
-                        <v-card
-                          v-if='((room.ucTotalStatus & 16) !== 0)'
-                          class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                          color="brown lighten-4"
-                          label="바닥온도"
-                          small>
-                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
-                        </v-card>
-                        <v-card
-                          v-if='((room.ucTotalStatus & 16) === 0)'
-                          class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                          color="#eeeeee"
-                          label="바닥온도"
-                          small>
-                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
-                        </v-card>
-                      </div>
-                    </v-card-text>
-                  </v-card>
-                  <v-card
-                    v-if='(room.ucUserSetStatus === 1 && room.ucCurStatus === 0)'
-                    color='deep-orange lighten-4'
-                    class='ma-0 pa-0 font-weight-bold'
-                    outlined
-                    width='94px'
-                    lg=12
-                    md=12
-                    sm=3
-                    xs=3>
-                    <v-card-text class="text-center ma-0 mt-1 mb-3 pa-0">
-                      <v-menu
-                        :value="showMenu"
-                        class="ma-0 pa-0"
-                      >
-                        <template v-slot:activator="{ on }" class="ma-0 pa-0">
-                          <div
-                            class="text--primary font-weight-bold title mb-1"
-                            style="cursor: pointer"
-                            v-on="on">
-                            <label v-if='((room.ucTotalStatus & 8) !== 0)' style="color: #78909C;cursor: pointer;">{{room.usRoomNo}}호</label>
-                            <label v-if='((room.ucTotalStatus & 8) === 0)' style="cursor: pointer;">{{room.usRoomNo}}호</label>
-                          </div>
-                        </template>
-                        <v-list>
-                          <v-list-item>
-                            <v-list-item-content>
-                              <v-list-item-subtitle style="cursor: pointer" @click="openRoomStat(room.usRoomNo)" >객실난방설정</v-list-item-subtitle>
-                            </v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>
-                              <v-list-item-subtitle style="cursor: pointer" @click="selectGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
-                            </v-list-item-content>
-                          </v-list-item>
-                        </v-list>
-                      </v-menu>
-                      <div class="text-center ma-0 pa-0">
-                        <v-chip
-                          v-if='room.ucRoomState === 0 && (room.ucTotalStatus % 2 === 0)'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="blue-grey lighten-4"
-                          small>공실
-                        </v-chip>
-                        <v-chip
-                          v-if='room.ucRoomState === 1'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="orange lighten-3"
-                          small>
-                          예비
-                        </v-chip>
-                        <v-chip
-                          v-if='room.ucRoomState === 2 && (room.ucTotalStatus % 2 === 0)'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="purple lighten-3"
-                          small>
-                          외출
-                        </v-chip>
-                        <v-chip
-                          v-if='room.ucTotalStatus % 2 === 1'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="pink lighten-2"
-                          small>
-                          재실
-                        </v-chip>
-                        <v-chip
-                          v-if='room.usManHeatingMode === 0'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="light-green accent-2"
-                          small>
-                          자동
-                        </v-chip>
-                        <v-chip
-                          v-if='room.usManHeatingMode === 1'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="indigo lighten-2"
-                          small>
-                          수동
-                        </v-chip>
-                        <v-chip
-                          v-if='room.usManHeatingMode === 2'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="blue-grey lighten-4"
-                          small>
-                          정지
-                        </v-chip>
-                      </div>
-                      <div class="text-center ma-0 pa-0">
-                        <v-card
-                          class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                          color="blue lighten-4"
-                          label="실내온도"
-                          small>
-                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{(!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
-                        </v-card>
-                        <v-card
-                          v-if='((room.ucTotalStatus & 16) !== 0)'
-                          class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                          color="brown lighten-4"
-                          label="바닥온도"
-                          small>
-                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
-                        </v-card>
-                        <v-card
-                          v-if='((room.ucTotalStatus & 16) === 0)'
-                          class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                          color="#eeeeee"
-                          label="바닥온도"
-                          small>
-                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
-                        </v-card>
-                      </div>
-                    </v-card-text>
-                  </v-card>
-                  <v-card
-                    v-if='(!(room.ucUserSetStatus === 1 && room.ucCurStatus === 0) && (room.ucCurStatus === 0 || room.ucCurStatus === 2))'
-                    color='blue-grey lighten-5'
-                    class='ma-0 pa-0 font-weight-bold'
-                    outlined
-                    width='94px'
-                    lg=12
-                    md=12
-                    sm=3
-                    xs=3>
-                    <v-card-text class="text-center ma-0 mt-1 mb-3 pa-0">
-                      <v-menu
-                        :value="showMenu"
-                        class="ma-0 pa-0"
-                      >
-                        <template v-slot:activator="{ on }" class="ma-0 pa-0">
-                          <div
-                            class="text--primary font-weight-bold title mb-1"
-                            style="cursor: pointer"
-                            v-on="on">
-                            <label v-if='((room.ucTotalStatus & 8) !== 0)' style="color: #78909C;cursor: pointer;">{{room.usRoomNo}}호</label>
-                            <label v-if='((room.ucTotalStatus & 8) === 0)' style="cursor: pointer;">{{room.usRoomNo}}호</label>
-                          </div>
-                        </template>
-                        <v-list>
-                          <v-list-item>
-                            <v-list-item-content>
-                              <v-list-item-subtitle style="cursor: pointer" @click="openRoomStat(room.usRoomNo)" >객실난방설정</v-list-item-subtitle>
-                            </v-list-item-content>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-content>
-                              <v-list-item-subtitle style="cursor: pointer" @click="selectGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
-                            </v-list-item-content>
-                          </v-list-item>
-                        </v-list>
-                      </v-menu>
-                      <div class="text-center ma-0 pa-0">
-                        <v-chip
-                          v-if='room.ucRoomState === 0 && (room.ucTotalStatus % 2 === 0)'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="blue-grey lighten-4"
-                          small>공실
-                        </v-chip>
-                        <v-chip
-                          v-if='room.ucRoomState === 1'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="orange lighten-3"
-                          small>
-                          예비
-                        </v-chip>
-                        <v-chip
-                          v-if='room.ucRoomState === 2 && (room.ucTotalStatus % 2 === 0)'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="purple lighten-3"
-                          small>
-                          외출
-                        </v-chip>
-                        <v-chip
-                          v-if='room.ucTotalStatus % 2 === 1'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="pink lighten-2"
-                          small>
-                          재실
-                        </v-chip>
-                        <v-chip
-                          v-if='room.usManHeatingMode === 0'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="light-green accent-2"
-                          small>
-                          자동
-                        </v-chip>
-                        <v-chip
-                          v-if='room.usManHeatingMode === 1'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="indigo lighten-2"
-                          small>
-                          수동
-                        </v-chip>
-                        <v-chip
-                          v-if='room.usManHeatingMode === 2'
-                          class="d-inline-flex ma-0 mr-1 pa-0"
-                          color="blue-grey lighten-4"
-                          small>
-                          정지
-                        </v-chip>
-                      </div>
-                      <div class="text-center ma-0 pa-0">
-                        <v-card
-                          class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                          color="blue lighten-4"
-                          label="실내온도"
-                          small>
-                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTroom_cur === 255 || room.fTroom_cur === -1 ) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
-                        </v-card>
-                        <v-card
-                          v-if='((room.ucTotalStatus & 16) !== 0)'
-                          class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                          color="brown lighten-4"
-                          label="바닥온도"
-                          small>
-                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
-                        </v-card>
-                        <v-card
-                          v-if='((room.ucTotalStatus & 16) === 0)'
-                          class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                          color="#eeeeee"
-                          label="바닥온도"
-                          small>
-                          <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
-                        </v-card>
-                      </div>
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-              </v-row>
-            </div>
-            <div v-if='!(room.usRoomNo === 201 || room.usRoomNo === 301 || room.usRoomNo === 501 || room.usRoomNo === 601)'>
-              <v-card
-                v-if='room.ucCurStatus === 1'
-                color='deep-orange lighten-2'
-                class='ma-0 pa-0 font-weight-bold'
-                outlined
-                width='94px'
-                lg=12
-                md=12
-                sm=3
-                xs=3>
-                <v-card-text class="text-center ma-0 mt-1 mb-3 pa-0">
-                  <v-menu
-                    :value="showMenu"
-                    class="ma-0 pa-0"
-                  >
-                    <template v-slot:activator="{ on }" class="ma-0 pa-0">
-                      <div
-                        class="text--primary font-weight-bold title mb-1"
-                        style="cursor: pointer"
-                        v-on="on">
-                        <label v-if='((room.ucTotalStatus & 8) !== 0)' style="color: #78909C;cursor: pointer;">{{room.usRoomNo}}호</label>
-                        <label v-if='((room.ucTotalStatus & 8) === 0)' style="cursor: pointer;">{{room.usRoomNo}}호</label>
-                      </div>
-                    </template>
-                    <v-list>
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-subtitle style="cursor: pointer" @click="openRoomStat(room.usRoomNo)" >객실난방설정</v-list-item-subtitle>
-                        </v-list-item-content>
-                      </v-list-item>
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-subtitle style="cursor: pointer" @click="selectGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
-                        </v-list-item-content>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
-                  <div class="text-center ma-0 pa-0">
-                    <v-chip
-                      v-if='room.ucRoomState === 0 && (room.ucTotalStatus % 2 === 0)'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="blue-grey lighten-4"
-                      small>공실
-                    </v-chip>
-                    <v-chip
-                      v-if='room.ucRoomState === 1'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="orange lighten-3"
-                      small>
-                      예비
-                    </v-chip>
-                    <v-chip
-                      v-if='room.ucRoomState === 2 && (room.ucTotalStatus % 2 === 0)'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="purple lighten-3"
-                      small>
-                      외출
-                    </v-chip>
-                    <v-chip
-                      v-if='room.ucTotalStatus % 2 === 1'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="pink lighten-2"
-                      small>
-                      재실
-                    </v-chip>
-                    <v-chip
-                      v-if='room.usManHeatingMode === 0'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="light-green accent-2"
-                      small>
-                      자동
-                    </v-chip>
-                    <v-chip
-                      v-if='room.usManHeatingMode === 1'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="indigo lighten-2"
-                      small>
-                      수동
-                    </v-chip>
-                    <v-chip
-                      v-if='room.usManHeatingMode === 2'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="blue-grey lighten-4"
-                      small>
-                      정지
-                    </v-chip>
-                  </div>
-                  <div class="text-center ma-0 pa-0">
-                    <v-card
-                      class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                      color="blue lighten-4"
-                      label="실내온도"
-                      small>
-                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTroom_cur === 255 || room.fTroom_cur === -1 ) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
-                    </v-card>
-                    <v-card
-                      v-if='((room.ucTotalStatus & 16) !== 0)'
-                      class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                      color="brown lighten-4"
-                      label="바닥온도"
-                      small>
-                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
-                    </v-card>
-                    <v-card
-                      v-if='((room.ucTotalStatus & 16) === 0)'
-                      class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                      color="#eeeeee"
-                      label="바닥온도"
-                      small>
-                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
-                    </v-card>
-                  </div>
-                </v-card-text>
-              </v-card>
-              <v-card
-                v-if='(room.ucUserSetStatus === 1 && room.ucCurStatus === 0)'
-                color='deep-orange lighten-4'
-                class='ma-0 pa-0 font-weight-bold'
-                outlined
-                width='94px'
-                lg=12
-                md=12
-                sm=3
-                xs=3>
-                <v-card-text class="text-center ma-0 mt-1 mb-3 pa-0">
-                  <v-menu
-                    :value="showMenu"
-                    class="ma-0 pa-0"
-                  >
-                    <template v-slot:activator="{ on }" class="ma-0 pa-0">
-                      <div
-                        class="text--primary font-weight-bold title mb-1"
-                        style="cursor: pointer"
-                        v-on="on">
-                        <label v-if='((room.ucTotalStatus & 8) !== 0)' style="color: #78909C;cursor: pointer;">{{room.usRoomNo}}호</label>
-                        <label v-if='((room.ucTotalStatus & 8) === 0)' style="cursor: pointer;">{{room.usRoomNo}}호</label>
-                      </div>
-                    </template>
-                    <v-list>
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-subtitle style="cursor: pointer" @click="openRoomStat(room.usRoomNo)" >객실난방설정</v-list-item-subtitle>
-                        </v-list-item-content>
-                      </v-list-item>
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-subtitle style="cursor: pointer" @click="selectGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
-                        </v-list-item-content>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
-                  <div class="text-center ma-0 pa-0">
-                    <v-chip
-                      v-if='room.ucRoomState === 0 && (room.ucTotalStatus % 2 === 0)'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="blue-grey lighten-4"
-                      small>공실
-                    </v-chip>
-                    <v-chip
-                      v-if='room.ucRoomState === 1'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="orange lighten-3"
-                      small>
-                      예비
-                    </v-chip>
-                    <v-chip
-                      v-if='room.ucRoomState === 2 && (room.ucTotalStatus % 2 === 0)'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="purple lighten-3"
-                      small>
-                      외출
-                    </v-chip>
-                    <v-chip
-                      v-if='room.ucTotalStatus % 2 === 1'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="pink lighten-2"
-                      small>
-                      재실
-                    </v-chip>
-                    <v-chip
-                      v-if='room.usManHeatingMode === 0'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="light-green accent-2"
-                      small>
-                      자동
-                    </v-chip>
-                    <v-chip
-                      v-if='room.usManHeatingMode === 1'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="indigo lighten-2"
-                      small>
-                      수동
-                    </v-chip>
-                    <v-chip
-                      v-if='room.usManHeatingMode === 2'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="blue-grey lighten-4"
-                      small>
-                      정지
-                    </v-chip>
-                  </div>
-                  <div class="text-center ma-0 pa-0">
-                    <v-card
-                      class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                      color="blue lighten-4"
-                      label="실내온도"
-                      small>
-                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{(!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
-                    </v-card>
-                    <v-card
-                      v-if='((room.ucTotalStatus & 16) !== 0)'
-                      class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                      color="brown lighten-4"
-                      label="바닥온도"
-                      small>
-                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
-                    </v-card>
-                    <v-card
-                      v-if='((room.ucTotalStatus & 16) === 0)'
-                      class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                      color="#eeeeee"
-                      label="바닥온도"
-                      small>
-                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
-                    </v-card>
-                  </div>
-                </v-card-text>
-              </v-card>
-              <v-card
-                v-if='(!(room.ucUserSetStatus === 1 && room.ucCurStatus === 0) && (room.ucCurStatus === 0 || room.ucCurStatus === 2))'
-                color='blue-grey lighten-5'
-                class='ma-0 pa-0 font-weight-bold'
-                outlined
-                width='94px'
-                lg=12
-                md=12
-                sm=3
-                xs=3>
-                <v-card-text class="text-center ma-0 mt-1 mb-3 pa-0">
-                  <v-menu
-                    :value="showMenu"
-                    class="ma-0 pa-0"
-                  >
-                    <template v-slot:activator="{ on }" class="ma-0 pa-0">
-                      <div
-                        class="text--primary font-weight-bold title mb-1"
-                        style="cursor: pointer"
-                        v-on="on">
-                        <label v-if='((room.ucTotalStatus & 8) !== 0)' style="color: #78909C;cursor: pointer;">{{room.usRoomNo}}호</label>
-                        <label v-if='((room.ucTotalStatus & 8) === 0)' style="cursor: pointer;">{{room.usRoomNo}}호</label>
-                      </div>
-                    </template>
-                    <v-list>
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-subtitle style="cursor: pointer" @click="openRoomStat(room.usRoomNo)" >객실난방설정</v-list-item-subtitle>
-                        </v-list-item-content>
-                      </v-list-item>
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-subtitle style="cursor: pointer" @click="selectGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
-                        </v-list-item-content>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
-                  <div class="text-center ma-0 pa-0">
-                    <v-chip
-                      v-if='room.ucRoomState === 0 && (room.ucTotalStatus % 2 === 0)'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="blue-grey lighten-4"
-                      small>공실
-                    </v-chip>
-                    <v-chip
-                      v-if='room.ucRoomState === 1'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="orange lighten-3"
-                      small>
-                      예비
-                    </v-chip>
-                    <v-chip
-                      v-if='room.ucRoomState === 2 && (room.ucTotalStatus % 2 === 0)'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="purple lighten-3"
-                      small>
-                      외출
-                    </v-chip>
-                    <v-chip
-                      v-if='room.ucTotalStatus % 2 === 1'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="pink lighten-2"
-                      small>
-                      재실
-                    </v-chip>
-                    <v-chip
-                      v-if='room.usManHeatingMode === 0'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="light-green accent-2"
-                      small>
-                      자동
-                    </v-chip>
-                    <v-chip
-                      v-if='room.usManHeatingMode === 1'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="indigo lighten-2"
-                      small>
-                      수동
-                    </v-chip>
-                    <v-chip
-                      v-if='room.usManHeatingMode === 2'
-                      class="d-inline-flex ma-0 mr-1 pa-0"
-                      color="blue-grey lighten-4"
-                      small>
-                      정지
-                    </v-chip>
-                  </div>
-                  <div class="text-center ma-0 pa-0">
-                    <v-card
-                      class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                      color="blue lighten-4"
-                      label="실내온도"
-                      small>
-                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTroom_cur === 255 || room.fTroom_cur === -1 ) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></div>
-                    </v-card>
-                    <v-card
-                      v-if='((room.ucTotalStatus & 16) !== 0)'
-                      class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                      color="brown lighten-4"
-                      label="바닥온도"
-                      small>
-                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
-                    </v-card>
-                    <v-card
-                      v-if='((room.ucTotalStatus & 16) === 0)'
-                      class="d-inline-flex ma-0 mt-1 ml-1 mr-1 pa-0 "
-                      color="#eeeeee"
-                      label="바닥온도"
-                      small>
-                      <div class='body-2 font-weight-bold ma-0 pa-0'>{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></div>
-                    </v-card>
-                  </div>
-                </v-card-text>
-              </v-card>
-            </div>
+              </div>
+              <v-col class='ma-0 pa-0'>
+                <v-card
+                  :color='room.boilerColor'
+                  class='ma-0 pa-0 font-weight-bold'
+                  outlined
+                  width='94px'
+                  height='104px'
+                  lg=12
+                  md=12
+                  sm=3
+                  xs=3>
+                  <v-card-text class="text-center ma-0 mt-1 pa-0">
+                    <v-menu
+                      :value="showMenu"
+                      class="ma-0 pa-0"
+                    >
+                      <template v-slot:activator="{ on }" class="ma-0 pa-0">
+                        <div
+                          class="text--primary font-weight-bold title mb-1 border"
+                          style="cursor: pointer"
+                          v-on="on">
+                          <label style="cursor: pointer;">{{room.usRoomNo}}호</label>
+                          <label class="text--primary caption mb-1" style="cursor: pointer;">&nbsp;{{room.roomStatTxt}}</label>
+                        </div>
+                      </template>
+                      <v-list>
+                        <v-list-item>
+                          <v-list-item-content>
+                            <v-list-item-subtitle style="cursor: pointer" @click="openRoomStat(room.usRoomNo)" >객실난방설정</v-list-item-subtitle>
+                          </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item>
+                          <v-list-item-content>
+                            <v-list-item-subtitle style="cursor: pointer" @click="selectGraph(room.usRoomNo)">객실상태그래프</v-list-item-subtitle>
+                          </v-list-item-content>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+                    <div class="text-center white ma-0 pa-0">
+                      <v-chip
+                        class="ma-0 pa-0 pl-1"
+                        color="white"
+                        title="제어기센서 전원상태"
+                        label>
+                        <svg xmlns="http://www.w3.org/2000/svg" :fill="room.powerColor" enable-background="new 0 0 511.718 511.718" width="25" height="25" viewBox="0 0 511.718 511.718" class="svg" src="src/views/svg/power-icon.svg">
+                          <path d="M233.272,0.002C104.443,0.002,0,104.443,0,233.271c0,128.835,104.435,233.272,233.272,233.272
+                        		c128.833,0,233.274-104.445,233.274-233.272C466.546,104.438,362.105,0.002,233.272,0.002z M209.72,61.401
+                        		c0-13.01,10.546-23.552,23.552-23.552c13.01,0,23.55,10.542,23.55,23.552V223.58c0,13.006-10.54,23.554-23.55,23.554
+                        		c-13.006,0-23.552-10.548-23.552-23.554V61.401z M233.272,405.56c-91.006,0-165.046-74.05-165.046-165.05
+                        		c0-59.038,31.897-113.976,83.247-143.338c11.289-6.45,25.677-2.533,32.141,8.756c6.458,11.289,2.533,25.678-8.756,32.138
+                        		c-36.722,21.001-59.528,60.254-59.528,102.444c0,65.036,52.912,117.946,117.942,117.946c65.035,0,117.949-52.91,117.949-117.946
+                        		c0-42.19-22.818-81.443-59.539-102.444c-11.293-6.452-15.216-20.843-8.756-32.138c6.464-11.297,20.847-15.214,32.147-8.756
+                        		c51.347,29.362,83.246,84.284,83.246,143.338C398.32,331.51,324.287,405.56,233.272,405.56z"/>
+                        </svg>
+                      </v-chip>
+                      <v-chip
+                        class="ma-0 pa-0 pr-1 pl-1 font-weight-bold"
+                        color="white"
+                        title="난방모드"
+                        label>
+                        <v-img
+                            :src="require('./svg/'+room.roomModPath)"
+                            :aspect-ratio="undefined"
+                            width="22"
+                            height="22"
+                        ></v-img>
+                      </v-chip>
+                      <v-chip
+                        class="ma-0 pa-0 pr-1 pl-1 font-weight-bold"
+                        color="white"
+                        title="제어기센서 통신상태"
+                        label>
+                        <v-img
+                            :src="require('./svg/'+room.sensorPath)"
+                            :aspect-ratio="undefined"
+                            width="20"
+                            height="20"
+                        ></v-img>
+                      </v-chip>
+                    </div>
+                  </v-card-text>
+                  <v-card-text class="text-center ma-0 pa-0">
+                    <div class="text-center caption blue-grey lighten-5 ma-0 pa-0" style="height:30px">
+                      <v-chip
+                        class="ma-0 pa-0 caption mr-1"
+                        color="#eceff1"
+                        title="객실실내온도"
+                        label
+                        style="height:29px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="#797979" enable-background="new 0 0 511.718 511.718" width="15" height="25" viewBox="0 0 511.718 511.718" class="svg" src="src/views/svg/temperature.svg">
+                          <path d="m130.28125 344.214844v-139.960938c0-8.382812-6.796875-15.179687-15.179688-15.179687-8.382812 0-15.175781 6.796875-15.175781 15.179687v139.960938c-22.875 6.601562-39.65625 27.710937-39.65625 52.683594 0 30.234374 24.597657 54.832031 54.832031 54.832031 30.234376 0 54.835938-24.597657 54.835938-54.832031 0-24.972657-16.785156-46.082032-39.65625-52.683594zm-15.179688 77.160156c-13.496093 0-24.476562-10.980469-24.476562-24.476562 0-13.5 10.980469-24.480469 24.476562-24.480469 13.496094 0 24.480469 10.984375 24.480469 24.480469 0 13.496093-10.980469 24.476562-24.480469 24.476562zm0 0"/><path d="m188.351562 308.113281v-234.867187c0-40.386719-32.859374-73.246094-73.25-73.246094-40.386718 0-73.246093 32.859375-73.246093 73.246094v234.867187c-26.347657 21.773438-41.855469 54.398438-41.855469 88.785157 0 63.464843 51.636719 115.101562 115.101562 115.101562 63.46875 0 115.105469-51.636719 115.105469-115.101562 0-34.386719-15.511719-67.011719-41.855469-88.785157zm-73.25 173.53125c-46.726562 0-84.746093-38.019531-84.746093-84.746093 0-27.289063 13.273437-53.078126 35.507812-68.980469 3.984375-2.851563 6.347657-7.449219 6.347657-12.347657v-242.324218c0-23.648438 19.242187-42.890625 42.890624-42.890625 23.652344 0 42.894532 19.242187 42.894532 42.890625v242.324218c0 4.898438 2.363281 9.496094 6.347656 12.347657 22.234375 15.902343 35.507812 41.691406 35.507812 68.980469 0 46.726562-38.019531 84.746093-84.75 84.746093zm0 0"/>
+                        </svg>
+                        <span class="ma-0 pa-0 ml-n2 font-weight-bold">{{(!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )) ? room.fTroom_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTroom_cur === 255 || room.fTroom_cur === -1 )"><sup>o</sup>C</span></span>
+                      </v-chip>
+                      <v-chip
+                        class="ma-0 pa-0 caption"
+                        color="#eceff1"
+                        title="객실바닥온도"
+                        label
+                        style="height:29px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="#797979" enable-background="new 0 0 511.718 511.718" width="15" height="25" viewBox="0 0 511.718 511.718" class="svg" src="src/views/svg/heater.svg">
+                          <path d="m123.585938 105.929688h335.449218c29.25 0 52.964844-23.710938 52.964844-52.964844 0-29.25-23.714844-52.964844-52.964844-52.964844h-406.070312c-29.242188.0234375-52.9414065 23.722656-52.964844 52.964844v282.484375c.0234375 29.242187 23.722656 52.941406 52.964844 52.964843h105.933594c9.738281.027344 17.625 7.917969 17.652343 17.65625v52.964844h35.3125v-52.964844c-.023437-29.242187-23.722656-52.945312-52.964843-52.96875h-105.933594c-9.738282-.027343-17.625-7.914062-17.65625-17.652343v-282.484375c.03125-9.738282 7.917968-17.625 17.65625-17.65625h406.070312c9.71875.074218 17.582032 7.9375 17.65625 17.65625-.03125 9.738281-7.917968 17.628906-17.65625 17.65625h-335.449218c-29.234376.042968-52.921876 23.730468-52.964844 52.964844.023437 29.242187 23.722656 52.941406 52.964844 52.964843h335.449218c9.71875.070313 17.582032 7.933594 17.65625 17.65625-.03125 9.738281-7.917968 17.625-17.65625 17.65625h-335.449218c-29.234376.042969-52.921876 23.730469-52.964844 52.964844.023437 29.242187 23.722656 52.941406 52.964844 52.964844h335.449218c9.71875.070312 17.582032 7.933593 17.65625 17.65625-.03125 9.738281-7.917968 17.625-17.65625 17.652343h-97.105468c-29.242188.023438-52.941407 23.726563-52.964844 52.96875v52.964844h35.3125v-52.964844c.027344-9.738281 7.914062-17.628906 17.652344-17.65625h97.105468c29.234375-.042968 52.921875-23.730468 52.964844-52.964843-.023438-29.242188-23.722656-52.945313-52.964844-52.964844h-335.449218c-9.722657-.074219-17.585938-7.933594-17.65625-17.65625.03125-9.738281 7.917968-17.628906 17.65625-17.65625h335.449218c29.234375-.042969 52.921875-23.730469 52.964844-52.964844-.023438-29.242187-23.722656-52.941406-52.964844-52.964843h-335.449218c-9.722657-.070313-17.585938-7.933594-17.65625-17.65625.03125-9.738282 7.917968-17.625 17.65625-17.65625zm0 0"/><path d="m167.722656 467.863281h52.96875c9.75 0 17.652344 7.902344 17.652344 17.652344v8.828125c0 9.75-7.902344 17.65625-17.652344 17.65625h-52.96875c-9.75 0-17.652344-7.90625-17.652344-17.65625v-8.828125c0-9.75 7.902344-17.652344 17.652344-17.652344zm0 0"/><path d="m300.136719 467.863281h52.964843c9.753907 0 17.65625 7.902344 17.65625 17.652344v8.828125c0 9.75-7.902343 17.65625-17.65625 17.65625h-52.964843c-9.75 0-17.652344-7.90625-17.652344-17.65625v-8.828125c0-9.75 7.902344-17.652344 17.652344-17.652344zm0 0"/>
+                        </svg>
+                        <span class="ma-0 pa-0 ml-1 font-weight-bold">{{!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 ) ? room.fTsurf_cur.toFixed(0) : '&nbsp;&nbsp;-&nbsp;&nbsp;'}}<span v-if="!(room.fTsurf_cur === 255 || room.fTsurf_cur === -1 )"><sup>o</sup>C</span></span>
+                      </v-chip>
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
           </v-col>
         </v-row>
       </v-flex>
@@ -1438,6 +923,8 @@ export default {
       endMenu:false,
       endDate: this.$moment(new Date().toISOString()).format('YYYY-MM-DD'),
       endTime: this.$moment(new Date().toISOString()).format('HH:mm'),
+      todayTxt: this.$moment(new Date().toISOString()).format('DD'),
+      tomorrowTxt: this.$moment(new Date().toISOString()).add(1,'days').format('DD'),
       bePriShow: false,
       beAll: false,
       settingTitle: '',
@@ -1493,8 +980,9 @@ export default {
       todayReserved: 0,
       tomorrowReserved: 0,
       refreshLoading: false,
-      sessionState: 0,
       sessionCnt: 0,
+      sessStatColor: '#48bcb4',
+      powerColor: '#ddd'
     }
   },
   methods: {
@@ -1547,7 +1035,11 @@ export default {
           }
           this.todayReserved = this.groupDatas.OccupiedRoomCnt
           this.tomorrowReserved = this.groupDatas.ReservedRoomCnt
-          this.sessionState = this.groupDatas.SessionState
+          if(this.groupDatas.SessionState === 4){
+            this.sessStatColor = '#48bcb4'
+          } else {
+            this.sessStatColor = 'red accent-3'
+          }
           this.sessionCnt = this.groupDatas.SessionCnt
           // alert(JSON.stringify(this.curGroups))
         })
@@ -1560,6 +1052,13 @@ export default {
       // axios.get(`http://localhost:3000/api/rooms`)
       axios.get(`${this.$apiRootPath}rooms`)
         .then((r) => {
+          var boilerColor = 'deep-orange lighten-2'
+          var roomStatTxt = '공실'
+          var roomModColor = 'light-green accent-2'
+          var roomModTxt = '자동'
+          var roomModPath = 'auto_Ja.png'
+          var sensorPath = 'rs_status_n_e.png'
+          var powerColor = '#ddd'
           if (this.roomsOldStats.length !== 0) {
             for (var key in this.roomsOldStats) {
               if( this.roomsOldStats[key].ucRoomState !==  r.data[key].ucRoomState ) {
@@ -1587,6 +1086,57 @@ export default {
           } else {
             this.roomsStats = r.data
           }
+
+          for (var key in this.roomsStats) {
+            if(this.roomsStats[key].ucCurStatus === 1){
+              boilerColor = 'deep-orange lighten-2'
+            } else if (this.roomsStats[key].ucUserSetStatus === 1 && this.roomsStats[key].ucCurStatus === 0){
+              boilerColor = 'deep-orange lighten-4'
+            }else if (
+              !(this.roomsStats[key].ucUserSetStatus === 1 && this.roomsStats[key].ucCurStatus === 0)
+              && (this.roomsStats[key].ucCurStatus === 0 || this.roomsStats[key].ucCurStatus === 2)){
+              boilerColor = 'blue-grey lighten-5'
+            }
+            this.roomsStats[key]['boilerColor'] = boilerColor
+            if (this.roomsStats[key].ucRoomState === 0 && (this.roomsStats[key].ucTotalStatus % 2 === 0)) {
+              roomStatTxt = '공실'
+            } else if (this.roomsStats[key].ucRoomState === 1){
+              roomStatTxt = '예비'
+            } else if (this.roomsStats[key].ucRoomState === 2 && (this.roomsStats[key].ucTotalStatus % 2 === 0)) {
+              roomStatTxt = '외출'
+            } else if (this.roomsStats[key].ucTotalStatus % 2 === 1){
+              roomStatTxt = '재실'
+            }
+            this.roomsStats[key]['roomStatTxt'] = roomStatTxt
+
+            if (this.roomsStats[key].usManHeatingMode === 0) {
+              roomModPath = 'auto_Ja.png'
+            } else if (this.roomsStats[key].usManHeatingMode === 1) {
+              roomModPath = 'manual_Su.png'
+            } else if (this.roomsStats[key].usManHeatingMode === 2) {
+              roomModPath = 'stop_Jung.png'
+            }
+            this.roomsStats[key]['roomModPath'] = roomModPath
+
+            if ( ((this.roomsStats[key].ucTotalStatus & 4) !== 0) &&
+                 ((this.roomsStats[key].ucTotalStatus & 8) !== 0) ) {
+              sensorPath = 'rs_status_a_e.png'
+            } else if ( (this.roomsStats[key].ucTotalStatus & 4) !== 0 ){
+              sensorPath = 'rs_status_t_e.png'
+            } else if ( (this.roomsStats[key].ucTotalStatus & 8) !== 0 ) {
+              sensorPath = 'rs_status_b_e.png'
+            }  else {
+              sensorPath = 'rs_status_n_e.png'
+            }
+            this.roomsStats[key]['sensorPath'] = sensorPath
+            if ( (this.roomsStats[key].ucTotalStatus & 16) !== 0) {
+              powerColor = '#10ac84'
+            } else {
+              powerColor = '#ddd'
+            }
+            this.roomsStats[key]['powerColor'] = powerColor
+          }
+
           this.CurStatus = 0
           this.SetStatus = 0
           for (var i = 0; i < this.roomsStats.length; i++) {
