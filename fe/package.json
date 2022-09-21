@@ -40,7 +40,7 @@
     "vue-svg-filler": "^1.0.6",
     "vue-svg-loader": "^0.16.0",
     "vue-sweet-calendar": "^0.3.1",
-    "vuetify": "^2.0.11",
+    "vuetify": "^2.6.10",
     "vuetify-dialog": "^2.0.0-rc.0",
     "vuex": "^3.0.1",
     "ws": "^7.1.2",
